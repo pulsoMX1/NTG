@@ -91,12 +91,11 @@
 
             document.getElementById('cargandoMuro').style.display = 'none';
             const adgemAppId = "32676";
-            
-            // INYECCIÓN CORREGIDA CON LA URL OFICIAL DE ADUNITS Y VARIABLES EXACTAS
+            // INYECCIÓN CORREGIDA CON LA URL OFICIAL WEB DE ADGEM
             const iframeWrapper = document.getElementById('iframe-wrapper');
             iframeWrapper.innerHTML = `
                 <iframe 
-                    src="https://adunits.adgem.com/v1/wall?appid=${adgemAppId}&playerid=${user.id}" 
+                    src="https://wall.adgem.com/?appid=${adgemAppId}&playerid=${user.id}" 
                     frameborder="0">
                 </iframe>
             `;
