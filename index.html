@@ -21,7 +21,6 @@
     </div>
 
     <script>
-        // CAMBIO CLAVE: Usamos 'supabaseClient' en lugar de 'supabase'
         const supabaseClient = supabase.createClient(
             'https://meiwuluwrdjszxeyoqtt.supabase.co', 
             'sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4'
@@ -31,20 +30,25 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
+            if(!email || !password) {
+                alert("Por favor, llena ambos campos.");
+                return;
+            }
+
             try {
                 let result;
                 if (type === 'signup') {
-                    // Usamos supabaseClient aquí
                     result = await supabaseClient.auth.signUp({ email, password });
                 } else {
-                    // Y usamos supabaseClient aquí
                     result = await supabaseClient.auth.signInWithPassword({ email, password });
                 }
 
                 if (result.error) throw result.error;
                 
-                alert(type === 'signup' ? "Registro exitoso." : "¡Bienvenido!");
-                if (type === 'login') window.location.href = 'ofertas.html';
+                // Como quitamos la confirmación por correo, Supabase inicia sesión automáticamente al registrarse.
+                // Así que, sea login o registro, los enviamos directo a las ofertas.
+                window.location.href = 'ofertas.html';
+
             } catch (err) {
                 alert("Error: " + err.message);
                 console.error("Detalle del error:", err);
