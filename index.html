@@ -21,37 +21,39 @@
     </div>
 
     <script>
-        // 2. Inicializar cliente UNA SOLA VEZ
-        const supabase = supabase.createClient(
+    // Comprobamos si ya existe antes de crearla para evitar el error de "Already declared"
+    if (typeof window.supabase === 'undefined') {
+        window.supabase = supabase.createClient(
             'https://meiwuluwrdjszxeyoqtt.supabase.co', 
             'sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4'
         );
-        
-        // 3. La función ahora es accesible porque está en el mismo bloque
-        async function authAction(type) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            let result;
-            if (type === 'signup') {
-                result = await supabase.auth.signUp({ email, password });
-            } else {
-                result = await supabase.auth.signInWithPassword({ email, password });
-            }
+    }
 
-            const { data, error } = result;
-            
-            if (error) {
-                alert(error.message);
+    // Definimos la función en el objeto window para asegurarnos de que el botón la encuentre siempre
+    window.authAction = async function(type) {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        let result;
+        if (type === 'signup') {
+            result = await window.supabase.auth.signUp({ email, password });
+        } else {
+            result = await window.supabase.auth.signInWithPassword({ email, password });
+        }
+
+        const { data, error } = result;
+        
+        if (error) {
+            alert("Error: " + error.message);
+        } else {
+            if (type === 'signup') {
+                alert("Registro exitoso. Revisa tu correo.");
             } else {
-                if (type === 'signup') {
-                    alert("¡Registro exitoso! Revisa tu correo.");
-                } else {
-                    alert("¡Bienvenido!");
-                    window.location.href = 'ofertas.html';
-                }
+                alert("¡Bienvenido a NetGamer!");
+                window.location.href = 'ofertas.html';
             }
         }
-    </script>
+    };
+</script>
 </body>
 </html>
