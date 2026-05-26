@@ -3,106 +3,450 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetGamer MX | Portal de Acceso</title>
+    <title>NetGamer MX - Premium Rewards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { 
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-        }
-        .login-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-        .login-container h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; color: #00ffcc; text-transform: uppercase; letter-spacing: 2px;}
-        .login-container p { color: #aaa; margin-bottom: 30px; font-size: 14px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 12px; color: #ccc; text-transform: uppercase; letter-spacing: 1px;}
-        .input-group input { 
-            width: 100%; padding: 15px; border-radius: 10px; border: none; 
-            background: rgba(0, 0, 0, 0.5); color: #fff; font-size: 14px; outline: none;
-            transition: 0.3s border; border: 1px solid transparent;
-        }
-        .input-group input:focus { border: 1px solid #00ffcc; }
-        .btn {
-            width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: 600; font-size: 16px;
-            cursor: pointer; transition: 0.3s; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .btn-primary { background: #00ffcc; color: #000; }
-        .btn-primary:hover { background: #00cca3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4); }
-        .btn-secondary { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
-        .loader { display: none; margin-top: 10px; color: #00ffcc; font-size: 12px; }
+        /* Animación suave para transiciones */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        iframe { width: 100%; height: calc(100vh - 120px); border: none; }
     </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
 
-    <div class="login-container">
-        <h1>NetGamer MX</h1>
-        <p>Tu portal de recompensas</p>
+    <div id="auth-container" class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-purple-500 tracking-wide">NetGamer <span class="text-white">MX</span></h1>
+                <p class="text-slate-400 text-sm mt-2">Gana recompensas jugando y completando misiones</p>
+            </div>
 
-        <div class="input-group">
-            <label>Correo Electrónico</label>
-            <input type="email" id="email" placeholder="jugador@email.com" required>
+            <div id="login-view">
+                <h2 class="text-xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Correo Electrónico</label>
+                        <input type="email" id="login-email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Contraseña</label>
+                        <input type="password" id="login-password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-3 rounded-xl shadow-lg shadow-purple-600/30 transition duration-200">Entrar a la Plataforma</button>
+                </form>
+                <p class="text-center text-sm text-slate-400 mt-6">
+                    ¿No tienes cuenta? <button onclick="toggleAuthViews(false)" class="text-purple-400 hover:underline font-semibold focus:outline-none">Regístrate aquí</button>
+                </p>
+            </div>
+
+            <div id="register-view" class="hidden">
+                <h2 class="text-xl font-bold mb-4 text-center">Crear Nueva Cuenta</h2>
+                <form id="register-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nombre de Usuario</label>
+                        <input type="text" id="register-username" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Correo Electrónico</label>
+                        <input type="email" id="register-email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Contraseña</label>
+                        <input type="password" id="register-password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200">Registrarme</button>
+                </form>
+                <p class="text-center text-sm text-slate-400 mt-6">
+                    ¿Ya tienes cuenta? <button onclick="toggleAuthViews(true)" class="text-purple-400 hover:underline font-semibold focus:outline-none">Inicia Sesión</button>
+                </p>
+            </div>
         </div>
-        <div class="input-group">
-            <label>Contraseña</label>
-            <input type="password" id="password" placeholder="••••••••" required>
-        </div>
+    </div>
 
-        <button class="btn btn-primary" onclick="handleAuth('login')">Entrar a ganar</button>
-        <button class="btn btn-secondary" onclick="handleAuth('signup')">Crear cuenta nueva</button>
-        <div id="loading" class="loader">Procesando...</div>
+
+    <div id="app-container" class="hidden flex min-h-screen">
+        
+        <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col justify-between hidden md:flex">
+            <div class="p-6">
+                <div class="text-2xl font-extrabold text-purple-500 tracking-wide mb-8">NetGamer <span class="text-white">MX</span></div>
+                <nav class="space-y-2">
+                    <button onclick="switchTab('tab-inicio')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-600 text-white font-semibold transition text-left">
+                        <i class="fa-solid fa-house"></i> <span>Inicio</span>
+                    </button>
+                    <button onclick="switchTab('tab-ofertas')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-700 hover:text-white transition text-left">
+                        <i class="fa-solid fa-gamepad"></i> <span>Muro de Ofertas</span>
+                    </button>
+                    <button onclick="switchTab('tab-canjear')" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-700 hover:text-white transition text-left">
+                        <i class="fa-solid fa-gift"></i> <span>Canjear Premios</span>
+                    </button>
+                </nav>
+            </div>
+            <div class="p-6 border-t border-slate-700">
+                <button onclick="cerrarSesion()" class="w-full bg-slate-900 hover:bg-rose-950 text-rose-400 font-semibold py-2 px-4 rounded-xl transition text-sm">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-x-hidden">
+            
+            <header class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 z-10">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-400 hidden md:inline">Bienvenido, <strong id="user-display-name" class="text-white">Usuario</strong></span>
+                </div>
+                <div class="bg-slate-950 px-4 py-1.5 rounded-full border border-purple-500/50 flex items-center space-x-2 shadow-inner">
+                    <i class="fa-solid fa-coins text-amber-400 animate-pulse"></i>
+                    <span id="user-balance" class="font-extrabold text-amber-300">0</span>
+                    <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">NetCoins</span>
+                </div>
+            </header>
+
+            <main class="flex-1 p-6 overflow-y-auto">
+
+                <div id="tab-inicio" class="tab-content active space-y-6">
+                    <div class="bg-gradient-to-r from-purple-800 to-indigo-900 rounded-3xl p-8 relative overflow-hidden shadow-xl">
+                        <div class="relative z-10 max-w-lg">
+                            <h2 class="text-3xl font-black mb-2">¡Consigue Dinero Real Jugando!</h2>
+                            <p class="text-purple-200 text-sm mb-6">Completa las tareas del muro, acumula NetCoins y canjéalos directamente a tu cuenta bancaria o por códigos de tus juegos favoritos.</p>
+                            <button onclick="switchTab('tab-ofertas')" class="bg-white text-indigo-900 font-extrabold px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition duration-200">Empezar Tareas</button>
+                        </div>
+                        <div class="absolute right-0 bottom-0 opacity-10 text-9xl p-4"><i class="fa-solid fa-gamepad"></i></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Tu Balance</span>
+                                <h3 class="text-2xl font-black text-amber-300 mt-1"><span class="balance-placeholder">0</span> NC</h3>
+                            </div>
+                            <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl text-xl"><i class="fa-solid fa-wallet"></i></div>
+                        </div>
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Equivalencia</span>
+                                <h3 class="text-2xl font-black text-emerald-400 mt-1" id="mxn-equivalence">$0.00 MXN</h3>
+                            </div>
+                            <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl text-xl"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        </div>
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Estado del Muro</span>
+                                <h3 class="text-2xl font-black text-purple-400 mt-1">Conectado</h3>
+                            </div>
+                            <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl text-xl"><i class="fa-solid fa-circle-check"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-ofertas" class="tab-content">
+                    <div class="bg-slate-800 rounded-2xl p-4 border border-slate-700 shadow-xl overflow-hidden">
+                        <div id="iframe-wrapper" class="flex flex-col items-center justify-center p-12 text-center text-slate-400">
+                            <i class="fa-solid fa-spinner animate-spin text-4xl text-purple-500 mb-4"></i>
+                            <p>Cargando muro seguro de AdGem...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-canjear" class="tab-content space-y-6">
+                    <div class="border-b border-slate-700 pb-4">
+                        <h2 class="text-2xl font-extrabold">Catálogo de Premios</h2>
+                        <p class="text-slate-400 text-sm">Cambia tus NetCoins acumulados de manera segura.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500 transition duration-300">
+                            <div>
+                                <div class="bg-red-600/20 text-red-400 font-black text-xs px-2.5 py-1 rounded-md inline-block mb-3">Código Digital</div>
+                                <h3 class="text-xl font-bold">Robux - Roblox Pin</h3>
+                                <p class="text-slate-400 text-xs mt-1">Recibe un pin digital para reclamar tus Robux directamente en tu cuenta de Roblox de forma inmediata.</p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+                                <span class="text-amber-400 font-extrabold text-sm"><i class="fa-solid fa-coins mr-1"></i> 1,000 NC</span>
+                                <button onclick="abrirFormularioRetiro('Roblox')" class="bg-purple-600 hover:bg-purple-700 text-xs font-bold px-4 py-2 rounded-xl transition">Canjear</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500 transition duration-300">
+                            <div>
+                                <div class="bg-blue-600/20 text-blue-400 font-black text-xs px-2.5 py-1 rounded-md inline-block mb-3">Efectivo Electrónico</div>
+                                <h3 class="text-xl font-bold">Saldo PayPal (USD)</h3>
+                                <p class="text-slate-400 text-xs mt-1">Enviamos saldo directo a tu billetera PayPal listo para usar en cualquier comercio electrónico del mundo.</p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+                                <span class="text-amber-400 font-extrabold text-sm"><i class="fa-solid fa-coins mr-1"></i> 2,000 NC</span>
+                                <button onclick="abrirFormularioRetiro('PayPal')" class="bg-purple-600 hover:bg-purple-700 text-xs font-bold px-4 py-2 rounded-xl transition">Canjear</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500 transition duration-300">
+                            <div>
+                                <div class="bg-emerald-600/20 text-emerald-400 font-black text-xs px-2.5 py-1 rounded-md inline-block mb-3">Transferencia Directa</div>
+                                <h3 class="text-xl font-bold">Transferencia Bancaria (SPEI)</h3>
+                                <p class="text-slate-400 text-xs mt-1">Recibe pesos mexicanos directamente en tu tarjeta de débito o cuenta de banco. Retiro revisado por administración.</p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+                                <span class="text-amber-400 font-extrabold text-sm"><i class="fa-solid fa-coins mr-1"></i> 2,000 NC</span>
+                                <button onclick="abrirFormularioRetiro('SPEI / Banco')" class="bg-purple-600 hover:bg-purple-700 text-xs font-bold px-4 py-2 rounded-xl transition">Canjear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="container-formulario-retiro" class="hidden bg-slate-800 border border-slate-700 p-6 rounded-2xl max-w-xl mx-auto mt-12 shadow-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-purple-400">Formulario de Retiro Seguro (<span id="tipo-recompensa-txt"></span>)</h3>
+                            <button onclick="cerrarFormularioRetiro()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        
+                        <div class="bg-slate-900 border border-amber-500/20 p-3 rounded-xl text-xs text-amber-400 mb-4">
+                            <i class="fa-solid fa-circle-info mr-1"></i> <strong>Reglas del Sistema:</strong> Retiro mínimo de <strong>100 MXN</strong> y máximo de <strong>3000 MXN</strong>. Las transferencias bancarias requieren verificación obligatoria de datos.
+                        </div>
+
+                        <form id="form-solicitud-retiro" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Monto a retirar (en MXN)</label>
+                                <input type="number" id="retiro-monto" min="100" max="3000" placeholder="Min 100 - Max 3000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nombre del Banco / Plataforma</label>
+                                    <input type="text" id="retiro-banco" placeholder="Ej. BBVA, Santander, PayPal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nombre Completo del Beneficiario</label>
+                                    <input type="text" id="retiro-beneficiario" placeholder="Titular de la cuenta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">CLABE Interbancaria / Correo de Pago</label>
+                                <input type="text" id="retiro-destino" placeholder="CLABE de 18 dígitos o email de PayPal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            </div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-purple-600/20">Enviar Solicitud de Validación</button>
+                        </form>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
     </div>
 
     <script>
-        const supabaseClient = supabase.createClient(
-            'https://meiwuluwrdjszxeyoqtt.supabase.co', 
-            'sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4'
-        );
+        // Configuración de las variables Maestras
+        const SUPABASE_URL = "https://meiwuluwrdjszxeyoqtt.supabase.co";
+        const SUPABASE_KEY = "TU_ANON_KEY_AQUÍ"; // Pon tu clave anon key aquí
+        const adgemAppId = "32676"; // Tu ID de AdGem asignado
+        
+        // Conversión comercial recomendada: 100 NetCoins = 1 Peso Mexicano
+        const CONVERSION_RATE = 100; 
 
-        async function handleAuth(type) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loader = document.getElementById('loading');
+        // Inicializamos el cliente de Supabase
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            if(!email || !password) {
-                alert("Por favor, llena ambos campos.");
+        // Al cargar la estructura de la página
+        document.addEventListener("DOMContentLoaded", async () => {
+            configurarEventosAuth();
+            verificarSesionActiva();
+        });
+
+        // Alternar visualización entre Vista Login y Vista Registro
+        function toggleAuthViews(showLogin) {
+            document.getElementById("login-view").classList.toggle("hidden", !showLogin);
+            document.getElementById("register-view").classList.toggle("hidden", showLogin);
+        }
+
+        // Control y manejo de los formularios de Entrada/Registro
+        function configurarEventosAuth() {
+            // Login
+            document.getElementById("login-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = document.getElementById("login-email").value;
+                const password = document.getElementById("login-password").value;
+                
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+                if (error) alert("Error de acceso: " + error.message);
+                else verificarSesionActiva();
+            });
+
+            // Registro
+            document.getElementById("register-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const username = document.getElementById("register-username").value;
+                const email = document.getElementById("register-email").value;
+                const password = document.getElementById("register-password").value;
+
+                const { data, error } = await _supabase.auth.signUp({
+                    email, password,
+                    options: { data: { username: username } }
+                });
+
+                if (error) alert("Error de registro: " + error.message);
+                else {
+                    alert("¡Cuenta registrada! Si configuraste confirmación por correo, revísalo. Si no, ya puedes iniciar sesión.");
+                    toggleAuthViews(true);
+                }
+            });
+
+            // Manejo de Solicitud de Retiro
+            document.getElementById("form-solicitud-retiro").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                procesarSolicitudRetiro();
+            });
+        }
+
+        // Valida el estado de la sesión y cambia la interfaz
+        async function verificarSesionActiva() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            if (session) {
+                const user = session.user;
+                document.getElementById("auth-container").classList.add("hidden");
+                document.getElementById("app-container").classList.remove("hidden");
+                
+                // Mostrar nombre de perfil
+                document.getElementById("user-display-name").innerText = user.user_metadata.username || user.email;
+                
+                // Cargar datos financieros y el muro
+                cargarDatosPerfil(user);
+                inyectarIframeAdGem(user);
+            } else {
+                document.getElementById("auth-container").classList.remove("hidden");
+                document.getElementById("app-container").classList.add("hidden");
+            }
+        }
+
+        // Obtener el balance dinámico desde Supabase
+        async function cargarDatosPerfil(user) {
+            const { data, error } = await _supabase
+                .from('perfiles')
+                .select('netcoins')
+                .eq('id', user.id)
+                .single();
+
+            if (!error && data) {
+                const monedas = data.netcoins || 0;
+                // Actualizar interfaz
+                document.getElementById("user-balance").innerText = monedas;
+                document.querySelectorAll(".balance-placeholder").forEach(el => el.innerText = monedas);
+                
+                // Calcular equivalencia real en MXN
+                const pesos = (monedas / CONVERSION_RATE).toFixed(2);
+                document.getElementById("mxn-equivalence").innerText = `$${pesos} MXN`;
+            }
+        }
+
+        // Inyección técnica limpia del Iframe de AdGem
+        function inyectarIframeAdGem(user) {
+            const wrapper = document.getElementById('iframe-wrapper');
+            wrapper.innerHTML = `
+                <iframe 
+                    src="https://api.adgem.com/v1/wall?appid=${adgemAppId}&playerid=${user.id}" 
+                    frameborder="0"
+                    class="w-full rounded-xl shadow-inner">
+                </iframe>
+            `;
+        }
+
+        // Sistema de navegación por pestañas (SPA)
+        function switchTab(tabId) {
+            // Desactivar contenidos anteriores
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Activar nuevo contenido
+            document.getElementById(tabId).classList.add('active');
+
+            // Actualizar estilos visuales del menú lateral (Sidebar)
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:bg-slate-700');
+            });
+            // Resaltar botón activo
+            event.currentTarget.classList.add('bg-purple-600', 'text-white');
+            event.currentTarget.classList.remove('text-slate-400', 'hover:bg-slate-700');
+        }
+
+        // Gestión de la Tienda de Premios
+        function abrirFormularioRetiro(tipo) {
+            document.getElementById("tipo-recompensa-txt").innerText = tipo;
+            document.getElementById("container-formulario-retiro").classList.remove("hidden");
+            // Scroll automático al formulario
+            document.getElementById("container-formulario-retiro").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cerrarFormularioRetiro() {
+            document.getElementById("container-formulario-retiro").classList.add("hidden");
+            document.getElementById("form-solicitud-retiro").reset();
+        }
+
+        // Lógica estricta de validación financiera y de base de datos
+        async function procesarSolicitudRetiro() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) return;
+
+            const user = session.user;
+            const montoMXN = parseInt(document.getElementById("retiro-monto").value);
+            const banco = document.getElementById("retiro-banco").value.trim();
+            const beneficiario = document.getElementById("retiro-beneficiario").value.trim();
+            const destino = document.getElementById("retiro-destino").value.trim();
+            const tipoPremo = document.getElementById("tipo-recompensa-txt").innerText;
+
+            // Calcular costo en NetCoins
+            const costoNetCoins = montoMXN * CONVERSION_RATE;
+
+            // 1. Validaciones financieras estrictas en Front-End
+            if (montoMXN < 100 || montoMXN > 3000) {
+                alert("Error: El monto de retiro debe estar entre 100 MXN y 3000 MXN.");
                 return;
             }
 
-            loader.style.display = 'block';
-
-            try {
-                let result;
-                if (type === 'signup') {
-                    result = await supabaseClient.auth.signUp({ email, password });
-                } else {
-                    result = await supabaseClient.auth.signInWithPassword({ email, password });
-                }
-
-                if (result.error) throw result.error;
-                
-                // Redirección exitosa
-                window.location.href = 'ofertas.html';
-
-            } catch (err) {
-                alert("Error: " + err.message);
-                loader.style.display = 'none';
+            // 2. Validación de campos obligatorios requeridos por administración
+            if (!banco || !beneficiario) {
+                alert("Error crítico: El nombre del Banco y el Beneficiario son campos estrictamente obligatorios para poder procesar la revisión manual.");
+                return;
             }
+
+            // 3. Verificar si el usuario cuenta con el saldo suficiente en tiempo real
+            const { data: perfil } = await _supabase.from('perfiles').select('netcoins').eq('id', user.id).single();
+            if (perfil.netcoins < costoNetCoins) {
+                alert(`Saldo insuficiente. Necesitas ${costoNetCoins} NetCoins para retirar $${montoMXN} MXN. Actualmente tienes ${perfil.netcoins} NetCoins.`);
+                return;
+            }
+
+            // 4. Enviar la transacción a la tabla de Supabase para auditoría del administrador
+            const { error: errorInsert } = await _supabase
+                .from('retiros_pendientes') // Asegúrate de crear esta tabla en tu Supabase
+                .insert([{
+                    user_id: user.id,
+                    monto_mxn: montoMXN,
+                    netcoins_deducidos: costoNetCoins,
+                    banco_plataforma: banco,
+                    nombre_beneficiario: beneficiario,
+                    cuenta_destino: destino,
+                    tipo_premio: tipoPremo,
+                    estatus: 'Pendiente De Validación'
+                }]);
+
+            if (errorInsert) {
+                alert("Error al procesar la solicitud en el servidor: " + errorInsert.message);
+                return;
+            }
+
+            // 5. Restar los puntos del balance del usuario
+            await _supabase
+                .from('perfiles')
+                .update({ netcoins: perfil.netcoins - costoNetCoins })
+                .eq('id', user.id);
+
+            alert("¡Solicitud enviada con éxito! La administración validará tus datos bancarios y procesará tu pago en un lapso de 5 minutos a 24 horas hábiles.");
+            cerrarFormularioRetiro();
+            cargarDatosPerfil(user); // Actualizar interfaz de saldo
+        }
+
+        // Cierre de sesión seguro
+        async function cerrarSesion() {
+            await _supabase.auth.signOut();
+            verificarSesionActiva();
         }
     </script>
 </body>
