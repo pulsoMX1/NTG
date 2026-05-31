@@ -66,229 +66,9 @@
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             #bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
         }
-
-        /* ── Bloqueo VPN / AdBlocker ── */
-        #bloqueo-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.97);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #bloqueo-overlay.activo { display: flex; }
-        #bloqueo-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 40px 32px;
-            max-width: 460px;
-            width: 100%;
-            text-align: center;
-        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
-
-    <!-- ══ OVERLAY DE BLOQUEO ══ -->
-    <div id="bloqueo-overlay">
-        <div id="bloqueo-card">
-            <div id="bloqueo-icono" class="text-6xl mb-5">🛡️</div>
-            <h2 id="bloqueo-titulo" class="text-2xl font-extrabold text-white mb-3">Acceso Bloqueado</h2>
-            <p id="bloqueo-mensaje" class="text-slate-400 text-sm leading-relaxed mb-6"></p>
-            <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 text-xs text-slate-400 text-left space-y-2 mb-6">
-                <p id="bloqueo-instrucciones"></p>
-            </div>
-            <button onclick="reintentarAcceso()" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-3 rounded-xl transition text-sm">
-                Ya lo desactivé — Reintentar
-            </button>
-        </div>
-    </div>
-
-    <!-- Script de detección temprana (antes del splash) -->
-    <script>
-        window._adBlockDetectado = false;
-        window._vpnDetectado = false;
-
-        // ══════════════════════════════════════════
-        // MOSTRAR / OCULTAR BLOQUEO
-        // ══════════════════════════════════════════
-        function mostrarBloqueo(tipo) {
-            const overlay = document.getElementById('bloqueo-overlay');
-            const titulo  = document.getElementById('bloqueo-titulo');
-            const mensaje = document.getElementById('bloqueo-mensaje');
-            const instrucciones = document.getElementById('bloqueo-instrucciones');
-            const icono   = document.getElementById('bloqueo-icono');
-
-            if (tipo === 'adblock') {
-                icono.innerText = '🚫';
-                titulo.innerText = 'Bloqueador de Anuncios Detectado';
-                mensaje.innerText = 'NetGamer MX se financia con anuncios para poder pagarte. Con un bloqueador activo no podemos operar.';
-                instrucciones.innerHTML = `
-                    <strong class="text-white block mb-2">Desactiva tu bloqueador para este sitio:</strong>
-                    • <b>uBlock / AdBlock:</b> clic en el ícono → desactivar para este sitio<br>
-                    • <b>Brave Shields:</b> clic en el escudo 🦁 → bajar a "Sin bloqueo"<br>
-                    • <b>Firefox:</b> clic en el escudo 🛡️ → desactivar protección mejorada<br>
-                    • <b>Opera:</b> Ajustes → Ad Blocker → desactivar
-                `;
-            } else {
-                icono.innerText = '🔒';
-                titulo.innerText = 'VPN / Proxy / Tor Detectado';
-                mensaje.innerText = 'El uso de VPN, proxies o redes de anonimización está prohibido para prevenir fraudes en el sistema de recompensas.';
-                instrucciones.innerHTML = `
-                    <strong class="text-white block mb-2">Desactiva tu VPN/Proxy:</strong>
-                    • Desconéctate de cualquier VPN activa<br>
-                    • Desactiva extensiones proxy en tu navegador<br>
-                    • Cierra Tor Browser o cualquier anonimizador<br>
-                    • Conecta directo a tu red doméstica o datos móviles
-                `;
-            }
-            overlay.classList.add('activo');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function ocultarBloqueo() {
-            document.getElementById('bloqueo-overlay').classList.remove('activo');
-            document.body.style.overflow = '';
-        }
-
-        async function reintentarAcceso() {
-            const btn = document.querySelector('#bloqueo-overlay button');
-            const tituloEl = document.getElementById('bloqueo-titulo');
-            const mensajeEl = document.getElementById('bloqueo-mensaje');
-            const instrEl = document.getElementById('bloqueo-instrucciones');
-            btn.disabled = true;
-            tituloEl.innerText = 'Verificando...';
-            mensajeEl.innerText = 'Por favor espera unos segundos.';
-            instrEl.innerHTML = '';
-
-            window._adBlockDetectado = false;
-            window._vpnDetectado = false;
-
-            await ejecutarVerificaciones();
-            btn.disabled = false;
-            if (!window._adBlockDetectado && !window._vpnDetectado) ocultarBloqueo();
-        }
-
-        // ══════════════════════════════════════════
-        // DETECCIÓN ADBLOCK — solo métodos confiables
-        // ══════════════════════════════════════════
-        async function verificarAdBlock() {
-            return new Promise((resolve) => {
-                let votos = 0;
-
-                // MÉTODO 1: Elemento señuelo con clases EasyList
-                const cebo = document.createElement('div');
-                cebo.className = 'adsbox ads ad-banner advertisement';
-                cebo.style.cssText = 'width:1px!important;height:1px!important;position:fixed!important;left:-9999px!important;top:-9999px!important;';
-                cebo.innerHTML = '&nbsp;';
-                document.body.appendChild(cebo);
-
-                setTimeout(() => {
-                    const estilo = window.getComputedStyle(cebo);
-                    const ceboBloqueado = (
-                        cebo.offsetHeight === 0 ||
-                        cebo.offsetWidth  === 0 ||
-                        estilo.display    === 'none' ||
-                        estilo.visibility === 'hidden'
-                    );
-                    try { document.body.removeChild(cebo); } catch(e) {}
-
-                    if (ceboBloqueado) votos++;
-                    if (typeof window.canRunAds === 'undefined') votos++;
-
-                    // Necesita 2 votos para evitar falsos positivos
-                    window._adBlockDetectado = votos >= 2;
-                    resolve();
-                }, 500);
-            });
-        }
-
-        // ══════════════════════════════════════════
-        // DETECCIÓN VPN — solo APIs con HTTPS y CORS
-        // ══════════════════════════════════════════
-        async function verificarVPN() {
-            let vpnVotos = 0;
-
-            // API 1: ip-api.com HTTPS (pro endpoint con CORS)
-            try {
-                const r = await fetch('https://pro.ip-api.com/json/?fields=status,proxy,hosting&key=free', {
-                    signal: AbortSignal.timeout(5000)
-                });
-                const d = await r.json();
-                if (d.proxy   === true) vpnVotos += 2;
-                if (d.hosting === true) vpnVotos++;
-            } catch(e) {}
-
-            // API 2: ipapi.is — tiene CORS abierto
-            try {
-                const r = await fetch('https://api.ipapi.is/', {
-                    signal: AbortSignal.timeout(5000)
-                });
-                const d = await r.json();
-                if (d.is_proxy === true) vpnVotos += 2;
-                if (d.is_vpn   === true) vpnVotos += 2;
-                if (d.is_tor   === true) vpnVotos += 3;
-                if (d.is_datacenter === true) vpnVotos++;
-            } catch(e) {}
-
-            // API 3: WebRTC leak detection
-            try {
-                await new Promise((res) => {
-                    const ips = new Set();
-                    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-                    pc.createDataChannel('');
-                    pc.createOffer().then(o => pc.setLocalDescription(o));
-                    pc.onicecandidate = (e) => {
-                        if (!e?.candidate) return;
-                        const m = /([0-9]{1,3}\.){3}[0-9]{1,3}/.exec(e.candidate.candidate);
-                        if (m) ips.add(m[0]);
-                    };
-                    setTimeout(() => {
-                        pc.close();
-                        const publicIPs = [...ips].filter(ip =>
-                            !ip.startsWith('10.') &&
-                            !ip.startsWith('192.168.') &&
-                            !ip.startsWith('172.') &&
-                            !ip.startsWith('127.')
-                        );
-                        if (publicIPs.length > 1) vpnVotos += 2;
-                        res();
-                    }, 2000);
-                });
-            } catch(e) {}
-
-            // Necesita 2+ votos para bloquear
-            window._vpnDetectado = vpnVotos >= 2;
-        }
-
-        // ══════════════════════════════════════════
-        // EJECUTAR TODO
-        // ══════════════════════════════════════════
-        async function ejecutarVerificaciones() {
-            await verificarAdBlock();
-            if (window._adBlockDetectado) { mostrarBloqueo('adblock'); return; }
-            await verificarVPN();
-            if (window._vpnDetectado) { mostrarBloqueo('vpn'); }
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', ejecutarVerificaciones);
-        } else {
-            ejecutarVerificaciones();
-        }
-
-        // Re-verificar AdBlock cada 25 segundos
-        setInterval(async () => {
-            await verificarAdBlock();
-            if (window._adBlockDetectado) mostrarBloqueo('adblock');
-        }, 25000);
-    </script>
-
-    <!-- Señuelo canRunAds -->
-    <script>window.canRunAds = true;</script>
 
     <div id="splash-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-[999]">
         <h1 class="text-3xl font-extrabold text-purple-500 tracking-wide mb-3">NetGamer <span class="text-white">MX</span></h1>
@@ -508,18 +288,20 @@
                             <div class="p-2.5 sm:p-3 bg-purple-500/10 text-purple-400 rounded-xl text-lg sm:text-xl"><i class="fa-solid fa-users"></i></div>
                         </div>
                     </div>
-                   <!-- SECCIÓN DE OFERTAS RECOMENDADAS (CÓDIGO DIRECTO Y SEGURO) -->
+                     <!-- SECCIÓN DE OFERTAS RECOMENDADAS (NATIVE BANNERS) -->
+    <div class="w-full flex flex-col items-center justify-center mb-5 py-1">
 <div class="mt-8 mb-6">
     <h3 class="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2">
         <i class="fa-solid fa-fire text-orange-500"></i> Otras Ofertas
     </h3>
     
-    <!-- La tarjeta visual mantiene el diseño, el script va directo dentro -->
-    <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl shadow-lg w-full min-h-[150px]">
+    <!-- Contenedor del Anuncio Nativo con estilo de tarjeta -->
+    <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl shadow-lg">
         <div id="container-7378a712ef2e1acc90b8893efa12f6e6"></div>
         <script async="async" data-cfasync="false" src="https://alarmpenguinmelt.com/7378a712ef2e1acc90b8893efa12f6e6/invoke.js"></script>
     </div>
 </div>
+
                     <div class="bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                         <div>
                             <h3 class="text-base sm:text-lg font-extrabold text-emerald-400 mb-1"><i class="fa-solid fa-user-plus mr-2"></i>¡Invita amigos y gana!</h3>
