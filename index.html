@@ -66,9 +66,194 @@
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             #bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
         }
+
+        /* ── Bloqueo VPN / AdBlocker ── */
+        #bloqueo-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.97);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #bloqueo-overlay.activo { display: flex; }
+        #bloqueo-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+
+    <!-- ══ OVERLAY DE BLOQUEO ══ -->
+    <div id="bloqueo-overlay">
+        <div id="bloqueo-card">
+            <div id="bloqueo-icono" class="text-6xl mb-5">🛡️</div>
+            <h2 id="bloqueo-titulo" class="text-2xl font-extrabold text-white mb-3">Acceso Bloqueado</h2>
+            <p id="bloqueo-mensaje" class="text-slate-400 text-sm leading-relaxed mb-6"></p>
+            <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 text-xs text-slate-400 text-left space-y-2 mb-6">
+                <p id="bloqueo-instrucciones"></p>
+            </div>
+            <button onclick="reintentarAcceso()" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-3 rounded-xl transition text-sm">
+                Ya lo desactivé — Reintentar
+            </button>
+        </div>
+    </div>
+
+    <!-- Script de detección temprana (antes del splash) -->
+    <script>
+        // ══ DETECCIÓN DE ADBLOCK ══
+        // Trampa: elemento que los adblockers ocultan automáticamente
+        window._adBlockDetectado = false;
+        window._vpnDetectado = false;
+
+        function mostrarBloqueo(tipo) {
+            const overlay = document.getElementById('bloqueo-overlay');
+            const titulo = document.getElementById('bloqueo-titulo');
+            const mensaje = document.getElementById('bloqueo-mensaje');
+            const instrucciones = document.getElementById('bloqueo-instrucciones');
+            const icono = document.getElementById('bloqueo-icono');
+
+            if (tipo === 'adblock') {
+                icono.innerText = '🚫';
+                titulo.innerText = 'Bloqueador de Anuncios Detectado';
+                mensaje.innerText = 'NetGamer MX se financia mediante anuncios para poder pagarte tus recompensas. Con un bloqueador de anuncios activo no podemos continuar.';
+                instrucciones.innerHTML = `
+                    <strong class="text-white block mb-2">Para continuar, desactiva tu bloqueador:</strong>
+                    • uBlock Origin / AdBlock: clic en el ícono → desactivar para este sitio<br>
+                    • Brave Browser: clic en el escudo 🦁 → desactivar Shields<br>
+                    • Firefox: clic en el escudo 🛡️ → desactivar protección<br>
+                    • Opera: desactivar Ad Blocker en ajustes
+                `;
+            } else if (tipo === 'vpn') {
+                icono.innerText = '🔒';
+                titulo.innerText = 'VPN / Proxy Detectado';
+                mensaje.innerText = 'El uso de VPN, proxies o redes de anonimización está estrictamente prohibido en NetGamer MX para prevenir fraudes y garantizar la integridad del sistema de recompensas.';
+                instrucciones.innerHTML = `
+                    <strong class="text-white block mb-2">Para continuar, desactiva tu VPN:</strong>
+                    • Desconéctate de cualquier VPN activa<br>
+                    • Desactiva extensiones de proxy en tu navegador<br>
+                    • Desactiva Tor Browser o cualquier red de anonimización<br>
+                    • Conecta directamente a tu red de internet
+                `;
+            }
+
+            overlay.classList.add('activo');
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+        }
+
+        function ocultarBloqueo() {
+            document.getElementById('bloqueo-overlay').classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+
+        async function reintentarAcceso() {
+            // Re-verificar adblock
+            await verificarAdBlock();
+            if (window._adBlockDetectado) { mostrarBloqueo('adblock'); return; }
+            // Re-verificar VPN
+            await verificarVPN();
+            if (window._vpnDetectado) { mostrarBloqueo('vpn'); return; }
+            ocultarBloqueo();
+        }
+
+        // ── Detección AdBlock ──
+        async function verificarAdBlock() {
+            return new Promise((resolve) => {
+                // Método 1: crear elemento señuelo con clase que adblockers ocultan
+                const cebo = document.createElement('div');
+                cebo.className = 'ad-banner ads adsbox ad-placement advertisement';
+                cebo.style.cssText = 'width:1px;height:1px;position:absolute;left:-9999px;top:-9999px;';
+                cebo.innerHTML = '&nbsp;';
+                document.body.appendChild(cebo);
+
+                setTimeout(() => {
+                    const bloqueado = (
+                        cebo.offsetHeight === 0 ||
+                        cebo.offsetWidth === 0 ||
+                        window.getComputedStyle(cebo).display === 'none' ||
+                        window.getComputedStyle(cebo).visibility === 'hidden' ||
+                        window.getComputedStyle(cebo).opacity === '0'
+                    );
+                    document.body.removeChild(cebo);
+
+                    // Método 2: verificar si baitads script fue bloqueado
+                    if (bloqueado || typeof window.canRunAds === 'undefined') {
+                        window._adBlockDetectado = true;
+                    } else {
+                        window._adBlockDetectado = false;
+                    }
+                    resolve();
+                }, 150);
+            });
+        }
+
+        // ── Detección VPN ──
+        async function verificarVPN() {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+
+                const res = await fetch('https://vpnapi.io/api/?key=free', {
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (
+                        data.security &&
+                        (data.security.vpn === true ||
+                         data.security.proxy === true ||
+                         data.security.tor === true ||
+                         data.security.relay === true)
+                    ) {
+                        window._vpnDetectado = true;
+                    } else {
+                        window._vpnDetectado = false;
+                    }
+                }
+            } catch (e) {
+                // Si la API falla, no bloqueamos (beneficio de la duda)
+                window._vpnDetectado = false;
+            }
+        }
+
+        // ── Ejecutar verificaciones al cargar ──
+        async function ejecutarVerificaciones() {
+            await verificarAdBlock();
+            if (window._adBlockDetectado) {
+                mostrarBloqueo('adblock');
+                return;
+            }
+            await verificarVPN();
+            if (window._vpnDetectado) {
+                mostrarBloqueo('vpn');
+                return;
+            }
+        }
+
+        // Ejecutar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', ejecutarVerificaciones);
+
+        // Re-verificar cada 30 segundos (por si activan el bloqueador después)
+        setInterval(async () => {
+            await verificarAdBlock();
+            if (window._adBlockDetectado) { mostrarBloqueo('adblock'); return; }
+        }, 30000);
+    </script>
+
+    <!-- Señuelo para adblock (script con nombre de anuncio) -->
+    <script>window.canRunAds = true;</script>
+    <script src="ads.js" onerror="window.canRunAds = false;"></script>
 
     <div id="splash-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-[999]">
         <h1 class="text-3xl font-extrabold text-purple-500 tracking-wide mb-3">NetGamer <span class="text-white">MX</span></h1>
