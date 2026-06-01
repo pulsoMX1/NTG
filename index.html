@@ -366,9 +366,10 @@
                         </div>
                         <!-- iframe CPAlead -->
                         <iframe
+                            id="iframe-cpalead"
                             sandbox='allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox'
                             referrerpolicy='no-referrer'
-                            src='https://www.cdnnd.com/wall/8wJIT'
+                            src='about:blank'
                             style='width:100%; height:690px; border:none;'
                             frameborder='0'>
                         </iframe>
@@ -815,6 +816,7 @@
                 cargarDatosReferidos(currentUser);
                 generarEnlaceReferido(currentUser);
                 setTimeout(() => inicializarRuleta(), 500);
+                inicializarCPAlead();
             } else {
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("app-container").classList.add("hidden");
@@ -1084,7 +1086,12 @@
             ctx.stroke();
         }
 
-        function inicializarRuleta() {
+        function inicializarCPAlead() {
+            const iframe = document.getElementById('iframe-cpalead');
+            if (iframe && currentUser) {
+                iframe.src = `https://www.cdnnd.com/wall/8wJIT?subid=${currentUser.id}`;
+            }
+        }
             dibujarRuleta(0);
             verificarEstadoRuleta();
         }
