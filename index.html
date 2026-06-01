@@ -177,11 +177,17 @@
                     </button>
                 </form>
                 <p class="text-center text-xs sm:text-sm text-slate-400 mt-5">
-                    ¿No tienes cuenta? <button type="button" onclick="toggleAuthViews(false)" class="text-purple-400 hover:underline font-semibold">Regístrate</button>
+                    ¿No tienes cuenta? <button type="button" onclick="toggleAuthViews(false)" class="text-amber-400 hover:underline font-semibold">¡Regístrate y recibe 1,000 NC gratis!</button>
                 </p>
             </div>
 
             <div id="register-view" class="hidden">
+                <!-- Banner 1000 NC -->
+                <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/40 rounded-2xl px-4 py-3 mb-5 text-center">
+                    <p class="text-amber-400 font-extrabold text-base">🎁 ¡Regístrate ahora y recibe</p>
+                    <p class="text-3xl font-black text-amber-300">1,000 NetCoins</p>
+                    <p class="text-amber-400/70 text-xs mt-0.5">de regalo al verificar tu cuenta</p>
+                </div>
                 <h2 class="text-lg sm:text-xl font-bold mb-4 text-center">Crear Cuenta</h2>
                 <form id="register-form" class="space-y-4">
                     <div>
@@ -576,7 +582,7 @@
         const SUPABASE_KEY = "sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4";
         const CONVERSION_RATE = 100;
         const NC_POR_REFERIDO = 500;
-        const NC_BONUS_BIENVENIDA = 250;
+        const NC_BONUS_BIENVENIDA = 1000;
         const BASE_URL = "https://daniel00998888.github.io/NetGamer-MX/";
 
         const adgemAppId = "32676";
