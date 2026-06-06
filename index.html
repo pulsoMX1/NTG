@@ -354,40 +354,55 @@
 
                 <div id="tab-ofertas" class="tab-content space-y-4 sm:space-y-6">
 
-                    <!-- MUROS CON PESTAÑAS -->
+                    <!-- MURO ADGEM -->
                     <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-                        <!-- Pestañas de selección -->
-                        <div class="flex border-b border-slate-700 bg-slate-900/50 overflow-x-auto">
-                            <button id="tab-muro-cpalead" onclick="cambiarMuroTab('cpalead')"
-                                class="muro-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-bold whitespace-nowrap border-b-2 border-purple-500 text-purple-400 transition">
-                                <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shrink-0"></span>
-                                CPAlead
-                            </button>
-                            <button id="tab-muro-adgem" onclick="cambiarMuroTab('adgem')"
-                                class="muro-tab-btn flex items-center gap-2 px-4 py-3 text-sm font-bold whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-white transition">
-                                <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shrink-0"></span>
-                                AdGem
-                            </button>
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                                <h3 class="font-extrabold text-sm text-white">AdGem — Muro de Ofertas</h3>
+                                <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">✅ Activo</span>
+                            </div>
                         </div>
-                        <!-- iframes (solo uno visible a la vez) -->
-                        <div id="muro-cpalead" class="muro-panel">
-                            <iframe
-                                id="iframe-cpalead"
-                                sandbox='allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox'
-                                referrerpolicy='no-referrer'
-                                src='about:blank'
-                                style='width:100%; height:690px; border:none;'
-                                frameborder='0'>
-                            </iframe>
-                        </div>
-                        <div id="muro-adgem" class="muro-panel hidden">
-                            <iframe
-                                id="iframe-adgem"
-                                src="about:blank"
-                                style="width:100%; height:690px; border:none;"
-                                frameborder="0"
-                                scrolling="yes">
-                            </iframe>
+                        <iframe
+                            id="iframe-adgem"
+                            src="about:blank"
+                            style="width:100%; height:690px; border:none;"
+                            frameborder="0"
+                            scrolling="yes">
+                        </iframe>
+                    </div>
+
+                    <!-- Muros próximamente -->
+                    <div class="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-5">
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-3">🔜 Más muros llegando pronto</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-3">
+                                <div class="w-9 h-9 bg-purple-500/10 rounded-lg flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-hourglass-half text-purple-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-white">Monlix</p>
+                                    <p class="text-xs text-amber-400 font-semibold">⏳ Aprobación pendiente</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-3">
+                                <div class="w-9 h-9 bg-purple-500/10 rounded-lg flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-hourglass-half text-purple-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-white">Lootably</p>
+                                    <p class="text-xs text-amber-400 font-semibold">⏳ Aprobación pendiente</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-3">
+                                <div class="w-9 h-9 bg-purple-500/10 rounded-lg flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-hourglass-half text-purple-400 text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-white">Torox</p>
+                                    <p class="text-xs text-amber-400 font-semibold">⏳ Próximamente</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -831,7 +846,6 @@
                 cargarDatosReferidos(currentUser);
                 generarEnlaceReferido(currentUser);
                 setTimeout(() => inicializarRuleta(), 500);
-                inicializarCPAlead();
                 inicializarAdGem();
             } else {
                 document.getElementById("auth-container").classList.remove("hidden");
@@ -1100,30 +1114,6 @@
             ctx.strokeStyle = '#7c3aed';
             ctx.lineWidth = 3;
             ctx.stroke();
-        }
-
-        function inicializarCPAlead() {
-            const iframe = document.getElementById('iframe-cpalead');
-            if (iframe && currentUser) {
-                iframe.src = `https://www.cdnnd.com/wall/8wJIT?subid=${currentUser.id}`;
-            }
-        }
-
-        function cambiarMuroTab(muro) {
-            // Actualizar pestañas
-            document.querySelectorAll('.muro-tab-btn').forEach(btn => {
-                btn.classList.remove('border-purple-500', 'text-purple-400');
-                btn.classList.add('border-transparent', 'text-slate-400');
-            });
-            const tabActivo = document.getElementById('tab-muro-' + muro);
-            if (tabActivo) {
-                tabActivo.classList.add('border-purple-500', 'text-purple-400');
-                tabActivo.classList.remove('border-transparent', 'text-slate-400');
-            }
-            // Mostrar/ocultar paneles
-            document.querySelectorAll('.muro-panel').forEach(p => p.classList.add('hidden'));
-            const panelActivo = document.getElementById('muro-' + muro);
-            if (panelActivo) panelActivo.classList.remove('hidden');
         }
 
         function inicializarAdGem() {
