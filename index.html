@@ -335,12 +335,17 @@
 
                     <!-- ══ WIDGET NUEVO: ADSTERRA SMARTLINK ══ -->
 <div class="bg-slate-800 border border-emerald-500/50 rounded-2xl p-5 sm:p-6 shadow-lg shadow-emerald-900/20 text-center relative overflow-hidden">
+    <!-- Botón de Información (?) -->
+    <button onclick="abrirAvisoAnunciantes()" class="absolute top-3 left-3 w-7 h-7 bg-slate-700/80 hover:bg-slate-600 border border-slate-500/50 rounded-full flex items-center justify-center text-slate-300 text-sm font-bold transition-all active:scale-95 z-10" title="Información sobre las ofertas">
+        ?
+    </button>
+
     <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Premium</div>
-    <div class="text-4xl mb-2">⚡</div>
-    <h3 class="text-lg sm:text-xl font-extrabold text-white mb-2">¡Ofetas de Anunciantes!</h3>
+    <div class="text-4xl mb-2 mt-2">⚡</div>
+    <h3 class="text-lg sm:text-xl font-extrabold text-white mb-2">¡Ofertas de Anunciantes!</h3>
     <p class="text-slate-400 text-xs sm:text-sm mb-5">Completa ofertas de Anunciantes y Gana Recompensas</p>
     
-    <!-- PEGA TU SMARTLINK DE ADSTERRA AQUÍ -->
+    <!-- ENLACE DE ADSTERRA -->
     <a href="https://alarmpenguinmelt.com/n3ke0t3e5r?key=8eed96dd0a579d45674d3e05e3a1e3f6" target="_blank" rel="noopener noreferrer" 
        class="inline-block w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm">
         🚀 Ver Ofertas Disponibles
@@ -349,6 +354,39 @@
     <p class="text-xs text-slate-500 mt-4">
         <i class="fa-solid fa-bolt text-emerald-500 mr-1"></i> Tráfico optimizado para tu región.
     </p>
+</div>
+<!-- ══════════════════════════════════════ -->
+
+<!-- ══ MODAL DE AVISO (TERMINOS DE OFERTAS EXTERNAS) ══ -->
+<div id="modalAvisoAnunciantes" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-slate-800 border border-slate-600 rounded-2xl p-6 max-w-sm w-full shadow-2xl relative transform scale-95 transition-transform duration-300" id="modalAvisoCuerpo">
+        
+        <!-- Botón de cerrar (X) -->
+        <button onclick="cerrarAvisoAnunciantes()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <div class="text-center mb-5">
+            <div class="text-4xl mb-3">ℹ️</div>
+            <h4 class="text-xl font-bold text-white">Aviso de Patrocinadores</h4>
+        </div>
+        
+        <div class="text-slate-300 text-sm space-y-4 leading-relaxed text-left">
+            <p>
+                Las ofertas mostradas en esta sección son operadas por <strong>redes de anunciantes externos</strong> y no son administradas por nosotros.
+            </p>
+            <p>
+                Cualquier recompensa que obtengas al participar en estas dinámicas será gestionada en la plataforma del anunciante. <strong class="text-emerald-400 font-bold">Nuestra plataforma NO acredita NetCoins ni modifica tu saldo interno</strong> por completar estas acciones.
+            </p>
+            <p class="text-xs text-slate-400 mt-2 border-t border-slate-700 pt-3">
+                * Interactuar con nuestros patrocinadores es voluntario y nos ayuda a mantener este proyecto en línea. ¡Agradecemos tu apoyo!
+            </p>
+        </div>
+        
+        <button onclick="cerrarAvisoAnunciantes()" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 px-4 rounded-xl transition-colors active:scale-95">
+            Entendido
+        </button>
+    </div>
 </div>
 <!-- ══════════════════════════════════════ -->
                     <div class="bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mt-4">
@@ -1307,5 +1345,35 @@
             document.getElementById('modal-legal').classList.add('hidden');
         }
     </script>
+    // Funciones para el Modal de Anunciantes
+function abrirAvisoAnunciantes() {
+    const modal = document.getElementById('modalAvisoAnunciantes');
+    const cuerpo = document.getElementById('modalAvisoCuerpo');
+    
+    // Mostrar el modal
+    modal.classList.remove('hidden');
+    
+    // Pequeño retraso para que la transición de CSS funcione
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        cuerpo.classList.remove('scale-95');
+        cuerpo.classList.add('scale-100');
+    }, 10);
+}
+
+function cerrarAvisoAnunciantes() {
+    const modal = document.getElementById('modalAvisoAnunciantes');
+    const cuerpo = document.getElementById('modalAvisoCuerpo');
+    
+    // Efecto de cierre
+    modal.classList.add('opacity-0');
+    cuerpo.classList.remove('scale-100');
+    cuerpo.classList.add('scale-95');
+    
+    // Ocultar completamente después de la animación
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
 </body>
 </html>
