@@ -102,28 +102,36 @@
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
 
-    <div id="modal-bonus">
-        <div id="modal-bonus-card" class="bg-slate-800 border border-purple-500/50 rounded-3xl w-full max-w-sm text-center p-8 shadow-2xl shadow-purple-900/50 relative">
-            <div class="absolute top-3 left-5 text-yellow-400 text-xl opacity-70">✦</div>
-            <div class="absolute top-6 right-6 text-purple-400 text-lg opacity-60">✦</div>
-            <div class="absolute bottom-20 left-4 text-amber-400 text-sm opacity-50">✦</div>
+   <div id="modal-bonus" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+    <div id="modal-bonus-card" class="bg-slate-800 border border-purple-500/50 rounded-2xl w-full max-w-sm text-center p-4 sm:p-5 max-h-[90vh] overflow-y-auto shadow-2xl shadow-purple-900/50 relative transform transition-all">
+        
+        <div class="absolute top-3 left-4 text-yellow-400 text-lg opacity-70">✦</div>
+        <div class="absolute top-4 right-4 text-purple-400 text-base opacity-60">✦</div>
+        <div class="absolute bottom-16 left-4 text-amber-400 text-xs opacity-50">✦</div>
 
-            <div id="bonus-coins-icon" class="text-7xl mb-4">🎁</div>
+        <div id="bonus-coins-icon" class="text-5xl mb-2 mt-1">🎁</div>
 
-            <span class="bg-amber-500/20 text-amber-400 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-widest border border-amber-500/30">
-                ¡Bonus de Bienvenida!
-            </span>
+        <span class="inline-block bg-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-amber-500/30">
+            ¡Bonus de Bienvenida!
+        </span>
 
-            <h2 class="text-2xl font-black text-white mt-4 mb-2">¡Bienvenido a NetGamer MX!</h2>
-            <p class="text-slate-400 text-sm mb-5">Como regalo por unirte, te hemos acreditado:</p>
+        <h2 class="text-xl font-black text-white mt-3 mb-1">¡Bienvenido a NetGamer MX!</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mb-4">Como regalo por unirte, te hemos acreditado:</p>
 
-            <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 rounded-2xl py-5 px-4 mb-6">
-                <div class="text-5xl font-black text-amber-400 mb-1">
-                    +<span id="bonus-cantidad">250</span> NC
-                </div>
-                <p class="text-amber-300/70 text-xs font-semibold">NetCoins acreditadas a tu cuenta</p>
+        <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 rounded-xl py-3.5 px-4 mb-4">
+            <div class="text-4xl font-black text-amber-400 mb-0.5">
+                +<span id="bonus-cantidad">250</span> NC
             </div>
-
+            <p class="text-amber-300/70 text-[11px] font-semibold">NetCoins acreditadas a tu cuenta</p>
+        </div>
+        
+        <button onclick="document.getElementById('modal-bonus').classList.add('hidden')" 
+                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold py-2.5 px-4 rounded-xl transition-all active:scale-95 text-sm shadow-lg shadow-purple-900/30">
+            ¡Excelente, gracias!
+        </button>
+        
+    </div>
+</div>
             <div class="text-left space-y-2 mb-6 bg-slate-900/50 rounded-xl p-4">
                 <p class="text-xs text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Completa ofertas y gana más NetCoins</p>
                 <p class="text-xs text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Invita amigos y ambos ganan 500 NC</p>
