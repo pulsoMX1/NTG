@@ -110,40 +110,40 @@
         <div class="absolute bottom-16 left-4 text-amber-400 text-xs opacity-50">✦</div>
 
         <div id="bonus-coins-icon" class="text-5xl mb-2 mt-1">🎁</div>
-
         <span class="inline-block bg-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-amber-500/30">
             ¡Bonus de Bienvenida!
         </span>
 
         <h2 class="text-xl font-black text-white mt-3 mb-1">¡Bienvenido a NetGamer MX!</h2>
-        <p class="text-slate-400 text-xs sm:text-sm mb-4">Como regalo por unirte, te hemos acreditado:</p>
+        <p class="text-slate-400 text-xs sm:text-sm mb-3">Como regalo por unirte, te hemos acreditado:</p>
 
-        <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 rounded-xl py-3.5 px-4 mb-4">
+        <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 rounded-xl py-3 px-4 mb-3">
             <div class="text-4xl font-black text-amber-400 mb-0.5">
                 +<span id="bonus-cantidad">250</span> NC
             </div>
             <p class="text-amber-300/70 text-[11px] font-semibold">NetCoins acreditadas a tu cuenta</p>
         </div>
         
-        <button onclick="document.getElementById('modal-bonus').classList.add('hidden')" 
-                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold py-2.5 px-4 rounded-xl transition-all active:scale-95 text-sm shadow-lg shadow-purple-900/30">
-            ¡Excelente, gracias!
+        <div class="text-left space-y-1.5 mb-4 bg-slate-900/50 rounded-xl p-3 border border-slate-700/50">
+            <p class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Completa ofertas y gana más NetCoins
+            </p>
+            <p class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Invita amigos y ambos ganan 500 NC
+            </p>
+            <p class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Canjea por PayPal, SPEI o Robux
+            </p>
+        </div>
+
+        <button onclick="reclamarBonus()" class="btn-bonus-reclamar w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold py-3 px-4 rounded-xl text-sm sm:text-base shadow-lg shadow-purple-700/40 transition duration-200 active:scale-95">
+            🎉 ¡Reclamar mis NetCoins!
         </button>
+        
+        <p class="text-slate-500 text-[10px] sm:text-xs mt-2.5">Solo se otorga una vez por cuenta</p>
         
     </div>
 </div>
-            <div class="text-left space-y-2 mb-6 bg-slate-900/50 rounded-xl p-4">
-                <p class="text-xs text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Completa ofertas y gana más NetCoins</p>
-                <p class="text-xs text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Invita amigos y ambos ganan 500 NC</p>
-                <p class="text-xs text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Canjea por PayPal, SPEI o Robux</p>
-            </div>
-
-            <button onclick="reclamarBonus()" class="btn-bonus-reclamar w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-extrabold py-4 rounded-2xl text-base shadow-lg shadow-purple-700/40 transition duration-200 active:scale-95">
-                🎉 ¡Reclamar mis NetCoins!
-            </button>
-            <p class="text-slate-600 text-xs mt-3">Solo se otorga una vez por cuenta</p>
-        </div>
-    </div>
 
     <div id="splash-screen" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center z-[999]">
         <h1 class="text-3xl font-extrabold text-purple-500 tracking-wide mb-3">NetGamer <span class="text-white">MX</span></h1>
