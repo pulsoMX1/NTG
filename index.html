@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Anuncio CPAnetwork invoke -->
+    <script async="async" data-cfasync="false" src="https://pl29885983.effectivecpmnetwork.com/08103591ba362aeb7a7ee360f307d4ac/invoke.js"></script>
     <style>
         
         * { box-sizing: border-box; }
@@ -345,6 +348,23 @@
             </header>
 
             <main id="main-content" class="flex-1 p-3 sm:p-6 overflow-y-auto">
+
+                <!-- Anuncio Banner Desktop 728x90 (oculto en móvil) -->
+                <div class="hidden sm:flex justify-center mb-4">
+                    <div id="container-08103591ba362aeb7a7ee360f307d4ac"></div>
+                </div>
+
+                <!-- Anuncio Banner Desktop 728x90 highperformanceformat -->
+                <div class="hidden sm:flex justify-center mb-4">
+                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
+                    <script>
+                    (function(){
+                        var atOptions = { 'key': '1e445d6376d731d4b4b8b14f689c49ee', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
+                        window._adOptions728 = atOptions;
+                    })();
+                    </script>
+                    <script src="https://www.highperformanceformat.com/1e445d6376d731d4b4b8b14f689c49ee/invoke.js"></script>
+                </div>
 
 
                 <div id="tab-inicio" class="tab-content active space-y-4 sm:space-y-6">
@@ -853,6 +873,16 @@
                 </div>
 
             </main>
+        </div>
+
+        <!-- Anuncio Banner Móvil 320x50 (solo en móvil, encima del bottom nav) -->
+        <div class="sm:hidden fixed bottom-[72px] left-0 right-0 z-40 flex justify-center pointer-events-none">
+            <div class="pointer-events-auto" id="ad-mobile-320-wrap">
+                <script>
+                atOptions = { 'key': 'c63e0cc3b3ff8e73aa2120d125f516eb', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+                </script>
+                <script src="https://www.highperformanceformat.com/c63e0cc3b3ff8e73aa2120d125f516eb/invoke.js"></script>
+            </div>
         </div>
 
         <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 z-50 justify-around items-center px-2 py-2">
@@ -1962,6 +1992,50 @@
             // Abrimos el blog en una pestaña nueva, mandando el ID oculto en la URL
             window.open(`${urlNoticias}?uid=${currentUser.id}`, '_blank');
         }
+    </script>
+    <!-- Anuncio flotante / popunder CPAnetwork -->
+    <script src="https://pl29885986.effectivecpmnetwork.com/1f/e5/ad/1fe5ad3527321360c99671bf492a9bec.js"></script>
+
+    <!-- Forzar sandbox en iframes de anuncios inyectados dinámicamente -->
+    <script>
+    (function() {
+        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms';
+        var AD_DOMAINS = ['highperformanceformat.com', 'effectivecpmnetwork.com'];
+
+        function isAdIframe(iframe) {
+            var src = iframe.src || '';
+            return AD_DOMAINS.some(function(d) { return src.indexOf(d) !== -1; }) || !iframe.id || iframe.id.indexOf('iframe-') === -1;
+        }
+
+        function applySandbox(iframe) {
+            // Solo aplicar a iframes de anuncios, no a los muros de oferta
+            var src = iframe.src || '';
+            var id  = iframe.id || '';
+            // Saltar iframes de muros de ofertas propios
+            if (id === 'iframe-cpalead' || id === 'iframe-adgem' || id === 'iframe-bitlabs') return;
+            if (!iframe.hasAttribute('sandbox')) {
+                iframe.setAttribute('sandbox', AD_SANDBOX);
+            }
+        }
+
+        // Observar iframes nuevos agregados al DOM
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType !== 1) return;
+                    if (node.tagName === 'IFRAME') applySandbox(node);
+                    node.querySelectorAll && node.querySelectorAll('iframe').forEach(applySandbox);
+                });
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Aplicar a iframes ya existentes al cargar
+        window.addEventListener('load', function() {
+            document.querySelectorAll('iframe').forEach(applySandbox);
+        });
+    })();
     </script>
  
 </body>
