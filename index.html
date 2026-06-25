@@ -2625,14 +2625,17 @@
             }, 1000);
         }
 
+        let _canalCola = null;
         function suscribirseColaPorEmparejamiento(juego, apuesta) {
-            const canal = _supabase.channel('cola-' + currentUser.id)
-                .on('postgres_changes', {
+            if (_canalCola) { _canalCola.unsubscribe(); _canalCola = null; }
+            _canalCola = _supabase.channel('cola-' + currentUser.id + '-' + Date.now());
+            _canalCola.on('postgres_changes', {
                     event: 'INSERT', schema: 'public', table: 'partidas',
                     filter: `jugador1_id=eq.${currentUser.id}`
                 }, async (payload) => {
                     clearInterval(_timerBusqueda);
-                    canal.unsubscribe();
+                    _canalCola.unsubscribe();
+                    _canalCola = null;
                     _partidaActual = payload.new.id;
                     _jugadorNum    = 1;
                     await _cargarNombreRival(payload.new.id);
@@ -2705,7 +2708,7 @@
                 procesarResultadoRonda(data, jugada);
             } else {
                 // Esperando al oponente — activar polling
-                _iniciarPollEsperaOponente(partida_id);
+                _iniciarPollEsperaOponente(_partidaActual);
             }
         }
 
