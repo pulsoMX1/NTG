@@ -2448,6 +2448,7 @@
         let _nombreRival   = 'Rival';
         let _timerRival    = null;
         let _timerRonda    = null;
+        let _resultadoProcesado = false;  // evita doble procesamiento (respuesta HTTP + Realtime)
 
         // Genera un color de fondo de avatar basado en el string ID
         function _avatarColor(id) {
@@ -2656,6 +2657,7 @@
 
             // Reset botones
             _jugadaHecha = false;
+            _resultadoProcesado = false;  // listo para recibir resultado de esta ronda
             document.querySelectorAll('.btn-jugada').forEach(b => {
                 b.disabled = false;
                 b.classList.remove('opacity-40', 'ring-2', 'ring-purple-500', 'bg-purple-500/20');
@@ -2716,6 +2718,8 @@
         }
 
         function procesarResultadoRonda(data, miJugada) {
+            if (_resultadoProcesado) return;  // ya fue procesado (HTTP llegó antes que Realtime o viceversa)
+            _resultadoProcesado = true;
             clearInterval(_timerJugada);
             document.getElementById('estado-espera-rival').classList.add('hidden');
 
