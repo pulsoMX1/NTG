@@ -1297,8 +1297,11 @@
             btn.disabled = true;
             btn.innerText = '⏳ Acreditando...';
 
-            // Llamada segura a la Edge Function
-            const { data, error } = await _supabase.functions.invoke('reclamar-bonus');
+            // Llamada segura a la Edge Function con token explícito
+            const { data: { session } } = await _supabase.auth.getSession();
+            const { data, error } = await _supabase.functions.invoke('reclamar-bonus', {
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
 
             // Manejo de errores desde el servidor
             if (error || data?.error) {
@@ -2179,8 +2182,10 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando link de pago...';
 
             try {
+                const { data: { session: pmSession } } = await _supabase.auth.getSession();
                 const { data, error } = await _supabase.functions.invoke('create-payment', {
-                    body: { user_id: currentUser.id, plan: 'premium_mensual' }
+                    body: { user_id: currentUser.id, plan: 'premium_mensual' },
+                    headers: { Authorization: `Bearer ${pmSession?.access_token}` }
                 });
 
                 if (error || !data?.init_point) {
