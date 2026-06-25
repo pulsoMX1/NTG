@@ -888,97 +888,225 @@
                 </div>
 
                 <!-- ══ TAB JUEGOS ══ -->
-                <div id="tab-juegos" class="tab-content space-y-4 sm:space-y-6">
+                <div id="tab-juegos" class="tab-content space-y-4 sm:space-y-5">
 
-                    <!-- Header vidas -->
-                    <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-2xl p-4">
-                        <div>
-                            <h2 class="text-lg font-black text-white">🎮 Arena de Juegos</h2>
-                            <p class="text-xs text-slate-400">Compite y gana NetCoins</p>
-                        </div>
-                        <div class="text-center">
-                            <div id="vidas-display" class="text-2xl mb-0.5">❤️❤️❤️</div>
-                            <p class="text-xs text-slate-400">Vidas de hoy</p>
+                    <!-- Header Arena -->
+                    <div class="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-900 p-5">
+                        <!-- glow decorativo -->
+                        <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full bg-purple-600/20 blur-3xl"></div>
+                        <div class="relative flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs font-bold tracking-widest uppercase text-purple-400">NetGamer</span>
+                                    <span class="text-[10px] bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-full px-2 py-0.5 font-bold">ARENA</span>
+                                </div>
+                                <h2 class="text-xl font-black text-white leading-tight">Juegos 1v1</h2>
+                                <p class="text-xs text-slate-400 mt-0.5">Gana NetCoins compitiendo en tiempo real</p>
+                            </div>
+                            <!-- Vidas -->
+                            <div class="text-right">
+                                <div id="vidas-display" class="text-xl leading-none mb-1">❤️❤️❤️</div>
+                                <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Vidas hoy</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Juego: Piedra Papel Tijeras -->
-                    <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-                        <div class="p-4 border-b border-slate-700 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-xl">✊</div>
-                            <div>
-                                <h3 class="font-bold text-white text-sm">Piedra Papel Tijeras</h3>
-                                <p class="text-xs text-slate-400">Elige tu apuesta y busca rival</p>
+                    <div class="rounded-2xl border border-slate-700 bg-slate-800/80 overflow-hidden">
+
+                        <!-- Cabecera del juego -->
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-slate-700/70 bg-slate-800">
+                            <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-lg shadow-lg shadow-purple-900/40">✊</div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-extrabold text-white text-sm leading-tight">Piedra Papel Tijeras</h3>
+                                <p class="text-[11px] text-slate-400">Elige apuesta · Emparejamiento en vivo · 1 vida por derrota</p>
                             </div>
+                            <span class="shrink-0 text-[10px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-full px-2 py-0.5">EN VIVO</span>
                         </div>
-                        <div class="p-4 grid grid-cols-3 gap-2">
-                            <button onclick="buscarPartida('ppt', 100)" class="btn-jugar flex flex-col items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl py-3 transition active:scale-95">
-                                <span class="text-emerald-400 font-extrabold text-sm">100 NC</span>
-                                <span class="text-xs text-slate-400">Básico</span>
+
+                        <!-- Modos de apuesta -->
+                        <div class="p-4 space-y-2">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Selecciona tu apuesta</p>
+                            <button onclick="buscarPartida('ppt', 100)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-emerald-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-sm">🌱</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">100 NC</p>
+                                        <p class="text-[11px] text-slate-400">Modo Básico</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] text-emerald-400 font-bold">Ganar +100 NC</span>
+                                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:text-emerald-400 transition"></i>
+                                </div>
                             </button>
-                            <button onclick="buscarPartida('ppt', 200)" class="btn-jugar flex flex-col items-center gap-1 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl py-3 transition active:scale-95">
-                                <span class="text-blue-400 font-extrabold text-sm">200 NC</span>
-                                <span class="text-xs text-slate-400">Normal</span>
+                            <button onclick="buscarPartida('ppt', 200)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-blue-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-sm">⚡</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">200 NC</p>
+                                        <p class="text-[11px] text-slate-400">Modo Normal</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] text-blue-400 font-bold">Ganar +200 NC</span>
+                                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:text-blue-400 transition"></i>
+                                </div>
                             </button>
-                            <button onclick="buscarPartida('ppt', 300)" class="btn-jugar flex flex-col items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl py-3 transition active:scale-95">
-                                <span class="text-amber-400 font-extrabold text-sm">300 NC</span>
-                                <span class="text-xs text-slate-400">Pro</span>
+                            <button onclick="buscarPartida('ppt', 300)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-amber-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-sm">🔥</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">300 NC</p>
+                                        <p class="text-[11px] text-slate-400">Modo Pro</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] text-amber-400 font-bold">Ganar +300 NC</span>
+                                    <i class="fa-solid fa-chevron-right text-slate-500 text-xs group-hover:text-amber-400 transition"></i>
+                                </div>
                             </button>
+                        </div>
+
+                        <!-- Reglas rápidas -->
+                        <div class="px-4 pb-4">
+                            <div class="flex items-center gap-4 bg-slate-900/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-[10px] text-slate-400">
+                                <span class="flex items-center gap-1"><span class="text-emerald-400">✓</span> Empate devuelve NC</span>
+                                <span class="flex items-center gap-1"><span class="text-rose-400">✗</span> Derrota = −1 vida</span>
+                                <span class="flex items-center gap-1"><span class="text-purple-400">⏱</span> 15s para elegir</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Próximamente -->
-                    <div class="bg-slate-800/50 border border-dashed border-slate-600 rounded-2xl p-6 text-center">
-                        <div class="text-3xl mb-2">🚀</div>
-                        <p class="text-slate-400 text-sm font-semibold">Más juegos próximamente</p>
-                        <p class="text-slate-500 text-xs mt-1">Trivia, Adivina el número y más</p>
+                    <div class="rounded-2xl border border-dashed border-slate-700 bg-slate-800/30 p-5 flex items-center gap-4">
+                        <div class="w-10 h-10 shrink-0 rounded-xl bg-slate-700/60 flex items-center justify-center text-xl">🚀</div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-300">Más juegos en camino</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Trivia, Adivina el número y torneos</p>
+                        </div>
                     </div>
 
                 </div>
 
                 <!-- ══ MODAL BUSCANDO PARTIDA ══ -->
-                <div id="modal-buscando" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[6000] p-4">
-                    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-6 text-center">
+                <div id="modal-buscando" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[6000] p-0 sm:p-4">
+                    <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm shadow-2xl overflow-hidden">
+
+                        <!-- ── FASE: BUSCANDO ── -->
                         <div id="fase-buscando">
-                            <div class="text-5xl mb-4 animate-bounce">🔍</div>
-                            <h3 class="text-xl font-black text-white mb-2">Buscando rival...</h3>
-                            <p class="text-slate-400 text-sm mb-4">Cancelamos si no encontramos en <span id="countdown-busqueda">30</span>s</p>
-                            <div class="w-full bg-slate-700 rounded-full h-2 mb-4">
-                                <div id="barra-busqueda" class="bg-purple-500 h-2 rounded-full transition-all duration-1000" style="width:100%"></div>
+                            <!-- barra top decorativa -->
+                            <div class="h-1 w-full bg-gradient-to-r from-purple-600 via-violet-500 to-purple-600 animate-pulse"></div>
+                            <div class="p-6 text-center">
+                                <!-- icono animado -->
+                                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center relative">
+                                    <span class="text-3xl">🔍</span>
+                                    <span class="absolute inset-0 rounded-2xl border border-purple-400/30 animate-ping"></span>
+                                </div>
+                                <h3 class="text-lg font-black text-white mb-1">Buscando rival...</h3>
+                                <p class="text-sm text-slate-400 mb-5">Emparejando con otro jugador en tiempo real</p>
+
+                                <!-- countdown + barra -->
+                                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 mb-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[11px] text-slate-400 font-semibold">Tiempo restante</span>
+                                        <span class="text-sm font-black text-white"><span id="countdown-busqueda">30</span>s</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-1.5">
+                                        <div id="barra-busqueda" class="bg-gradient-to-r from-purple-500 to-violet-400 h-1.5 rounded-full transition-all duration-1000" style="width:100%"></div>
+                                    </div>
+                                </div>
+
+                                <button onclick="cancelarBusqueda()" class="w-full flex items-center justify-center gap-2 border border-slate-600 hover:border-rose-500/50 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold text-sm py-2.5 rounded-xl transition">
+                                    <i class="fa-solid fa-xmark text-xs"></i> Cancelar búsqueda
+                                </button>
                             </div>
-                            <button onclick="cancelarBusqueda()" class="text-rose-400 text-sm hover:text-rose-300 transition">Cancelar búsqueda</button>
                         </div>
 
+                        <!-- ── FASE: JUGANDO ── -->
                         <div id="fase-jugando" class="hidden">
-                            <div class="text-4xl mb-3">⚔️</div>
-                            <h3 class="text-xl font-black text-white mb-1">¡Rival encontrado!</h3>
-                            <p class="text-slate-400 text-sm mb-4">Elige en <span id="countdown-jugada">15</span>s o perderás automáticamente</p>
-                            <div class="grid grid-cols-3 gap-3 mb-4">
-                                <button onclick="hacerJugada('piedra')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
-                                    <span class="text-3xl">✊</span>
-                                    <span class="text-xs text-slate-300 font-bold">Piedra</span>
-                                </button>
-                                <button onclick="hacerJugada('papel')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
-                                    <span class="text-3xl">✋</span>
-                                    <span class="text-xs text-slate-300 font-bold">Papel</span>
-                                </button>
-                                <button onclick="hacerJugada('tijeras')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
-                                    <span class="text-3xl">✌️</span>
-                                    <span class="text-xs text-slate-300 font-bold">Tijeras</span>
-                                </button>
+                            <div class="h-1 w-full bg-gradient-to-r from-emerald-500 via-cyan-400 to-emerald-500"></div>
+                            <div class="p-5">
+                                <!-- header rival encontrado -->
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">¡Rival encontrado!</span>
+                                        <h3 class="text-base font-black text-white leading-tight">Elige tu jugada</h3>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xl font-black text-white" id="countdown-jugada">15</div>
+                                        <p class="text-[10px] text-slate-500">segundos</p>
+                                    </div>
+                                </div>
+
+                                <!-- barra countdown jugada -->
+                                <div class="w-full bg-slate-700 rounded-full h-1 mb-5">
+                                    <div id="barra-jugada" class="bg-gradient-to-r from-cyan-500 to-emerald-400 h-1 rounded-full transition-all duration-1000" style="width:100%"></div>
+                                </div>
+
+                                <!-- Apuesta info -->
+                                <div class="flex items-center justify-center gap-1.5 bg-amber-500/10 border border-amber-500/25 rounded-lg py-1.5 mb-4">
+                                    <span class="text-xs text-slate-400">Apuesta:</span>
+                                    <span id="apuesta-display" class="text-sm font-black text-amber-400"></span>
+                                    <span class="text-xs text-slate-400">NC</span>
+                                    <span class="text-xs text-slate-500 ml-1">→ ganar <span class="text-emerald-400 font-bold" id="premio-display"></span> NC</span>
+                                </div>
+
+                                <!-- Botones de jugada -->
+                                <div class="grid grid-cols-3 gap-2.5 mb-4">
+                                    <button onclick="hacerJugada('piedra')" class="btn-jugada flex flex-col items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-violet-500/50 rounded-2xl py-5 transition active:scale-95 group">
+                                        <span class="text-4xl leading-none group-hover:scale-110 transition">✊</span>
+                                        <span class="text-[11px] font-bold text-slate-300 group-hover:text-white transition">Piedra</span>
+                                    </button>
+                                    <button onclick="hacerJugada('papel')" class="btn-jugada flex flex-col items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-violet-500/50 rounded-2xl py-5 transition active:scale-95 group">
+                                        <span class="text-4xl leading-none group-hover:scale-110 transition">✋</span>
+                                        <span class="text-[11px] font-bold text-slate-300 group-hover:text-white transition">Papel</span>
+                                    </button>
+                                    <button onclick="hacerJugada('tijeras')" class="btn-jugada flex flex-col items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 hover:border-violet-500/50 rounded-2xl py-5 transition active:scale-95 group">
+                                        <span class="text-4xl leading-none group-hover:scale-110 transition">✌️</span>
+                                        <span class="text-[11px] font-bold text-slate-300 group-hover:text-white transition">Tijeras</span>
+                                    </button>
+                                </div>
+
+                                <!-- estado espera -->
+                                <div id="estado-espera-rival" class="hidden text-center">
+                                    <div class="flex items-center justify-center gap-2 text-sm text-slate-400">
+                                        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                                        Esperando que el rival elija...
+                                    </div>
+                                </div>
+
+                                <p class="text-[10px] text-slate-600 text-center mt-2">Si no eliges a tiempo, se jugará Piedra automáticamente</p>
                             </div>
-                            <p class="text-xs text-slate-500">Apuesta: <span id="apuesta-display" class="text-amber-400 font-bold"></span> NC</p>
                         </div>
 
+                        <!-- ── FASE: RESULTADO ── -->
                         <div id="fase-resultado" class="hidden">
-                            <div id="resultado-emoji" class="text-6xl mb-3"></div>
-                            <h3 id="resultado-titulo" class="text-2xl font-black mb-1"></h3>
-                            <p id="resultado-detalle" class="text-slate-400 text-sm mb-2"></p>
-                            <p id="resultado-jugadas" class="text-xs text-slate-500 mb-4"></p>
-                            <button onclick="cerrarModalJuego()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition active:scale-95">
-                                Continuar
-                            </button>
+                            <div id="resultado-barra-top" class="h-1 w-full"></div>
+                            <div class="p-6 text-center">
+                                <div id="resultado-emoji" class="text-6xl mb-3 leading-none"></div>
+                                <h3 id="resultado-titulo" class="text-2xl font-black mb-1"></h3>
+                                <p id="resultado-detalle" class="text-sm text-slate-400 mb-2"></p>
+
+                                <!-- jugadas -->
+                                <div id="resultado-jugadas-box" class="flex items-center justify-center gap-3 bg-slate-800 border border-slate-700 rounded-xl p-3 mb-5">
+                                    <div class="text-center">
+                                        <div id="resultado-mi-jugada" class="text-3xl mb-0.5"></div>
+                                        <p class="text-[10px] text-slate-400 font-semibold">Tú</p>
+                                    </div>
+                                    <div class="text-lg text-slate-600 font-black">VS</div>
+                                    <div class="text-center">
+                                        <div id="resultado-rival-jugada" class="text-3xl mb-0.5"></div>
+                                        <p class="text-[10px] text-slate-400 font-semibold">Rival</p>
+                                    </div>
+                                </div>
+
+                                <button onclick="cerrarModalJuego()" class="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-bold py-3 rounded-xl transition active:scale-95 shadow-lg shadow-purple-900/30">
+                                    Continuar
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -2360,17 +2488,23 @@
         function iniciarFaseJugando() {
             document.getElementById('fase-buscando').classList.add('hidden');
             document.getElementById('fase-jugando').classList.remove('hidden');
+            document.getElementById('estado-espera-rival').classList.add('hidden');
             document.getElementById('apuesta-display').textContent = _apuestaActual;
+            const premioEl = document.getElementById('premio-display');
+            if (premioEl) premioEl.textContent = _apuestaActual;
             // Reset botones (por si quedaron deshabilitados de partida anterior)
             document.querySelectorAll('.btn-jugada').forEach(b => {
                 b.disabled = false;
-                b.classList.remove('opacity-40', 'ring-2', 'ring-purple-500', 'scale-95');
+                b.classList.remove('opacity-40', 'ring-2', 'ring-purple-500', 'scale-95', 'bg-purple-500/20');
             });
             let seg = 15;
             document.getElementById('countdown-jugada').textContent = seg;
+            const barraJugada = document.getElementById('barra-jugada');
+            if (barraJugada) barraJugada.style.width = '100%';
             _timerJugada = setInterval(async () => {
                 seg--;
                 document.getElementById('countdown-jugada').textContent = seg;
+                if (barraJugada) barraJugada.style.width = (seg / 15 * 100) + '%';
                 if (seg <= 0) {
                     clearInterval(_timerJugada);
                     if (!_jugadaHecha) await hacerJugada('piedra'); // jugada default si no eligió
@@ -2393,6 +2527,7 @@
                     b.classList.add('opacity-40');
                 }
             });
+            document.getElementById('estado-espera-rival').classList.remove('hidden');
 
             const { data: { session } } = await _supabase.auth.getSession();
             const { data, error } = await _supabase.functions.invoke('hacer-jugada', {
@@ -2422,14 +2557,16 @@
 
         function mostrarResultado(data, miJugada) {
             document.getElementById('fase-jugando').classList.add('hidden');
+            document.getElementById('estado-espera-rival').classList.add('hidden');
             document.getElementById('fase-resultado').classList.remove('hidden');
 
             const ganeYo = data.ganador_id === currentUser.id;
             const empate = data.resultado === 'empate';
 
-            const emoji = empate ? '🤝' : ganeYo ? '🏆' : '💀';
+            const emoji  = empate ? '🤝' : ganeYo ? '🏆' : '💀';
             const titulo = empate ? '¡Empate!' : ganeYo ? '¡Ganaste!' : '¡Perdiste!';
-            const color = empate ? 'text-blue-400' : ganeYo ? 'text-emerald-400' : 'text-rose-400';
+            const color  = empate ? 'text-blue-400' : ganeYo ? 'text-emerald-400' : 'text-rose-400';
+            const barra  = empate ? 'bg-blue-500' : ganeYo ? 'bg-gradient-to-r from-emerald-500 to-cyan-400' : 'bg-gradient-to-r from-rose-500 to-pink-600';
             const detalle = empate
                 ? 'Se devolvieron tus NetCoins.'
                 : ganeYo
@@ -2437,14 +2574,18 @@
                 : `-${_apuestaActual} NC y perdiste 1 vida 💔`;
 
             const emojisJugada = { piedra: '✊', papel: '✋', tijeras: '✌️' };
-            const j1 = emojisJugada[data.jugada1] || '?';
-            const j2 = emojisJugada[data.jugada2] || '?';
+            // Determinar cuál fue mi jugada vs la del rival según número de jugador
+            const esJ1 = _jugadorNum === 1;
+            const miEmoji    = emojisJugada[esJ1 ? data.jugada1 : data.jugada2] || '❓';
+            const rivalEmoji = emojisJugada[esJ1 ? data.jugada2 : data.jugada1] || '❓';
 
+            document.getElementById('resultado-barra-top').className = `h-1 w-full ${barra}`;
             document.getElementById('resultado-emoji').textContent = emoji;
             document.getElementById('resultado-titulo').className = `text-2xl font-black mb-1 ${color}`;
             document.getElementById('resultado-titulo').textContent = titulo;
             document.getElementById('resultado-detalle').textContent = detalle;
-            document.getElementById('resultado-jugadas').textContent = `${j1} vs ${j2}`;
+            document.getElementById('resultado-mi-jugada').textContent = miEmoji;
+            document.getElementById('resultado-rival-jugada').textContent = rivalEmoji;
 
             cargarVidas();
             cargarDatosPerfil(currentUser);
