@@ -321,6 +321,9 @@
                     <button onclick="switchTab('tab-historial', event)" class="tab-btn w-full flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-700 hover:text-white transition text-left text-sm">
                         <i class="fa-solid fa-clock-rotate-left shrink-0"></i> <span class="sidebar-label">Historial</span>
                     </button>
+                    <button onclick="switchTab('tab-juegos', event)" class="tab-btn w-full flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-700 hover:text-white transition text-left text-sm">
+                        <i class="fa-solid fa-gamepad-modern shrink-0"></i> <span class="sidebar-label">Juegos</span>
+                    </button>
                     <button id="sidebar-btn-premium" onclick="switchTab('tab-premium', event)" class="tab-btn w-full flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl text-amber-400 hover:bg-amber-500/10 transition text-left text-sm font-bold border border-amber-500/30">
                         <i class="fa-solid fa-crown shrink-0"></i> <span class="sidebar-label">Premium</span>
                     </button>
@@ -884,6 +887,101 @@
 
                 </div>
 
+                <!-- ══ TAB JUEGOS ══ -->
+                <div id="tab-juegos" class="tab-content space-y-4 sm:space-y-6">
+
+                    <!-- Header vidas -->
+                    <div class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-2xl p-4">
+                        <div>
+                            <h2 class="text-lg font-black text-white">🎮 Arena de Juegos</h2>
+                            <p class="text-xs text-slate-400">Compite y gana NetCoins</p>
+                        </div>
+                        <div class="text-center">
+                            <div id="vidas-display" class="text-2xl mb-0.5">❤️❤️❤️</div>
+                            <p class="text-xs text-slate-400">Vidas de hoy</p>
+                        </div>
+                    </div>
+
+                    <!-- Juego: Piedra Papel Tijeras -->
+                    <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+                        <div class="p-4 border-b border-slate-700 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-xl">✊</div>
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Piedra Papel Tijeras</h3>
+                                <p class="text-xs text-slate-400">Elige tu apuesta y busca rival</p>
+                            </div>
+                        </div>
+                        <div class="p-4 grid grid-cols-3 gap-2">
+                            <button onclick="buscarPartida('ppt', 100)" class="btn-jugar flex flex-col items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl py-3 transition active:scale-95">
+                                <span class="text-emerald-400 font-extrabold text-sm">100 NC</span>
+                                <span class="text-xs text-slate-400">Básico</span>
+                            </button>
+                            <button onclick="buscarPartida('ppt', 200)" class="btn-jugar flex flex-col items-center gap-1 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl py-3 transition active:scale-95">
+                                <span class="text-blue-400 font-extrabold text-sm">200 NC</span>
+                                <span class="text-xs text-slate-400">Normal</span>
+                            </button>
+                            <button onclick="buscarPartida('ppt', 300)" class="btn-jugar flex flex-col items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl py-3 transition active:scale-95">
+                                <span class="text-amber-400 font-extrabold text-sm">300 NC</span>
+                                <span class="text-xs text-slate-400">Pro</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Próximamente -->
+                    <div class="bg-slate-800/50 border border-dashed border-slate-600 rounded-2xl p-6 text-center">
+                        <div class="text-3xl mb-2">🚀</div>
+                        <p class="text-slate-400 text-sm font-semibold">Más juegos próximamente</p>
+                        <p class="text-slate-500 text-xs mt-1">Trivia, Adivina el número y más</p>
+                    </div>
+
+                </div>
+
+                <!-- ══ MODAL BUSCANDO PARTIDA ══ -->
+                <div id="modal-buscando" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[6000] p-4">
+                    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-6 text-center">
+                        <div id="fase-buscando">
+                            <div class="text-5xl mb-4 animate-bounce">🔍</div>
+                            <h3 class="text-xl font-black text-white mb-2">Buscando rival...</h3>
+                            <p class="text-slate-400 text-sm mb-4">Cancelamos si no encontramos en <span id="countdown-busqueda">30</span>s</p>
+                            <div class="w-full bg-slate-700 rounded-full h-2 mb-4">
+                                <div id="barra-busqueda" class="bg-purple-500 h-2 rounded-full transition-all duration-1000" style="width:100%"></div>
+                            </div>
+                            <button onclick="cancelarBusqueda()" class="text-rose-400 text-sm hover:text-rose-300 transition">Cancelar búsqueda</button>
+                        </div>
+
+                        <div id="fase-jugando" class="hidden">
+                            <div class="text-4xl mb-3">⚔️</div>
+                            <h3 class="text-xl font-black text-white mb-1">¡Rival encontrado!</h3>
+                            <p class="text-slate-400 text-sm mb-4">Elige en <span id="countdown-jugada">15</span>s o perderás automáticamente</p>
+                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                <button onclick="hacerJugada('piedra')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
+                                    <span class="text-3xl">✊</span>
+                                    <span class="text-xs text-slate-300 font-bold">Piedra</span>
+                                </button>
+                                <button onclick="hacerJugada('papel')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
+                                    <span class="text-3xl">✋</span>
+                                    <span class="text-xs text-slate-300 font-bold">Papel</span>
+                                </button>
+                                <button onclick="hacerJugada('tijeras')" class="btn-jugada flex flex-col items-center gap-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-xl py-4 transition active:scale-95">
+                                    <span class="text-3xl">✌️</span>
+                                    <span class="text-xs text-slate-300 font-bold">Tijeras</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-slate-500">Apuesta: <span id="apuesta-display" class="text-amber-400 font-bold"></span> NC</p>
+                        </div>
+
+                        <div id="fase-resultado" class="hidden">
+                            <div id="resultado-emoji" class="text-6xl mb-3"></div>
+                            <h3 id="resultado-titulo" class="text-2xl font-black mb-1"></h3>
+                            <p id="resultado-detalle" class="text-slate-400 text-sm mb-2"></p>
+                            <p id="resultado-jugadas" class="text-xs text-slate-500 mb-4"></p>
+                            <button onclick="cerrarModalJuego()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition active:scale-95">
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ══ TAB PREMIUM ══ -->
                 <div id="tab-premium" class="tab-content space-y-4 sm:space-y-6">
 
@@ -1042,6 +1140,10 @@
             <button onclick="switchTab('tab-historial', event)" class="tab-btn-mobile flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition min-w-0">
                 <i class="fa-solid fa-clock-rotate-left text-base"></i>
                 <span class="text-[10px] font-semibold">Historial</span>
+            </button>
+            <button onclick="switchTab('tab-juegos', event)" class="tab-btn-mobile flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 transition min-w-0">
+                <i class="fa-solid fa-dice text-base"></i>
+                <span class="text-[10px] font-semibold">Juegos</span>
             </button>
             <button onclick="switchTab('tab-premium', event)" class="tab-btn-mobile flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-amber-400 transition min-w-0">
                 <i class="fa-solid fa-crown text-base"></i>
@@ -2153,6 +2255,209 @@
             // Abrimos el blog en una pestaña nueva, mandando el ID oculto en la URL
             window.open(`${urlNoticias}?uid=${currentUser.id}`, '_blank');
         }
+
+        // ══════════════════════════════════════════
+        // SISTEMA DE JUEGOS
+        // ══════════════════════════════════════════
+        let _partidaActual = null;
+        let _jugadorNum = null;
+        let _apuestaActual = 0;
+        let _timerBusqueda = null;
+        let _timerJugada = null;
+        let _canalPartida = null;
+        let _jugadaHecha = false;
+
+        async function cargarVidas() {
+            if (!currentUser) return;
+            const { data } = await _supabase
+                .from('perfiles')
+                .select('vidas_hoy, vidas_reset_fecha, is_premium')
+                .eq('id', currentUser.id)
+                .single();
+            if (!data) return;
+            const hoy = new Date().toISOString().split('T')[0];
+            let vidas = data.vidas_hoy;
+            if (data.vidas_reset_fecha !== hoy) vidas = data.is_premium ? 7 : 3;
+            const max = data.is_premium ? 7 : 3;
+            const el = document.getElementById('vidas-display');
+            if (el) el.textContent = '❤️'.repeat(vidas) + '🖤'.repeat(Math.max(0, max - vidas));
+        }
+
+        async function buscarPartida(juego, apuesta) {
+            if (!currentUser) { mostrarNotificacion('Inicia sesión primero', 'error'); return; }
+            _apuestaActual = apuesta;
+            _jugadaHecha = false;
+
+            const { data: { session } } = await _supabase.auth.getSession();
+            const { data, error } = await _supabase.functions.invoke('buscar-partida', {
+                body: { juego, apuesta },
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
+
+            if (error || data?.error) {
+                const msgs = {
+                    sin_vidas: '😴 Sin vidas por hoy. Vuelve mañana.',
+                    sin_netcoins: `❌ Necesitas ${apuesta} NC para jugar.`,
+                    apuesta_invalida: 'Apuesta no válida.'
+                };
+                mostrarNotificacion(msgs[data?.error] || 'Error al buscar partida', 'error');
+                return;
+            }
+
+            mostrarModalJuego();
+
+            if (data.status === 'emparejado') {
+                _partidaActual = data.partida_id;
+                _jugadorNum = data.eres_jugador;
+                iniciarFaseJugando();
+                suscribirsePartida(data.partida_id);
+            } else {
+                // Buscando — escuchar cola
+                iniciarCountdownBusqueda();
+                suscribirseColaPorEmparejamiento(juego, apuesta);
+            }
+        }
+
+        function mostrarModalJuego() {
+            document.getElementById('modal-buscando').classList.remove('hidden');
+            document.getElementById('fase-buscando').classList.remove('hidden');
+            document.getElementById('fase-jugando').classList.add('hidden');
+            document.getElementById('fase-resultado').classList.add('hidden');
+        }
+
+        function iniciarCountdownBusqueda() {
+            let seg = 30;
+            document.getElementById('countdown-busqueda').textContent = seg;
+            document.getElementById('barra-busqueda').style.width = '100%';
+            _timerBusqueda = setInterval(async () => {
+                seg--;
+                document.getElementById('countdown-busqueda').textContent = seg;
+                document.getElementById('barra-busqueda').style.width = (seg / 30 * 100) + '%';
+                if (seg <= 0) {
+                    clearInterval(_timerBusqueda);
+                    await cancelarBusqueda();
+                    mostrarNotificacion('No se encontró rival. Se devolvieron tus NC.', 'info');
+                    cerrarModalJuego();
+                }
+            }, 1000);
+        }
+
+        function suscribirseColaPorEmparejamiento(juego, apuesta) {
+            const canal = _supabase.channel('cola-' + currentUser.id)
+                .on('postgres_changes', {
+                    event: 'INSERT', schema: 'public', table: 'partidas',
+                    filter: `jugador2_id=eq.${currentUser.id}`
+                }, (payload) => {
+                    clearInterval(_timerBusqueda);
+                    canal.unsubscribe();
+                    _partidaActual = payload.new.id;
+                    _jugadorNum = 1;
+                    iniciarFaseJugando();
+                    suscribirsePartida(payload.new.id);
+                })
+                .subscribe();
+        }
+
+        function iniciarFaseJugando() {
+            document.getElementById('fase-buscando').classList.add('hidden');
+            document.getElementById('fase-jugando').classList.remove('hidden');
+            document.getElementById('apuesta-display').textContent = _apuestaActual;
+            let seg = 15;
+            document.getElementById('countdown-jugada').textContent = seg;
+            _timerJugada = setInterval(async () => {
+                seg--;
+                document.getElementById('countdown-jugada').textContent = seg;
+                if (seg <= 0) {
+                    clearInterval(_timerJugada);
+                    if (!_jugadaHecha) await hacerJugada('piedra'); // jugada default si no eligió
+                }
+            }, 1000);
+        }
+
+        async function hacerJugada(jugada) {
+            if (_jugadaHecha) return;
+            _jugadaHecha = true;
+            clearInterval(_timerJugada);
+            document.querySelectorAll('.btn-jugada').forEach(b => b.disabled = true);
+
+            const { data: { session } } = await _supabase.auth.getSession();
+            const { data, error } = await _supabase.functions.invoke('hacer-jugada', {
+                body: { partida_id: _partidaActual, jugada },
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
+
+            if (data?.resultado) {
+                mostrarResultado(data, jugada);
+            }
+            // Si no hay resultado aún, el canal Realtime lo notificará
+        }
+
+        function suscribirsePartida(partida_id) {
+            _canalPartida = _supabase.channel('partida-' + partida_id)
+                .on('postgres_changes', {
+                    event: 'UPDATE', schema: 'public', table: 'partidas',
+                    filter: `id=eq.${partida_id}`
+                }, (payload) => {
+                    if (payload.new.estatus === 'terminada') {
+                        clearInterval(_timerJugada);
+                        mostrarResultado(payload.new, null);
+                    }
+                })
+                .subscribe();
+        }
+
+        function mostrarResultado(data, miJugada) {
+            document.getElementById('fase-jugando').classList.add('hidden');
+            document.getElementById('fase-resultado').classList.remove('hidden');
+
+            const ganeYo = data.ganador_id === currentUser.id;
+            const empate = data.resultado === 'empate';
+
+            const emoji = empate ? '🤝' : ganeYo ? '🏆' : '💀';
+            const titulo = empate ? '¡Empate!' : ganeYo ? '¡Ganaste!' : '¡Perdiste!';
+            const color = empate ? 'text-blue-400' : ganeYo ? 'text-emerald-400' : 'text-rose-400';
+            const detalle = empate
+                ? 'Se devolvieron tus NetCoins.'
+                : ganeYo
+                ? `+${_apuestaActual} NC agregados a tu balance 🎉`
+                : `-${_apuestaActual} NC y perdiste 1 vida 💔`;
+
+            const emojisJugada = { piedra: '✊', papel: '✋', tijeras: '✌️' };
+            const j1 = emojisJugada[data.jugada1] || '?';
+            const j2 = emojisJugada[data.jugada2] || '?';
+
+            document.getElementById('resultado-emoji').textContent = emoji;
+            document.getElementById('resultado-titulo').className = `text-2xl font-black mb-1 ${color}`;
+            document.getElementById('resultado-titulo').textContent = titulo;
+            document.getElementById('resultado-detalle').textContent = detalle;
+            document.getElementById('resultado-jugadas').textContent = `${j1} vs ${j2}`;
+
+            cargarVidas();
+            cargarDatosPerfil(currentUser);
+        }
+
+        async function cancelarBusqueda() {
+            clearInterval(_timerBusqueda);
+            const { data: { session } } = await _supabase.auth.getSession();
+            await _supabase.functions.invoke('cancelar-busqueda', {
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
+        }
+
+        function cerrarModalJuego() {
+            document.getElementById('modal-buscando').classList.add('hidden');
+            if (_canalPartida) _canalPartida.unsubscribe();
+            _partidaActual = null;
+            _jugadorNum = null;
+            _jugadaHecha = false;
+        }
+
+        // Cargar vidas cuando se abre el tab de juegos
+        const _switchTabOriginal = switchTab;
+        switchTab = function(tabId, event) {
+            _switchTabOriginal(tabId, event);
+            if (tabId === 'tab-juegos') cargarVidas();
+        };
 
         // ══════════════════════════════════════════
         // SISTEMA PREMIUM
