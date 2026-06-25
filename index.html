@@ -2754,9 +2754,15 @@
             const ganeRonda  = data.ganador_id === currentUser.id;
             const empateRond = data.resultado === 'empate';
 
-            if (!empateRond) {
-                if (ganeRonda) _puntosYo++;
-                else           _puntosRival++;
+            // Usar puntos directo de la BD (no acumular localmente para evitar desfase)
+            if (data.puntos_j1 !== undefined && data.puntos_j2 !== undefined) {
+                _puntosYo    = esJ1 ? data.puntos_j1 : data.puntos_j2;
+                _puntosRival = esJ1 ? data.puntos_j2 : data.puntos_j1;
+            } else {
+                if (!empateRond) {
+                    if (ganeRonda) _puntosYo++;
+                    else           _puntosRival++;
+                }
             }
 
             const emojisJugada = { piedra: '✊', papel: '✋', tijeras: '✌️' };
