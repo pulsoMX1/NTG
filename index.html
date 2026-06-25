@@ -2746,24 +2746,21 @@
 
         function procesarResultadoRonda(data, miJugada) {
             if (_resultadoProcesado) return;
+
+            // Solo procesar si el resultado es definitivo:
+            // - tiene ganador_id real, O
+            // - resultado es explícitamente 'empate'
+            const esEmpateConfirmado = data.resultado === 'empate';
+            const tieneGanador = !!data.ganador_id;
+            if (!esEmpateConfirmado && !tieneGanador) return; // esperar datos completos
+
             _resultadoProcesado = true;
             clearInterval(_timerJugada);
             document.getElementById('estado-espera-rival').classList.add('hidden');
 
             const esJ1       = _jugadorNum === 1;
-            // Determinar si gané basado en ganador_id vs currentUser.id
-            // Si ganador_id es null = empate
-            const empateRond = data.resultado === 'empate' || data.ganador_id === null;
+            const empateRond = esEmpateConfirmado;
             const ganeRonda  = !empateRond && data.ganador_id === currentUser.id;
-
-            console.log('[PPT] Resultado ronda:', {
-                esJ1, jugadorNum: _jugadorNum,
-                currentUserId: currentUser?.id,
-                ganador_id: data.ganador_id,
-                ganeRonda, empateRond,
-                jugada1: data.jugada1, jugada2: data.jugada2,
-                puntos_j1: data.puntos_j1, puntos_j2: data.puntos_j2
-            });
 
             // Usar puntos directo de la BD (no acumular localmente para evitar desfase)
             if (data.puntos_j1 !== undefined && data.puntos_j2 !== undefined) {
