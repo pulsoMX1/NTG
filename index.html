@@ -2645,7 +2645,7 @@
                 .subscribe();
         }
 
-        function iniciarFaseJugando() {
+        function iniciarFaseJugando(tsInicio) {
             _ocultarTodasFases();
             document.getElementById('fase-jugando').classList.remove('hidden');
             document.getElementById('estado-espera-rival').classList.add('hidden');
@@ -2670,14 +2670,17 @@
                 b.classList.remove('opacity-40', 'ring-2', 'ring-purple-500', 'bg-purple-500/20');
             });
 
-            let seg = 15;
+            // Calcular segundos restantes sincronizados con tsInicio (timestamp BD)
+            const DURACION_JUGADA = 15;
+            const transcurridoSeg = tsInicio ? Math.floor((Date.now() - tsInicio) / 1000) : 0;
+            let seg = Math.max(1, DURACION_JUGADA - transcurridoSeg);
             document.getElementById('countdown-jugada').textContent = seg;
             const barraJugada = document.getElementById('barra-jugada');
-            if (barraJugada) barraJugada.style.width = '100%';
+            if (barraJugada) barraJugada.style.width = (seg / DURACION_JUGADA * 100) + '%';
             _timerJugada = setInterval(async () => {
                 seg--;
                 document.getElementById('countdown-jugada').textContent = seg;
-                if (barraJugada) barraJugada.style.width = (seg / 15 * 100) + '%';
+                if (barraJugada) barraJugada.style.width = (seg / DURACION_JUGADA * 100) + '%';
                 if (seg <= 0) {
                     clearInterval(_timerJugada);
                     if (!_jugadaHecha) await hacerJugada('piedra');
@@ -2819,12 +2822,10 @@
                 return;
             }
 
-            // Mostrar quién ganó esta ronda brevemente (2s) y luego siguiente ronda
+            // Mostrar quién ganó esta ronda y arrancar la siguiente sincronizados
             _rondaActual++;
             _ocultarTodasFases();
 
-            // Inline mini-resultado antes del anuncio de ronda
-            // Reutilizamos anuncio-ronda con info extra
             document.getElementById('fase-anuncio-ronda').classList.remove('hidden');
             document.getElementById('marcador-yo').textContent    = _puntosYo;
             document.getElementById('marcador-rival').textContent  = _puntosRival;
@@ -2837,16 +2838,35 @@
             document.getElementById('anuncio-ronda-texto').textContent = `Ronda ${_rondaActual - 1}`;
             document.getElementById('anuncio-ronda-sub').textContent    = textoRonda;
 
-            // Después de 2s lanzar anuncio de la siguiente ronda (4s) y luego jugar
+            // Sincronizar inicio de siguiente ronda usando updated_at de la BD
+            // Ambos clientes calculan el mismo momento de arranque sin importar
+            // cuando recibieron el evento
             clearInterval(_timerRonda);
-            let seg = 2;
-            _timerRonda = setInterval(() => {
-                seg--;
-                if (seg <= 0) {
-                    clearInterval(_timerRonda);
-                    mostrarAnuncioRonda(_rondaActual, () => iniciarFaseJugando());
-                }
-            }, 1000);
+            const PAUSA_RESULTADO_MS = 2500; // tiempo mostrando resultado de ronda
+            const ANUNCIO_MS        = 3500; // tiempo del anuncio 'Ronda X'
+            const tsBase = data.updated_at ? new Date(data.updated_at).getTime() : Date.now();
+            const ahora  = Date.now();
+            const transcurrido = Math.max(0, ahora - tsBase);
+            // Tiempo restante para mostrar resultado antes de anuncio
+            const esperaResultado = Math.max(0, PAUSA_RESULTADO_MS - transcurrido);
+            // Tiempo restante para el anuncio de ronda antes de jugar
+            const esperaAnuncio = Math.max(0, PAUSA_RESULTADO_MS + ANUNCIO_MS - transcurrido);
+
+            _timerRonda = setTimeout(() => {
+                _ocultarTodasFases();
+                document.getElementById('fase-anuncio-ronda').classList.remove('hidden');
+                document.getElementById('anuncio-ronda-texto').textContent = `Ronda ${_rondaActual}`;
+                const subs = ['¡Que empiece el juego!', '¿Puedes mantener la ventaja?', '¡Ronda decisiva!', '¡Todo o nada!', '¡Dale con todo!'];
+                document.getElementById('anuncio-ronda-sub').textContent = subs[Math.min(_rondaActual - 1, subs.length - 1)];
+                document.getElementById('marcador-yo').textContent    = _puntosYo;
+                document.getElementById('marcador-rival').textContent  = _puntosRival;
+            }, esperaResultado);
+
+            const tsInicioJugada = tsBase + PAUSA_RESULTADO_MS + ANUNCIO_MS;
+            setTimeout(() => {
+                _resultadoProcesado = false; // reset JUSTO antes de iniciar nueva ronda
+                iniciarFaseJugando(tsInicioJugada);
+            }, esperaAnuncio);
         }
 
         function mostrarResultadoFinal(ganeYo, miEmoji, rivalEmoji) {
