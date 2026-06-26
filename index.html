@@ -335,8 +335,8 @@
                     <span>&bull;</span>
                     <button onclick="abrirTerminos()" class="hover:text-purple-400 transition">Términos</button>
                 </div>
-                <button onclick="cerrarSesion()" class="w-full bg-slate-900 hover:bg-rose-950 active:bg-rose-900 text-rose-400 font-semibold py-2 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket shrink-0"></i> <span class="sidebar-label">Cerrar Sesión</span>
+                <button onclick="abrirModalPerfil()" class="w-full bg-slate-900 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white font-semibold py-2 px-3 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-user shrink-0 text-purple-400"></i> <span class="sidebar-label">Mi Perfil</span>
                 </button>
             </div>
         </aside>
@@ -1145,7 +1145,7 @@
                             <div class="h-1 w-full bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500"></div>
                             <div class="p-6">
                                 <p class="text-center text-[10px] font-bold tracking-widest uppercase text-amber-400 mb-0.5">¡Rival encontrado!</p>
-                                <h3 class="text-center text-sm font-black text-white mb-4">El primero en ganar 3 rondas se lleva los NetCoins</h3>
+                                <h3 class="text-center text-sm font-black text-white mb-4">El primero en ganar 3 rondas se lleva las monedas</h3>
                                 <div class="flex items-center justify-between gap-2 mb-5">
                                     <!-- Yo -->
                                     <div class="flex-1 flex flex-col items-center gap-2">
@@ -1378,7 +1378,7 @@
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
-                                    <span><strong class="text-white">5 vidas por día para jugar en la seccion de juegos</strong> <span class="text-slate-400">(usuarios normales solo tienen 3)</span></span>
+                                    <span><strong class="text-white">5 vidas por día</strong> <span class="text-slate-400">(usuarios normales solo tienen 3)</span></span>
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
@@ -1458,11 +1458,137 @@
                 <i class="fa-solid fa-crown text-base"></i>
                 <span class="text-[10px] font-bold">👑</span>
             </button>
-            <button onclick="cerrarSesion()" class="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-rose-400 transition min-w-0">
-                <i class="fa-solid fa-right-from-bracket text-base"></i>
-                <span class="text-[10px] font-semibold">Salir</span>
+            <button onclick="abrirModalPerfil()" class="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-slate-400 hover:text-purple-400 transition min-w-0">
+                <i class="fa-solid fa-circle-user text-base"></i>
+                <span class="text-[10px] font-semibold">Perfil</span>
             </button>
         </nav>
+    </div>
+
+    <!-- Modal: Perfil de Usuario -->
+    <div id="modal-perfil" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[6002] p-0 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+
+            <!-- Barra top -->
+            <div class="h-1 w-full bg-gradient-to-r from-purple-600 via-violet-500 to-purple-600 shrink-0"></div>
+
+            <!-- Header con avatar -->
+            <div class="relative bg-gradient-to-br from-purple-950/60 via-slate-900 to-slate-900 px-6 pt-6 pb-5 shrink-0">
+                <!-- glow -->
+                <div class="pointer-events-none absolute -top-6 -right-6 w-32 h-32 rounded-full bg-purple-600/20 blur-3xl"></div>
+                <!-- cerrar -->
+                <button onclick="cerrarModalPerfil()" class="absolute top-4 right-4 w-8 h-8 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition z-10">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+                <div class="flex items-center gap-4">
+                    <!-- Avatar -->
+                    <div id="perfil-avatar" class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-lg border-2 border-purple-500/50 shrink-0"></div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 id="perfil-nombre" class="text-lg font-black text-white leading-tight truncate"></h2>
+                            <span id="perfil-badge-premium" class="hidden text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-full px-2 py-0.5 font-bold shrink-0">👑 Premium</span>
+                        </div>
+                        <p id="perfil-email" class="text-xs text-slate-400 truncate mt-0.5"></p>
+                        <p id="perfil-miembro-desde" class="text-[10px] text-slate-500 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuerpo scrollable -->
+            <div class="overflow-y-auto flex-1 p-5 space-y-4">
+
+                <!-- Stats rápidas -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                        <div id="perfil-stat-nc" class="text-lg font-black text-amber-400 leading-tight">—</div>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">NetCoins</p>
+                    </div>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                        <div id="perfil-stat-referidos" class="text-lg font-black text-purple-400 leading-tight">—</div>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Referidos</p>
+                    </div>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                        <div id="perfil-stat-vidas" class="text-lg font-black text-rose-400 leading-tight">—</div>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Vidas hoy</p>
+                    </div>
+                </div>
+
+                <!-- Información de cuenta -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+                    <div class="px-4 py-2.5 border-b border-slate-700 bg-slate-800/80">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Información de cuenta</p>
+                    </div>
+                    <div class="divide-y divide-slate-700/60">
+                        <div class="flex items-center justify-between px-4 py-3 gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-user text-purple-400 text-xs"></i></span>
+                                <span class="text-xs text-slate-400">Usuario</span>
+                            </div>
+                            <span id="perfil-info-username" class="text-xs font-bold text-white truncate max-w-[160px]">—</span>
+                        </div>
+                        <div class="flex items-center justify-between px-4 py-3 gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-envelope text-blue-400 text-xs"></i></span>
+                                <span class="text-xs text-slate-400">Correo</span>
+                            </div>
+                            <span id="perfil-info-email" class="text-xs font-bold text-white truncate max-w-[160px]">—</span>
+                        </div>
+                        <div class="flex items-center justify-between px-4 py-3 gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar text-emerald-400 text-xs"></i></span>
+                                <span class="text-xs text-slate-400">Miembro desde</span>
+                            </div>
+                            <span id="perfil-info-fecha" class="text-xs font-bold text-white">—</span>
+                        </div>
+                        <div class="flex items-center justify-between px-4 py-3 gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-crown text-amber-400 text-xs"></i></span>
+                                <span class="text-xs text-slate-400">Plan</span>
+                            </div>
+                            <span id="perfil-info-plan" class="text-xs font-bold">—</span>
+                        </div>
+                        <div class="flex items-center justify-between px-4 py-3 gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-7 h-7 rounded-lg bg-slate-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-fingerprint text-slate-400 text-xs"></i></span>
+                                <span class="text-xs text-slate-400">ID de cuenta</span>
+                            </div>
+                            <span id="perfil-info-id" class="text-[10px] font-mono text-slate-400 truncate max-w-[130px]">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="space-y-2">
+                    <button onclick="cerrarModalPerfil(); switchTab('tab-premium', null)" id="perfil-btn-premium" class="w-full flex items-center justify-between bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center"><i class="fa-solid fa-crown text-amber-400 text-sm"></i></span>
+                            <div class="text-left">
+                                <p class="text-sm font-extrabold text-amber-300">Obtener Premium</p>
+                                <p class="text-[11px] text-slate-400">5 vidas/día · sin anuncios · más</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-amber-500/60 text-xs group-hover:text-amber-400 transition"></i>
+                    </button>
+
+                    <button onclick="cerrarModalPerfil(); abrirRecargarVidas()" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center"><i class="fa-solid fa-heart-circle-plus text-rose-400 text-sm"></i></span>
+                            <div class="text-left">
+                                <p class="text-sm font-bold text-white">Recargar vidas</p>
+                                <p class="text-[11px] text-slate-400">Consigue más vidas para seguir jugando</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-600 text-xs group-hover:text-rose-400 transition"></i>
+                    </button>
+                </div>
+
+                <!-- Cerrar sesión -->
+                <button onclick="cerrarModalPerfil(); cerrarSesion()" class="w-full flex items-center justify-center gap-2 border border-slate-700 hover:border-rose-500/50 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold text-sm py-3 rounded-xl transition active:scale-95">
+                    <i class="fa-solid fa-right-from-bracket text-xs"></i> Cerrar sesión
+                </button>
+
+            </div>
+        </div>
     </div>
 
     <!-- Modal: Recargar Vidas -->
@@ -2603,6 +2729,62 @@
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        /* ==================== MODAL PERFIL ==================== */
+        async function abrirModalPerfil() {
+            if (!currentUser) return;
+            document.getElementById('modal-perfil').classList.remove('hidden');
+
+            const username = currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'Usuario';
+            const email    = currentUser.email || '—';
+            const userId   = currentUser.id || '';
+            const creadoEn = currentUser.created_at
+                ? new Date(currentUser.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+                : '—';
+
+            // Avatar con iniciales y color único
+            const avatarEl = document.getElementById('perfil-avatar');
+            avatarEl.style.background = _avatarColor(userId);
+            avatarEl.textContent = _iniciales(username);
+
+            // Textos principales
+            document.getElementById('perfil-nombre').textContent        = username;
+            document.getElementById('perfil-email').textContent         = email;
+            document.getElementById('perfil-miembro-desde').textContent = `Miembro desde ${creadoEn}`;
+            document.getElementById('perfil-info-username').textContent = username;
+            document.getElementById('perfil-info-email').textContent    = email;
+            document.getElementById('perfil-info-fecha').textContent    = creadoEn;
+            document.getElementById('perfil-info-id').textContent       = userId.slice(0, 8) + '...' + userId.slice(-4);
+
+            // Cargar datos desde perfiles
+            const { data } = await _supabase
+                .from('perfiles')
+                .select('netcoins, total_referidos, is_premium, vidas_hoy, vidas_reset_fecha')
+                .eq('id', userId)
+                .single();
+
+            if (data) {
+                const hoy = new Date().toISOString().split('T')[0];
+                const maxVidas  = data.is_premium ? 5 : 3;
+                const vidasHoy  = data.vidas_reset_fecha !== hoy ? maxVidas : (data.vidas_hoy ?? maxVidas);
+                const isPremium = !!data.is_premium;
+
+                document.getElementById('perfil-stat-nc').textContent        = (data.netcoins || 0).toLocaleString('es-MX');
+                document.getElementById('perfil-stat-referidos').textContent = data.total_referidos || 0;
+                document.getElementById('perfil-stat-vidas').textContent     = `${vidasHoy}/${maxVidas}`;
+
+                document.getElementById('perfil-info-plan').textContent  = isPremium ? '👑 Premium' : 'Gratuito';
+                document.getElementById('perfil-info-plan').className    = `text-xs font-bold ${isPremium ? 'text-amber-400' : 'text-slate-300'}`;
+
+                // Badge y botón premium
+                document.getElementById('perfil-badge-premium').classList.toggle('hidden', !isPremium);
+                document.getElementById('perfil-btn-premium').classList.toggle('hidden', isPremium);
+            }
+        }
+
+        function cerrarModalPerfil() {
+            document.getElementById('modal-perfil').classList.add('hidden');
         }
 
         async function cerrarSesion() {
