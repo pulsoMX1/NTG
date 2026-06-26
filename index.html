@@ -2796,8 +2796,12 @@
             if (btnRecargar) { if (vidas <= 0) { btnRecargar.classList.remove('hidden'); btnRecargar.style.display='flex'; } else { btnRecargar.classList.add('hidden'); btnRecargar.style.display=''; } }
         }
 
+        let _buscandoPartida = false;
         async function buscarPartida(juego, apuesta) {
             if (!currentUser) { mostrarNotificacion('Inicia sesión primero', 'error'); return; }
+            if (_buscandoPartida) return;
+            _buscandoPartida = true;
+            document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = true);
             _apuestaActual = apuesta;
             _jugadaHecha   = false;
             _rondaActual   = 1;
@@ -2829,6 +2833,8 @@
                 };
                 mostrarNotificacion(msgs[codigoError] || '⚠️ Ocurrió un error al buscar partida. Intenta de nuevo.', 'error');
                 if (codigoError === 'sin_vidas') setTimeout(() => abrirRecargarVidas(), 600);
+                _buscandoPartida = false;
+                document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
                 return;
             }
 
@@ -3228,6 +3234,8 @@
         }
 
         async function cancelarBusqueda() {
+            _buscandoPartida = false;
+            document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
             clearInterval(_timerBusqueda);
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
@@ -3239,6 +3247,8 @@
         }
 
         function cerrarModalJuego() {
+            _buscandoPartida = false;
+            document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
             document.getElementById('modal-buscando').classList.add('hidden');
             if (_canalPartida) { _canalPartida.unsubscribe(); _canalPartida = null; }
             clearInterval(_timerBusqueda);
