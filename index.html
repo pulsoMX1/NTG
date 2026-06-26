@@ -13,6 +13,17 @@
     <style>
         
         * { box-sizing: border-box; }
+
+        /* Ocultar anuncios por defecto hasta saber si es premium */
+        #ad-native-banner, #ad-mobile-320-wrap, #ad-desktop-728 {
+            display: none !important;
+        }
+        /* Clase que activa los anuncios para no-premium */
+        body.ads-enabled #ad-native-banner,
+        body.ads-enabled #ad-mobile-320-wrap,
+        body.ads-enabled #ad-desktop-728 {
+            display: flex !important;
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -3388,6 +3399,13 @@
                 }
             } else {
                 if (styleEl) styleEl.remove();
+            }
+
+            // Activar o desactivar anuncios según premium
+            if (!isPremium) {
+                document.body.classList.add('ads-enabled');
+            } else {
+                document.body.classList.remove('ads-enabled');
             }
 
             // Cargar Social Bar solo si NO es premium
