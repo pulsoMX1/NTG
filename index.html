@@ -906,7 +906,10 @@
                             </div>
                             <div class="text-right shrink-0">
                                 <div id="vidas-display" class="text-xl leading-none mb-1">❤️❤️❤️</div>
-                                <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Vidas hoy</p>
+                                <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Vidas hoy</p>
+                                <button onclick="abrirRecargarVidas()" class="text-[10px] font-bold bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 rounded-lg px-2 py-1 transition active:scale-95 flex items-center gap-1 ml-auto">
+                                    <i class="fa-solid fa-heart-circle-plus text-xs"></i> Recargar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1444,6 +1447,79 @@
                 <span class="text-[10px] font-semibold">Salir</span>
             </button>
         </nav>
+    </div>
+
+    <!-- Modal: Recargar Vidas -->
+    <div id="modal-recargar-vidas" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[6001] p-0 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm shadow-2xl overflow-hidden">
+            <div class="h-1 w-full bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500"></div>
+            <div class="p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-black text-white">💖 Recargar Vidas</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Elige el paquete que mejor te convenga</p>
+                    </div>
+                    <button onclick="cerrarRecargarVidas()" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Paquetes usuario normal -->
+                <div id="paquetes-normal" class="space-y-2 mb-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Paquetes disponibles</p>
+                    <button onclick="comprarVidas(1, 2)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-base">❤️</div>
+                            <div class="text-left">
+                                <p class="text-sm font-extrabold text-white">1 Vida</p>
+                                <p class="text-[11px] text-slate-400">Una vida extra para seguir jugando</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-black text-rose-400 group-hover:text-rose-300">$2 MXN</span>
+                    </button>
+                    <button onclick="comprarVidas(3, 5)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-base">❤️❤️❤️</div>
+                            <div class="text-left">
+                                <p class="text-sm font-extrabold text-white">3 Vidas <span class="text-emerald-400 text-[10px] font-bold ml-1">¡Ahorra $1!</span></p>
+                                <p class="text-[11px] text-slate-400">El mejor valor del día</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-black text-rose-400 group-hover:text-rose-300">$5 MXN</span>
+                    </button>
+                </div>
+
+                <!-- Paquetes premium -->
+                <div id="paquetes-premium" class="hidden space-y-2 mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Paquetes Premium</p>
+                        <span class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full px-2 py-0.5 font-bold">👑 Precio especial</span>
+                    </div>
+                    <button onclick="comprarVidas(1, 1)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-amber-500/20 hover:border-amber-500/50 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">❤️</div>
+                            <div class="text-left">
+                                <p class="text-sm font-extrabold text-white">1 Vida</p>
+                                <p class="text-[11px] text-slate-400">Precio exclusivo Premium</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-black text-amber-400 group-hover:text-amber-300">$1 MXN</span>
+                    </button>
+                    <button onclick="comprarVidas(5, 3)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-amber-500/20 hover:border-amber-500/50 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">❤️❤️❤️❤️❤️</div>
+                            <div class="text-left">
+                                <p class="text-sm font-extrabold text-white">5 Vidas <span class="text-emerald-400 text-[10px] font-bold ml-1">¡Mejor oferta!</span></p>
+                                <p class="text-[11px] text-slate-400">Precio exclusivo Premium</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-black text-amber-400 group-hover:text-amber-300">$3 MXN</span>
+                    </button>
+                </div>
+
+                <p class="text-[10px] text-slate-600 text-center">Pago seguro vía MercadoPago · Las vidas se acreditan al instante</p>
+            </div>
+        </div>
     </div>
 
     <!-- Modal: Eliminar anuncios con Premium -->
@@ -3067,6 +3143,54 @@
             _switchTabOriginal(tabId, event);
             if (tabId === 'tab-juegos') cargarVidas();
         };
+
+        // ══════════════════════════════════════════
+        // RECARGAR VIDAS
+        // ══════════════════════════════════════════
+        function abrirRecargarVidas() {
+            // Mostrar paquetes según tipo de usuario
+            document.getElementById('paquetes-normal').classList.toggle('hidden', isPremium);
+            document.getElementById('paquetes-premium').classList.toggle('hidden', !isPremium);
+            document.getElementById('modal-recargar-vidas').classList.remove('hidden');
+        }
+
+        function cerrarRecargarVidas() {
+            document.getElementById('modal-recargar-vidas').classList.add('hidden');
+        }
+
+        async function comprarVidas(cantidad, precioMXN) {
+            if (!currentUser) return;
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="w-full text-center text-sm text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Generando pago...</div>`;
+
+            try {
+                const { data: { session } } = await _supabase.auth.getSession();
+                const { data, error } = await _supabase.functions.invoke('comprar-vidas', {
+                    body: { cantidad, precio_mxn: precioMXN },
+                    headers: { Authorization: `Bearer ${session?.access_token}` }
+                });
+
+                if (error || !data?.init_point) throw new Error('No se pudo generar el link de pago.');
+
+                cerrarRecargarVidas();
+                mostrarNotificacion('Redirigiendo a MercadoPago...', 'info');
+                const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (esMobil) {
+                    window.location.href = esMobil && data.preference_id
+                        ? `https://www.mercadopago.com.mx/payment-link/v1/redirect?preference-id=${data.preference_id}`
+                        : data.init_point;
+                } else {
+                    window.open(data.init_point, '_blank');
+                }
+            } catch(err) {
+                mostrarNotificacion('Error: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
 
         // ══════════════════════════════════════════
         // SISTEMA PREMIUM
