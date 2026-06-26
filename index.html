@@ -1966,7 +1966,8 @@
                             const max = payload.new.is_premium ? 5 : 3;
                             const vidas = Math.max(0, Math.min(payload.new.vidas_hoy, max));
                             vidasEl.textContent = '❤️'.repeat(vidas) + '🖤'.repeat(max - vidas);
-                            const tieneIlimitadasRT = payload.new.vidas_ilimitadas ||
+                            const tieneIlimitadasRT = payload.new.vidas_ilimitadas_permanente ||
+                                payload.new.vidas_ilimitadas ||
                                 (payload.new.is_premium && payload.new.premium_hasta && new Date(payload.new.premium_hasta) >= new Date());
                             const vidasDisplayEl = document.getElementById('vidas-display');
                             if (tieneIlimitadasRT) {
@@ -2632,13 +2633,14 @@
 
             const { data } = await _supabase
                 .from('perfiles')
-                .select('netcoins, total_referidos, is_premium, vidas_hoy, vidas_reset_fecha, vidas_ilimitadas, premium_hasta')
+                .select('netcoins, total_referidos, is_premium, vidas_hoy, vidas_reset_fecha, vidas_ilimitadas, vidas_ilimitadas_permanente, premium_hasta')
                 .eq('id', userId)
                 .single();
 
             if (data) {
                 const hoy      = new Date().toISOString().split('T')[0];
-                const tieneVidasIlim = data.vidas_ilimitadas ||
+                const tieneVidasIlim = data.vidas_ilimitadas_permanente ||
+                    data.vidas_ilimitadas ||
                     (data.is_premium && data.premium_hasta && new Date(data.premium_hasta) >= new Date());
                 const maxVidas = tieneVidasIlim ? null : 3;
                 const vidasHoy = tieneVidasIlim ? null : (data.vidas_reset_fecha !== hoy ? 3 : (data.vidas_hoy ?? 3));
@@ -2772,12 +2774,13 @@
             if (!currentUser) return;
             const { data } = await _supabase
                 .from('perfiles')
-                .select('vidas_hoy, vidas_reset_fecha, is_premium, vidas_ilimitadas, premium_hasta')
+                .select('vidas_hoy, vidas_reset_fecha, is_premium, vidas_ilimitadas, vidas_ilimitadas_permanente, premium_hasta')
                 .eq('id', currentUser.id)
                 .single();
             if (!data) return;
             const hoy = new Date().toISOString().split('T')[0];
-            const tieneVidasIlimitadas = data.vidas_ilimitadas ||
+            const tieneVidasIlimitadas = data.vidas_ilimitadas_permanente ||
+                data.vidas_ilimitadas ||
                 (data.is_premium && data.premium_hasta && new Date(data.premium_hasta) >= new Date());
             const el = document.getElementById('vidas-display');
             const btnRecargar = document.getElementById('btn-recargar-vidas');
