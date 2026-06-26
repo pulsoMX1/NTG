@@ -1325,6 +1325,14 @@
                                     Sin anuncios en toda la plataforma
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <span class="w-7 h-7 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-heart text-rose-400 text-xs"></i></span>
+                                    <span><strong class="text-white">5 vidas por día</strong> <span class="text-slate-400 text-xs">(normales: 3)</span></span>
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <span class="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-tag text-amber-400 text-xs"></i></span>
+                                    Recargas de vidas con <strong class="text-amber-400 ml-1">hasta 70% de descuento</strong>
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <span class="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-crown text-amber-400 text-xs"></i></span>
                                     Badge <span class="text-amber-400 font-bold ml-1">👑 Premium</span> en tu perfil
                                 </li>
@@ -1367,6 +1375,14 @@
                             <ul class="space-y-3 mb-6">
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la plataforma
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+                                    <span><strong class="text-white">5 vidas por día</strong> <span class="text-slate-400">(usuarios normales solo tienen 3)</span></span>
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+                                    <span>Recargas de vidas con <strong class="text-amber-400">hasta 70% de descuento</strong></span>
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Badge <span class="text-amber-400 font-bold">👑 Premium</span> en tu perfil
@@ -1523,7 +1539,7 @@
                             </div>
                         </div>
                         <p class="text-[10px] text-slate-500 text-center mt-2">
-                            <span class="text-amber-400 font-bold">Hazte Premium</span> y ahorra hasta un 70% en recargas
+                            <button onclick="cerrarRecargarVidas(); switchTab('tab-premium', null)" class="text-amber-400 font-bold hover:text-amber-300 transition">Hazte Premium</button> y ahorra hasta un 70% en recargas
                         </p>
                     </div>
                 </div>
