@@ -1479,7 +1479,7 @@
                     </button>
                     <button onclick="comprarVidas(3, 5)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-base">❤️❤️❤️</div>
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-base">❤️</div>
                             <div class="text-left">
                                 <p class="text-sm font-extrabold text-white">3 Vidas <span class="text-emerald-400 text-[10px] font-bold ml-1">¡Ahorra $1!</span></p>
                                 <p class="text-[11px] text-slate-400">El mejor valor del día</p>
@@ -1507,7 +1507,7 @@
                     </button>
                     <button onclick="comprarVidas(5, 3)" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-amber-500/20 hover:border-amber-500/50 rounded-xl px-4 py-3 transition active:scale-95 group">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">❤️❤️❤️❤️❤️</div>
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">❤️</div>
                             <div class="text-left">
                                 <p class="text-sm font-extrabold text-white">5 Vidas <span class="text-emerald-400 text-[10px] font-bold ml-1">¡Mejor oferta!</span></p>
                                 <p class="text-[11px] text-slate-400">Precio exclusivo Premium</p>
@@ -2707,11 +2707,12 @@
 
             if (codigoError || error) {
                 const msgs = {
-                    sin_vidas:        '💔 No tienes vidas para seguir jugando. Vuelve mañana.',
+                    sin_vidas:        '💔 No tienes vidas para seguir jugando. Vuelve mañana o recarga más vidas.',
                     sin_netcoins:     `💰 Balance insuficiente. Necesitas ${apuesta} NC para jugar.`,
                     apuesta_invalida: '⚠️ Apuesta no válida.'
                 };
                 mostrarNotificacion(msgs[codigoError] || '⚠️ Ocurrió un error al buscar partida. Intenta de nuevo.', 'error');
+                if (codigoError === 'sin_vidas') setTimeout(() => abrirRecargarVidas(), 600);
                 return;
             }
 
