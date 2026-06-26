@@ -3269,16 +3269,17 @@
             cerrarRecargarVidas();
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
-                const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/crear-preferencia-mp', {
+                const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/comprar-vidas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
-                    body: JSON.stringify({ tipo: 'vidas_ilimitadas', monto: 29 })
+                    body: JSON.stringify({ tipo: 'vidas_ilimitadas' })
                 });
-                const { url } = await res.json();
+                const resData = await res.json();
+                const url = resData.url || resData.init_point;
                 if (url) window.location.href = url;
             } catch(e) {
                 console.error(e);
-                mostrarToast('Error al procesar el pago. Intenta de nuevo.', 'error');
+                mostrarNotificacion('Error al procesar el pago. Intenta de nuevo.', 'error');
             }
         }
 
