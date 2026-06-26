@@ -1505,7 +1505,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-right text-amber-500/60 text-xs group-hover:text-amber-400 transition"></i>
                         </button>
-                        <button onclick="abrirRecargarVidas()" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
+                        <button id="btn-recargar-vidas-perfil" onclick="abrirRecargarVidas()" class="w-full flex items-center justify-between bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-rose-500/40 rounded-xl px-4 py-3 transition active:scale-95 group">
                             <div class="flex items-center gap-3">
                                 <span class="w-8 h-8 rounded-lg bg-rose-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-heart-circle-plus text-rose-400 text-sm"></i></span>
                                 <div class="text-left">
@@ -2760,6 +2760,8 @@
                 document.getElementById('perfil-info-plan').className        = `text-xs font-bold ${isPremium ? 'text-amber-400' : 'text-slate-300'}`;
                 document.getElementById('perfil-badge-premium').classList.toggle('hidden', !isPremium);
                 document.getElementById('perfil-btn-premium').classList.toggle('hidden', isPremium);
+                const btnRecPerfil = document.getElementById('btn-recargar-vidas-perfil');
+                if (btnRecPerfil) btnRecPerfil.classList.toggle('hidden', vidasHoy > 0);
             }
         }
 
