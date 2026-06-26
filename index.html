@@ -3364,18 +3364,26 @@
                     styleEl = document.createElement('style');
                     styleEl.id = styleId;
                     styleEl.textContent = `
-                        /* Ocultar social bar de effectivecpmnetwork */
+                        /* Ocultar TODOS los anuncios para premium */
                         #snigel-cmp-framework, .snigel-cmp-framework,
                         div[id*="adngin"], div[class*="adngin"],
                         div[id*="social-bar"], div[class*="social-bar"],
                         div[id*="socialbar"], div[class*="socialbar"],
                         div[id*="sticky-footer"], div[class*="sticky-footer"],
                         div[id*="floating"], div[class*="floating-ad"],
+                        div[id*="adsterra"], div[class*="adsterra"],
+                        div[id*="aso-"], div[class*="aso-"],
+                        div[id*="_ad_"], div[class*="_ad_"],
                         iframe[src*="effectivecpmnetwork"],
                         iframe[src*="highperformanceformat"],
+                        iframe[src*="adsterra"],
                         div[id*="container-08103591ba362aeb7a7ee360f307d4ac"],
-                        #ad-native-banner, #ad-mobile-320-wrap,
-                        #ad-desktop-728 { display: none !important; }
+                        #ad-native-banner, #ad-mobile-320-wrap, #ad-desktop-728,
+                        /* Social Bar Adsterra — se inyecta como fixed en body */
+                        body > div[style*="position: fixed"],
+                        body > div[style*="position:fixed"],
+                        body > iframe[style*="position: fixed"],
+                        body > iframe[style*="position:fixed"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
                     `;
                     document.head.appendChild(styleEl);
                 }
