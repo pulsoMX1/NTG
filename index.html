@@ -2415,7 +2415,10 @@
             document.getElementById('ruleta-resultado').innerText = '';
 
             // 1. Llamar a la Edge Function PRIMERO para obtener el premio oficial
-            const { data, error } = await _supabase.functions.invoke('girar-ruleta');
+            const { data: { session } } = await _supabase.auth.getSession();
+            const { data, error } = await _supabase.functions.invoke('girar-ruleta', {
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
 
             if (error || data?.error) {
                 ruletaGirando = false;
