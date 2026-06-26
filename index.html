@@ -2098,6 +2098,11 @@
                             vidasEl.textContent = '❤️'.repeat(vidas) + '🖤'.repeat(max - vidas);
                             const btnR = document.getElementById('btn-recargar-vidas');
                             if (btnR) { if (vidas <= 0) { btnR.classList.remove('hidden'); btnR.style.display='flex'; } else { btnR.classList.add('hidden'); btnR.style.display=''; } }
+                            // Actualizar texto vidas en perfil en tiempo real
+                            const statVidas = document.getElementById('perfil-stat-vidas');
+                            if (statVidas) statVidas.textContent = `${vidas}/${max}`;
+                            const btnRecPerfil = document.getElementById('btn-recargar-vidas-perfil');
+                            if (btnRecPerfil) btnRecPerfil.classList.toggle('hidden', vidas > 0);
                         }
                     }
                 ).subscribe();
