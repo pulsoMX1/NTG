@@ -2762,7 +2762,7 @@
                 .subscribe();
         }
 
-        function procesarResultadoRonda(data, miJugada) {
+        async function procesarResultadoRonda(data, miJugada) {
             if (_resultadoProcesado) return;
 
             _resultadoProcesado = true;
@@ -2789,9 +2789,21 @@
             }
 
             const emojisJugada = { piedra: '✊', papel: '✋', tijeras: '✌️' };
-            const miJugadaFinal = (esJ1 ? data.jugada1 : data.jugada2) || _miUltimaJugada;
-            const miEmoji    = emojisJugada[miJugadaFinal] || '❓';
-            const rivalEmoji = emojisJugada[esJ1 ? data.jugada2 : data.jugada1] || '🎰';
+            // Si las jugadas vienen null (Realtime llega antes de que se guarden),
+            // hacemos una segunda consulta para obtenerlas
+            let jugada1Final = data.jugada1;
+            let jugada2Final = data.jugada2;
+            if ((!jugada1Final || !jugada2Final) && _partidaActual) {
+                try {
+                    const { data: fresh } = await _supabase
+                        .from('partidas').select('jugada1,jugada2').eq('id', _partidaActual).single();
+                    if (fresh) { jugada1Final = fresh.jugada1; jugada2Final = fresh.jugada2; }
+                } catch(e) {}
+            }
+            const miJugadaFinal    = (esJ1 ? jugada1Final : jugada2Final) || _miUltimaJugada;
+            const rivalJugadaFinal = (esJ1 ? jugada2Final : jugada1Final) || null;
+            const miEmoji    = emojisJugada[miJugadaFinal]    || '❓';
+            const rivalEmoji = emojisJugada[rivalJugadaFinal] || '❓';
 
             // ¿Alguien ganó ya 3 rondas?
             if (_puntosYo >= 3 || _puntosRival >= 3) {
