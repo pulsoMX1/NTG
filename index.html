@@ -3369,6 +3369,14 @@
                     await cargarVidas();
                     await cargarTabPerfil();
                     detenerPollPremium();
+                    // Limpiar anuncios repetidamente por 5s por si Adsterra sigue inyectando
+                    let intentos = 0;
+                    const limpiador = setInterval(() => {
+                        _limpiarAnunciosDom();
+                        document.body.classList.remove('ads-enabled');
+                        intentos++;
+                        if (intentos >= 10) clearInterval(limpiador);
+                    }, 500);
                 }
             }, 4000); // cada 4 segundos
         }
@@ -3388,6 +3396,45 @@
                 isPremium = !!data.is_premium;
                 aplicarEstadoPremium();
             }
+        }
+
+        let _adObserver = null;
+
+        function _limpiarAnunciosDom() {
+            // Eliminar todos los elementos inyectados por Adsterra/Social Bar del DOM
+            document.querySelectorAll(
+                'body > div[style*="position: fixed"], body > div[style*="position:fixed"],' +
+                'body > iframe[style*="position: fixed"], body > iframe[style*="position:fixed"],' +
+                'div[id*="social-bar"], div[class*="social-bar"],' +
+                'div[id*="socialbar"], div[class*="socialbar"],' +
+                'div[id*="aso-"], div[id*="adsterra"],' +
+                '[id^="container-08103591"]'
+            ).forEach(el => el.remove());
+
+            // Scripts del social bar
+            ['sb-script-1','sb-script-2'].forEach(id => {
+                const s = document.getElementById(id); if (s) s.remove();
+            });
+
+            // Ocultar iframes de redes de anuncios
+            document.querySelectorAll('iframe').forEach(f => {
+                const src = f.src || f.getAttribute('src') || '';
+                if (src.includes('effectivecpmnetwork') || src.includes('highperformanceformat') || src.includes('adsterra')) {
+                    f.remove();
+                }
+            });
+        }
+
+        function _iniciarAdObserver() {
+            if (_adObserver) return;
+            _adObserver = new MutationObserver(() => {
+                if (isPremium) _limpiarAnunciosDom();
+            });
+            _adObserver.observe(document.body, { childList: true, subtree: true });
+        }
+
+        function _detenerAdObserver() {
+            if (_adObserver) { _adObserver.disconnect(); _adObserver = null; }
         }
 
         async function aplicarEstadoPremium() {
@@ -3429,8 +3476,11 @@
             // Activar o desactivar anuncios según premium
             if (!isPremium) {
                 document.body.classList.add('ads-enabled');
+                _detenerAdObserver();
             } else {
                 document.body.classList.remove('ads-enabled');
+                _limpiarAnunciosDom(); // eliminar lo que ya está en DOM
+                _iniciarAdObserver(); // vigilar y eliminar lo que se inyecte después
             }
 
             // Cargar Social Bar solo si NO es premium
@@ -3481,7 +3531,10 @@
             const sidebarBtn = document.getElementById('sidebar-btn-premium');
 
             // Tab Premium: mostrar estado activo o formulario
-            document.getElementById('premium-activo').classList.toggle('hidden', !isPremium);
+            const premiumActivoEl = document.getElementById('premium-activo');
+            const premiumOfertaEl2 = document.getElementById('premium-oferta');
+            if (premiumActivoEl) premiumActivoEl.classList.toggle('hidden', !isPremium);
+            if (premiumOfertaEl2) premiumOfertaEl2.classList.toggle('hidden', isPremium);
 
             // Llenar fechas de suscripción
             if (isPremium) {
