@@ -1987,13 +1987,18 @@
                             setTimeout(() => el.classList.remove("balance-bump"), 400);
                         }
 
-                        // Premium — re-ejecutar toda la lógica central
+                        // Premium — detectar cambio y recargar
                         if (payload.new.is_premium !== undefined) {
                             detenerPollPremium();
-                            isPremium = !!(payload.new.is_premium &&
+                            const nuevoEstado = !!(payload.new.is_premium &&
                                 payload.new.premium_hasta &&
                                 new Date(payload.new.premium_hasta) >= new Date());
-                            // Pasar fechas del payload para no hacer otra consulta a BD
+                            if (nuevoEstado && !isPremium) {
+                                // false -> true: recargar para aplicar todo limpio
+                                window.location.reload();
+                                return;
+                            }
+                            isPremium = nuevoEstado;
                             _premiumFechas = {
                                 premium_desde: payload.new.premium_desde,
                                 premium_hasta: payload.new.premium_hasta
