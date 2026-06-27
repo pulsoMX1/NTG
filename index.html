@@ -2941,8 +2941,7 @@
             document.getElementById('marcador-rival').textContent  = _puntosRival;
             document.getElementById('anuncio-ronda-texto').textContent = `Ronda ${numeroRonda}`;
 
-            const subs = ['¡Que empiece el juego!', '¿Puedes mantener la ventaja?', '¡Ronda decisiva!', '¡Todo o nada!', '¡Dale con todo!'];
-            document.getElementById('anuncio-ronda-sub').textContent = subs[Math.min(numeroRonda - 1, subs.length - 1)];
+            document.getElementById('anuncio-ronda-sub').textContent = _textoAnuncioRonda(numeroRonda, _puntosYo, _puntosRival);
 
             clearInterval(_timerRonda);
             let seg = 4;
@@ -2971,6 +2970,26 @@
             }, 1000);
         }
 
+
+        function _textoAnuncioRonda(ronda, ptsYo, ptsRival) {
+            const maxPts = Math.max(ptsYo, ptsRival);
+            const voy_ganando = ptsYo > ptsRival;
+            const voy_perdiendo = ptsYo < ptsRival;
+            const empate = ptsYo === ptsRival;
+            // Alguien está a 1 punto de ganar (necesita 3)
+            const rivalCasiGana = ptsRival === 2;
+            const yoCasiGano   = ptsYo === 2;
+            const ambosEnMatch = yoCasiGano && rivalCasiGana; // 2-2
+
+            if (ronda === 1) return '¡Que empiece el juego!';
+            if (ambosEnMatch) return '¡Ronda decisiva! El próximo punto gana 🏆';
+            if (yoCasiGano && !rivalCasiGana) return '¡Un punto más y ganas! 💪';
+            if (rivalCasiGana && !yoCasiGano) return '¡Cuidado! Tu rival está a un punto de ganar';
+            if (voy_ganando) return '¡Vas ganando, no te confíes!';
+            if (voy_perdiendo) return '¡Vamos, aún puedes remontar!';
+            if (empate) return '¡Todo parejo, a darlo todo!';
+            return '¡Dale con todo!';
+        }
         let _canalCola = null;
         function suscribirseColaPorEmparejamiento(juego, apuesta) {
             if (_canalCola) { _canalCola.unsubscribe(); _canalCola = null; }
@@ -3029,7 +3048,7 @@
                 if (barraJugada) barraJugada.style.width = (seg / DURACION_JUGADA * 100) + '%';
                 if (seg <= 0) {
                     clearInterval(_timerJugada);
-                    if (!_jugadaHecha) await hacerJugada('piedra');
+                    if (!_jugadaHecha) { const ops = ['piedra','papel','tijeras']; await hacerJugada(ops[Math.floor(Math.random()*3)]); }
                 }
             }, 1000);
         }
@@ -3202,8 +3221,7 @@
                 _ocultarTodasFases();
                 document.getElementById('fase-anuncio-ronda').classList.remove('hidden');
                 document.getElementById('anuncio-ronda-texto').textContent = `Ronda ${_rondaActual}`;
-                const subs = ['¡Que empiece el juego!', '¿Puedes mantener la ventaja?', '¡Ronda decisiva!', '¡Todo o nada!', '¡Dale con todo!'];
-                document.getElementById('anuncio-ronda-sub').textContent = subs[Math.min(_rondaActual - 1, subs.length - 1)];
+                document.getElementById('anuncio-ronda-sub').textContent = _textoAnuncioRonda(_rondaActual, _puntosYo, _puntosRival);
                 document.getElementById('marcador-yo').textContent    = _puntosYo;
                 document.getElementById('marcador-rival').textContent  = _puntosRival;
             }, esperaResultado);
