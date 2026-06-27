@@ -1957,8 +1957,24 @@
         function compartirTwitter() { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(obtenerMensajeCompartir())}`, '_blank'); }
 
         async function suscribirseCambiosEnVivo(user) {
-            // Corrección al error supabase.js:4 (Desuscribir del canal antes de volver a crearlo)
             try { await _supabase.removeChannel(_supabase.channel('cambios-saldo')); } catch (e) {}
+            try { await _supabase.removeChannel(_supabase.channel('cambios-premium')); } catch (e) {}
+
+            // Canal separado sin filter para capturar cambios de premium (service role bypasea RLS)
+            _supabase.channel('cambios-premium')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'perfiles' },
+                    async (payload) => {
+                        if (payload.new.id !== user.id) return;
+                        if (payload.new.is_premium === undefined) return;
+                        const activoAhora = !!(payload.new.is_premium &&
+                            payload.new.premium_hasta &&
+                            new Date(payload.new.premium_hasta) >= new Date());
+                        if (activoAhora && !isPremium) {
+                            detenerPollPremium();
+                            window.location.reload();
+                        }
+                    }
+                ).subscribe();
 
             _supabase.channel('cambios-saldo')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'perfiles', filter: `id=eq.${user.id}` },
