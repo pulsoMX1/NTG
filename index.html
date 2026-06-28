@@ -2112,16 +2112,19 @@
             document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('bg-purple-600', 'text-white'); btn.classList.add('text-slate-400'); });
             // Mobile bottom nav
             document.querySelectorAll('.tab-btn-mobile').forEach(btn => { btn.classList.remove('text-purple-400'); btn.classList.add('text-slate-400'); });
-            if (e && e.currentTarget) {
-                const target = e.currentTarget;
-                if (target.classList.contains('tab-btn')) {
-                    target.classList.add('bg-purple-600', 'text-white');
-                    target.classList.remove('text-slate-400');
-                } else if (target.classList.contains('tab-btn-mobile')) {
-                    target.classList.add('text-purple-400');
-                    target.classList.remove('text-slate-400');
+            // Marcar el botón correcto según tabId (funciona con y sin evento)
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('bg-purple-600', 'text-white');
+                    btn.classList.remove('text-slate-400');
                 }
-            }
+            });
+            document.querySelectorAll('.tab-btn-mobile').forEach(btn => {
+                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('text-purple-400');
+                    btn.classList.remove('text-slate-400');
+                }
+            });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
