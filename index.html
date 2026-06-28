@@ -2692,7 +2692,7 @@
             document.getElementById('perfil-info-username').textContent = username;
             document.getElementById('perfil-info-email').textContent    = email;
             document.getElementById('perfil-info-fecha').textContent    = creadoEn;
-            document.getElementById('perfil-info-id').textContent       = userId.slice(0, 8) + '...' + userId.slice(-4);
+            document.getElementById('perfil-info-id').textContent       = userId;
 
             const { data } = await _supabase
                 .from('perfiles')
