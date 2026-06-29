@@ -3793,6 +3793,352 @@
         });
     })();
     </script>
- 
+
+<!-- ══════════════════════════════════════════════ -->
+<!--           SOPORTE TÉCNICO - BURBUJA + CHAT     -->
+<!-- ══════════════════════════════════════════════ -->
+
+<!-- Burbuja flotante -->
+<button id="support-bubble" onclick="abrirSoporte()"
+    class="fixed bottom-24 right-4 sm:bottom-8 sm:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 border-2 border-purple-400/30"
+    title="Soporte Técnico">
+    <i class="fa-solid fa-headset text-white text-xl"></i>
+    <span id="support-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center text-white border-2 border-slate-900">!</span>
+</button>
+
+<!-- Modal de chat de soporte -->
+<div id="support-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <!-- Backdrop -->
+    <div onclick="cerrarSoporte()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+    <!-- Panel del chat -->
+    <div class="relative w-full sm:w-[420px] h-[92vh] sm:h-[600px] bg-slate-900 sm:rounded-2xl flex flex-col overflow-hidden border border-slate-700 shadow-2xl">
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-purple-800 to-indigo-800 border-b border-purple-700/50 flex-shrink-0">
+            <div class="w-9 h-9 rounded-full bg-purple-500/30 flex items-center justify-center">
+                <i class="fa-solid fa-headset text-purple-200 text-base"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-bold text-sm text-white">Soporte NetGamer MX</p>
+                <p class="text-xs text-purple-300 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block animate-pulse"></span>
+                    Respondemos en menos de 24h
+                </p>
+            </div>
+            <button onclick="cerrarSoporte()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-white text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Mensajes -->
+        <div id="support-messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth">
+            <!-- Mensaje de bienvenida -->
+            <div class="flex gap-2.5 items-end">
+                <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 mb-1">
+                    <i class="fa-solid fa-robot text-white text-xs"></i>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-sm px-3.5 py-2.5 max-w-[80%]">
+                    <p class="text-sm text-slate-200">👋 ¡Hola! Bienvenido al soporte de <span class="font-bold text-purple-400">NetGamer MX</span>.</p>
+                    <p class="text-sm text-slate-300 mt-1">Cuéntanos tu problema y te ayudaremos lo antes posible. Puedes adjuntar capturas de pantalla si lo necesitas.</p>
+                </div>
+            </div>
+            <!-- Mensajes dinámicos se insertan aquí -->
+            <div id="support-chat-messages"></div>
+            <!-- Spinner de carga -->
+            <div id="support-loading" class="hidden flex justify-center py-4">
+                <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+
+        <!-- Preview de imágenes seleccionadas -->
+        <div id="support-preview-container" class="hidden px-4 pt-3 pb-1 bg-slate-850 border-t border-slate-700/50 flex-shrink-0">
+            <div id="support-preview-grid" class="flex gap-2 flex-wrap"></div>
+        </div>
+
+        <!-- Input área -->
+        <div class="px-3 py-3 bg-slate-900 border-t border-slate-700 flex-shrink-0">
+            <div class="flex items-end gap-2 bg-slate-800 rounded-2xl px-3 py-2 border border-slate-700 focus-within:border-purple-500/70 transition">
+                <!-- Adjuntar archivo -->
+                <label for="support-file-input" class="cursor-pointer flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 transition mb-0.5" title="Adjuntar imagen">
+                    <i class="fa-solid fa-paperclip text-slate-400 hover:text-purple-400 text-sm transition"></i>
+                </label>
+                <input type="file" id="support-file-input" accept="image/*" multiple class="hidden" onchange="handleSupportFiles(this)">
+
+                <!-- Texto -->
+                <textarea id="support-input-text" placeholder="Escribe tu mensaje..." rows="1"
+                    class="flex-1 bg-transparent text-sm text-white placeholder-slate-500 resize-none outline-none max-h-32 overflow-y-auto py-1.5 leading-relaxed"
+                    oninput="autoResizeTextarea(this)"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); enviarMensajeSoporte();}"></textarea>
+
+                <!-- Enviar -->
+                <button onclick="enviarMensajeSoporte()" id="support-send-btn"
+                    class="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center transition active:scale-90 mb-0.5">
+                    <i class="fa-solid fa-paper-plane text-white text-xs"></i>
+                </button>
+            </div>
+            <p class="text-center text-xs text-slate-600 mt-2">Puedes adjuntar imágenes o capturas de pantalla</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//         SOPORTE TÉCNICO - LÓGICA
+// ══════════════════════════════════════════════
+
+let supportTicketId = null;
+let supportRealtimeChannel = null;
+let supportFilesSelected = [];
+
+async function abrirSoporte() {
+    if (!currentUser) {
+        mostrarNotificacion("Debes iniciar sesión para contactar soporte.", "error");
+        return;
+    }
+    document.getElementById('support-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    await cargarConversacionSoporte();
+}
+
+function cerrarSoporte() {
+    document.getElementById('support-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+    if (supportRealtimeChannel) {
+        _supabase.removeChannel(supportRealtimeChannel);
+        supportRealtimeChannel = null;
+    }
+}
+
+async function cargarConversacionSoporte() {
+    const loading = document.getElementById('support-loading');
+    const container = document.getElementById('support-chat-messages');
+    loading.classList.remove('hidden');
+
+    // Buscar ticket abierto del usuario
+    const { data: tickets } = await _supabase
+        .from('support_tickets')
+        .select('id, status')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+    if (tickets && tickets.length > 0) {
+        supportTicketId = tickets[0].id;
+    } else {
+        // Crear ticket nuevo
+        const { data: newTicket } = await _supabase
+            .from('support_tickets')
+            .insert({ user_id: currentUser.id, status: 'open' })
+            .select('id')
+            .single();
+        if (newTicket) supportTicketId = newTicket.id;
+    }
+
+    // Cargar mensajes existentes
+    if (supportTicketId) {
+        const { data: msgs } = await _supabase
+            .from('support_messages')
+            .select('*')
+            .eq('ticket_id', supportTicketId)
+            .order('created_at', { ascending: true });
+
+        container.innerHTML = '';
+        if (msgs) msgs.forEach(m => renderMensajeSoporte(m));
+
+        // Suscribir a tiempo real
+        suscribirSoporteRealtime();
+    }
+
+    loading.classList.add('hidden');
+    scrollSoporteAbajo();
+}
+
+function renderMensajeSoporte(msg) {
+    const container = document.getElementById('support-chat-messages');
+    const esAdmin = msg.sender === 'admin';
+    const hora = new Date(msg.created_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+    const div = document.createElement('div');
+    div.className = `flex ${esAdmin ? 'gap-2.5 items-end' : 'justify-end'} mb-2`;
+    div.dataset.msgId = msg.id;
+
+    let contenidoMedia = '';
+    if (msg.images && msg.images.length > 0) {
+        contenidoMedia = `<div class="flex flex-wrap gap-1.5 mt-2">
+            ${msg.images.map(url => `
+                <a href="${url}" target="_blank" class="block">
+                    <img src="${url}" class="w-24 h-24 object-cover rounded-xl border border-slate-600 hover:opacity-90 transition cursor-zoom-in" />
+                </a>`).join('')}
+        </div>`;
+    }
+
+    if (esAdmin) {
+        div.innerHTML = `
+            <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 mb-1">
+                <i class="fa-solid fa-headset text-white text-xs"></i>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-sm px-3.5 py-2.5 max-w-[80%]">
+                <p class="text-xs font-bold text-purple-400 mb-1">Soporte</p>
+                ${msg.message ? `<p class="text-sm text-slate-200 leading-relaxed">${escapeHtml(msg.message)}</p>` : ''}
+                ${contenidoMedia}
+                <p class="text-xs text-slate-500 mt-1.5 text-right">${hora}</p>
+            </div>`;
+    } else {
+        div.innerHTML = `
+            <div class="bg-purple-600/80 border border-purple-500/30 rounded-2xl rounded-br-sm px-3.5 py-2.5 max-w-[80%]">
+                ${msg.message ? `<p class="text-sm text-white leading-relaxed">${escapeHtml(msg.message)}</p>` : ''}
+                ${contenidoMedia}
+                <p class="text-xs text-purple-300/70 mt-1.5 text-right">${hora}</p>
+            </div>`;
+    }
+
+    container.appendChild(div);
+}
+
+function suscribirSoporteRealtime() {
+    if (supportRealtimeChannel) _supabase.removeChannel(supportRealtimeChannel);
+
+    supportRealtimeChannel = _supabase
+        .channel(`support-ticket-${supportTicketId}`)
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'support_messages',
+            filter: `ticket_id=eq.${supportTicketId}`
+        }, payload => {
+            const ya = document.querySelector(`[data-msg-id="${payload.new.id}"]`);
+            if (!ya) {
+                renderMensajeSoporte(payload.new);
+                scrollSoporteAbajo();
+                if (payload.new.sender === 'admin') {
+                    mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
+                    document.getElementById('support-badge').classList.remove('hidden');
+                }
+            }
+        })
+        .subscribe();
+}
+
+async function enviarMensajeSoporte() {
+    const input = document.getElementById('support-input-text');
+    const texto = input.value.trim();
+
+    if (!texto && supportFilesSelected.length === 0) return;
+    if (!supportTicketId) return;
+
+    const sendBtn = document.getElementById('support-send-btn');
+    sendBtn.disabled = true;
+
+    // Subir imágenes si hay
+    let imageUrls = [];
+    if (supportFilesSelected.length > 0) {
+        for (const file of supportFilesSelected) {
+            const ext = file.name.split('.').pop();
+            const path = `support/${supportTicketId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+            const { data: uploadData, error: uploadError } = await _supabase.storage
+                .from('support-images')
+                .upload(path, file, { cacheControl: '3600', upsert: false });
+            if (!uploadError && uploadData) {
+                const { data: { publicUrl } } = _supabase.storage.from('support-images').getPublicUrl(path);
+                imageUrls.push(publicUrl);
+            }
+        }
+    }
+
+    const { error } = await _supabase.from('support_messages').insert({
+        ticket_id: supportTicketId,
+        sender: 'user',
+        user_id: currentUser.id,
+        message: texto || null,
+        images: imageUrls.length > 0 ? imageUrls : null
+    });
+
+    if (!error) {
+        input.value = '';
+        input.style.height = 'auto';
+        limpiarPreviewSoporte();
+    } else {
+        mostrarNotificacion("Error al enviar. Intenta de nuevo.", "error");
+    }
+
+    sendBtn.disabled = false;
+    input.focus();
+}
+
+function handleSupportFiles(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    const maxFiles = 4;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    for (const file of files) {
+        if (supportFilesSelected.length >= maxFiles) {
+            mostrarNotificacion(`Máximo ${maxFiles} imágenes por mensaje.`, "error"); break;
+        }
+        if (file.size > maxSize) {
+            mostrarNotificacion(`${file.name} supera los 5MB.`, "error"); continue;
+        }
+        supportFilesSelected.push(file);
+    }
+
+    renderPreviewSoporte();
+    input.value = '';
+}
+
+function renderPreviewSoporte() {
+    const container = document.getElementById('support-preview-container');
+    const grid = document.getElementById('support-preview-grid');
+
+    if (supportFilesSelected.length === 0) {
+        container.classList.add('hidden');
+        grid.innerHTML = '';
+        return;
+    }
+
+    container.classList.remove('hidden');
+    grid.innerHTML = '';
+
+    supportFilesSelected.forEach((file, idx) => {
+        const url = URL.createObjectURL(file);
+        const div = document.createElement('div');
+        div.className = 'relative group';
+        div.innerHTML = `
+            <img src="${url}" class="w-16 h-16 object-cover rounded-xl border border-slate-600" />
+            <button onclick="quitarPreviewSoporte(${idx})"
+                class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-400 rounded-full text-white text-xs flex items-center justify-center shadow-lg transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>`;
+        grid.appendChild(div);
+    });
+}
+
+function quitarPreviewSoporte(idx) {
+    supportFilesSelected.splice(idx, 1);
+    renderPreviewSoporte();
+}
+
+function limpiarPreviewSoporte() {
+    supportFilesSelected = [];
+    renderPreviewSoporte();
+}
+
+function scrollSoporteAbajo() {
+    const c = document.getElementById('support-messages-container');
+    if (c) setTimeout(() => { c.scrollTop = c.scrollHeight; }, 50);
+}
+
+function autoResizeTextarea(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+</script>
+
 </body>
 </html>
