@@ -3757,16 +3757,38 @@
         };
 
         async function verificarBadgeSoporte(userId) {
+            // 1. Verificar si ya hay mensajes sin leer al cargar
             const { data } = await _supabase
                 .from('support_tickets')
-                .select('unread_user')
+                .select('id, unread_user')
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .single();
+
             if (data && data.unread_user > 0) {
                 document.getElementById('support-badge').classList.remove('hidden');
             }
+
+            // 2. Suscripción global permanente — activa aunque el chat esté cerrado
+            if (!data?.id) return;
+            const ticketId = data.id;
+
+            _supabase.channel('support-badge-global')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'support_messages',
+                    filter: `ticket_id=eq.${ticketId}`
+                }, payload => {
+                    if (payload.new.sender !== 'admin') return;
+                    const modalAbierto = !document.getElementById('support-modal').classList.contains('hidden');
+                    if (!modalAbierto) {
+                        document.getElementById('support-badge').classList.remove('hidden');
+                        mostrarNotificacion('💬 Nueva respuesta de soporte', 'info');
+                    }
+                })
+                .subscribe();
         }
     </script>
     <!-- Anuncio flotante / popunder CPAnetwork -->
