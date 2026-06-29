@@ -530,6 +530,10 @@ async function enviarRespuestaAdmin() {
 
     await _supabase.from('support_tickets').update({ updated_at: new Date().toISOString() }).eq('id', ticketActivoId);
 
+    // Incrementar mensajes no leídos para el usuario
+    const { data: t } = await _supabase.from('support_tickets').select('unread_user').eq('id', ticketActivoId).single();
+    await _supabase.from('support_tickets').update({ unread_user: (t?.unread_user || 0) + 1 }).eq('id', ticketActivoId);
+
     input.value = '';
     input.style.height = 'auto';
     limpiarAdminFiles();
