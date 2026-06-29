@@ -268,7 +268,8 @@ async function cargarTickets() {
         `)
         .order('updated_at', { ascending: false });
 
-    document.getElementById('tickets-loading').style.display = 'none';
+    const loadingEl = document.getElementById('tickets-loading');
+    if (loadingEl) loadingEl.style.display = 'none';
 
     if (error || !tickets) return;
     todosLosTickets = tickets;
