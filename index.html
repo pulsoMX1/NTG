@@ -4071,9 +4071,9 @@ async function enviarMensajeSoporte() {
     const sendBtn = document.getElementById('support-send-btn');
     sendBtn.disabled = true;
 
-    // Subir imágenes si hay
-    let imageUrls = [];
+    // 1. Si hay imágenes, mandarlas primero como mensaje separado (sin texto)
     if (supportFilesSelected.length > 0) {
+        let imageUrls = [];
         for (const file of supportFilesSelected) {
             const ext = file.name.split('.').pop();
             const path = `support/${supportTicketId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
@@ -4085,22 +4085,33 @@ async function enviarMensajeSoporte() {
                 imageUrls.push(publicUrl);
             }
         }
+        if (imageUrls.length > 0) {
+            await _supabase.from('support_messages').insert({
+                ticket_id: supportTicketId,
+                sender: 'user',
+                user_id: currentUser.id,
+                message: null,
+                images: imageUrls
+            });
+        }
+        limpiarPreviewSoporte();
     }
 
-    const { error } = await _supabase.from('support_messages').insert({
-        ticket_id: supportTicketId,
-        sender: 'user',
-        user_id: currentUser.id,
-        message: texto || null,
-        images: imageUrls.length > 0 ? imageUrls : null
-    });
-
-    if (!error) {
-        input.value = '';
-        input.style.height = 'auto';
-        limpiarPreviewSoporte();
-    } else {
-        mostrarNotificacion("Error al enviar. Intenta de nuevo.", "error");
+    // 2. Si hay texto, mandarlo como mensaje separado (sin imágenes)
+    if (texto) {
+        const { error } = await _supabase.from('support_messages').insert({
+            ticket_id: supportTicketId,
+            sender: 'user',
+            user_id: currentUser.id,
+            message: texto,
+            images: null
+        });
+        if (error) {
+            mostrarNotificacion("Error al enviar. Intenta de nuevo.", "error");
+        } else {
+            input.value = '';
+            input.style.height = 'auto';
+        }
     }
 
     sendBtn.disabled = false;
