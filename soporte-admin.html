@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Soporte NetGamer MX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #0f172a; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 99px; }
+        .ticket-item { transition: background 0.15s; }
+        .ticket-item:hover { background: #1e293b; }
+        .ticket-item.active { background: #1e293b; border-left: 3px solid #a855f7; }
+        .msg-user { background: #7c3aed55; border: 1px solid #7c3aed44; border-radius: 16px 16px 4px 16px; }
+        .msg-admin { background: #1e293b; border: 1px solid #334155; border-radius: 16px 16px 16px 4px; }
+        #login-screen { display: flex; }
+        #app-screen { display: none; }
+        textarea { resize: none; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden">
+
+<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-white"></i>
+            </div>
+            <div>
+                <h1 class="font-black text-lg text-white">Panel Admin</h1>
+                <p class="text-xs text-slate-400">NetGamer MX – Soporte</p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 block">Email</label>
+                <input id="login-email" type="email" placeholder="admin@ejemplo.com"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-4 py-3 text-sm text-white outline-none transition placeholder-slate-600">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 block">Contraseña</label>
+                <input id="login-password" type="password" placeholder="••••••••"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-xl px-4 py-3 text-sm text-white outline-none transition placeholder-slate-600"
+                    onkeydown="if(event.key==='Enter') iniciarSesionAdmin()">
+            </div>
+            <p id="login-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></p>
+            <button onclick="iniciarSesionAdmin()" id="login-btn"
+                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold py-3 rounded-xl text-sm transition active:scale-95">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>Entrar al panel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════ APP ═══════════════════ -->
+<div id="app-screen" class="h-screen flex flex-col">
+
+    <!-- Topbar -->
+    <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/80 flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-headset text-white text-sm"></i>
+            </div>
+            <div>
+                <h1 class="font-black text-sm text-white">Soporte Técnico</h1>
+                <p class="text-xs text-slate-500">NetGamer MX Admin Panel</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="admin-email-label" class="text-xs text-slate-500 hidden sm:block"></span>
+            <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1">
+                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                <span class="text-xs text-emerald-400 font-semibold">En línea</span>
+            </div>
+            <button onclick="cerrarSesionAdmin()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition" title="Cerrar sesión">
+                <i class="fa-solid fa-right-from-bracket text-slate-400 text-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cuerpo principal -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- ── SIDEBAR – Lista de tickets ── -->
+        <div class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 border-r border-slate-700/80 flex flex-col">
+
+            <!-- Búsqueda + filtros -->
+            <div class="p-3 border-b border-slate-700/50 space-y-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input id="search-input" type="text" placeholder="Buscar usuario..." oninput="filtrarTickets()"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-sm text-white outline-none focus:border-purple-500 transition placeholder-slate-600">
+                </div>
+                <div class="flex gap-1.5">
+                    <button onclick="setFiltro('all')" data-filter="all"
+                        class="filter-btn flex-1 text-xs font-semibold py-1.5 rounded-lg bg-purple-600 text-white transition">
+                        Todos
+                    </button>
+                    <button onclick="setFiltro('open')" data-filter="open"
+                        class="filter-btn flex-1 text-xs font-semibold py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 transition">
+                        Abiertos
+                    </button>
+                    <button onclick="setFiltro('resolved')" data-filter="resolved"
+                        class="filter-btn flex-1 text-xs font-semibold py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 transition">
+                        Resueltos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contadores -->
+            <div class="flex items-center justify-between px-3 py-2 border-b border-slate-700/50">
+                <span class="text-xs text-slate-500"><span id="tickets-count">0</span> conversaciones</span>
+                <span id="unread-badge" class="hidden text-xs bg-red-500/20 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5 font-semibold">
+                    <span id="unread-count">0</span> sin leer
+                </span>
+            </div>
+
+            <!-- Lista tickets -->
+            <div id="tickets-list" class="flex-1 overflow-y-auto">
+                <div id="tickets-loading" class="flex items-center justify-center py-12">
+                    <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CHAT PRINCIPAL ── -->
+        <div id="chat-area" class="flex-1 flex flex-col overflow-hidden bg-slate-950">
+
+            <!-- Estado vacío -->
+            <div id="chat-empty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
+                <div class="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-comments text-slate-600 text-2xl"></i>
+                </div>
+                <p class="font-bold text-slate-400">Selecciona una conversación</p>
+                <p class="text-sm text-slate-600 mt-1">Elige un ticket del panel izquierdo para ver los mensajes</p>
+            </div>
+
+            <!-- Chat activo -->
+            <div id="chat-active" class="hidden flex-1 flex flex-col overflow-hidden">
+
+                <!-- Header del chat -->
+                <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/50 flex-shrink-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-user text-purple-400 text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p id="chat-user-email" class="font-bold text-sm text-white truncate">—</p>
+                            <p id="chat-user-id" class="text-xs text-slate-500 truncate font-mono">—</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span id="chat-status-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full border"></span>
+                        <button onclick="toggleEstadoTicket()" id="toggle-status-btn"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensajes -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto px-5 py-5 space-y-3"></div>
+
+                <!-- Preview imágenes admin -->
+                <div id="admin-preview-container" class="hidden px-4 pt-3 pb-1 bg-slate-900 border-t border-slate-700/50">
+                    <div id="admin-preview-grid" class="flex gap-2 flex-wrap"></div>
+                </div>
+
+                <!-- Input respuesta -->
+                <div class="px-4 py-3 bg-slate-900 border-t border-slate-700 flex-shrink-0">
+                    <div class="flex items-end gap-2 bg-slate-800 rounded-2xl px-3 py-2 border border-slate-700 focus-within:border-purple-500/70 transition">
+                        <label for="admin-file-input" class="cursor-pointer flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 transition mb-0.5" title="Adjuntar imagen">
+                            <i class="fa-solid fa-paperclip text-slate-400 hover:text-purple-400 text-sm transition"></i>
+                        </label>
+                        <input type="file" id="admin-file-input" accept="image/*" multiple class="hidden" onchange="handleAdminFiles(this)">
+
+                        <textarea id="admin-reply-input" placeholder="Escribe tu respuesta..." rows="1"
+                            class="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none max-h-32 overflow-y-auto py-1.5 leading-relaxed"
+                            oninput="autoResizeAdmin(this)"
+                            onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); enviarRespuestaAdmin();}"></textarea>
+
+                        <button onclick="enviarRespuestaAdmin()" id="admin-send-btn"
+                            class="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center transition active:scale-90 mb-0.5">
+                            <i class="fa-solid fa-paper-plane text-white text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1.5 text-center">Enter para enviar · Shift+Enter para nueva línea</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://meiwuluwrdjszxeyoqtt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4";
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let adminUser = null;
+let todosLosTickets = [];
+let filtroActual = 'all';
+let ticketActivoId = null;
+let chatRealtimeChannel = null;
+let adminFilesSelected = [];
+let ticketsRealtimeChannel = null;
+
+// ══════════════════════════════════
+//             AUTH
+// ══════════════════════════════════
+
+async function iniciarSesionAdmin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-btn');
+    const errorEl = document.getElementById('login-error');
+
+    if (!email || !password) { showLoginError('Completa todos los campos.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Entrando...';
+    errorEl.classList.add('hidden');
+
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+    if (error || !data.user) {
+        showLoginError('Credenciales incorrectas. Verifica tu email y contraseña.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i>Entrar al panel';
+        return;
+    }
+
+    adminUser = data.user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'flex';
+    document.getElementById('admin-email-label').textContent = adminUser.email;
+
+    await cargarTickets();
+    suscribirTicketsRealtime();
+}
+
+function showLoginError(msg) {
+    const el = document.getElementById('login-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+async function cerrarSesionAdmin() {
+    await _supabase.auth.signOut();
+    location.reload();
+}
+
+// ══════════════════════════════════
+//           TICKETS
+// ══════════════════════════════════
+
+async function cargarTickets() {
+    const { data: tickets, error } = await _supabase
+        .from('support_tickets')
+        .select(`
+            id, status, created_at, updated_at, user_id, unread_admin,
+            perfiles ( email )
+        `)
+        .order('updated_at', { ascending: false });
+
+    document.getElementById('tickets-loading').style.display = 'none';
+
+    if (error || !tickets) return;
+    todosLosTickets = tickets;
+    renderTicketsList();
+}
+
+function renderTicketsList() {
+    const container = document.getElementById('tickets-list');
+    const search = document.getElementById('search-input').value.toLowerCase();
+
+    let lista = todosLosTickets.filter(t => {
+        if (filtroActual === 'open' && t.status !== 'open') return false;
+        if (filtroActual === 'resolved' && t.status !== 'resolved') return false;
+        if (search) {
+            const email = (t.perfiles?.email || t.user_id || '').toLowerCase();
+            if (!email.includes(search)) return false;
+        }
+        return true;
+    });
+
+    document.getElementById('tickets-count').textContent = lista.length;
+
+    const sinLeer = todosLosTickets.filter(t => t.unread_admin > 0).length;
+    const badge = document.getElementById('unread-badge');
+    if (sinLeer > 0) {
+        badge.classList.remove('hidden');
+        document.getElementById('unread-count').textContent = sinLeer;
+    } else {
+        badge.classList.add('hidden');
+    }
+
+    if (lista.length === 0) {
+        container.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-center px-4">
+            <i class="fa-solid fa-inbox text-slate-700 text-3xl mb-3"></i>
+            <p class="text-sm text-slate-500">Sin conversaciones</p>
+        </div>`;
+        return;
+    }
+
+    container.innerHTML = lista.map(t => {
+        const email = t.perfiles?.email || 'Usuario desconocido';
+        const emailCorto = email.length > 26 ? email.slice(0, 23) + '...' : email;
+        const fecha = formatFecha(t.updated_at);
+        const esActivo = t.id === ticketActivoId;
+        const sinLeerT = t.unread_admin || 0;
+        const statusColor = t.status === 'open' ? 'bg-emerald-400' : 'bg-slate-500';
+
+        return `<div onclick="abrirTicket('${t.id}')" data-ticket-id="${t.id}"
+            class="ticket-item cursor-pointer px-4 py-3.5 border-b border-slate-800 ${esActivo ? 'active' : ''}">
+            <div class="flex items-start gap-3">
+                <div class="relative flex-shrink-0 mt-0.5">
+                    <div class="w-8 h-8 rounded-full bg-purple-600/20 border border-purple-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-purple-400 text-xs"></i>
+                    </div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 ${statusColor} rounded-full border-2 border-slate-900"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                        <p class="text-sm font-semibold text-white truncate">${emailCorto}</p>
+                        <span class="text-xs text-slate-500 flex-shrink-0">${fecha}</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-0.5">
+                        <p class="text-xs text-slate-500 truncate">Ticket #${t.id.slice(0,8)}</p>
+                        ${sinLeerT > 0 ? `<span class="flex-shrink-0 w-5 h-5 bg-purple-600 rounded-full text-xs text-white font-bold flex items-center justify-center">${sinLeerT}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setFiltro(f) {
+    filtroActual = f;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const isActive = btn.dataset.filter === f;
+        btn.className = btn.className.replace(/bg-purple-600 text-white|bg-slate-800 text-slate-400 hover:bg-slate-700/g, '').trim();
+        btn.className += isActive ? ' bg-purple-600 text-white' : ' bg-slate-800 text-slate-400 hover:bg-slate-700';
+    });
+    renderTicketsList();
+}
+
+function filtrarTickets() { renderTicketsList(); }
+
+function suscribirTicketsRealtime() {
+    ticketsRealtimeChannel = _supabase
+        .channel('admin-tickets-global')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, async () => {
+            await cargarTickets();
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, async (payload) => {
+            if (payload.new.sender === 'user') {
+                // Actualizar unread_admin del ticket
+                const ticket = todosLosTickets.find(t => t.id === payload.new.ticket_id);
+                if (ticket && payload.new.ticket_id !== ticketActivoId) {
+                    ticket.unread_admin = (ticket.unread_admin || 0) + 1;
+                    renderTicketsList();
+                    mostrarToast(`💬 Nuevo mensaje de usuario`, 'info');
+                }
+            }
+        })
+        .subscribe();
+}
+
+// ══════════════════════════════════
+//           CHAT
+// ══════════════════════════════════
+
+async function abrirTicket(ticketId) {
+    ticketActivoId = ticketId;
+
+    document.getElementById('chat-empty').classList.add('hidden');
+    document.getElementById('chat-active').classList.remove('hidden');
+    document.getElementById('chat-active').classList.add('flex');
+
+    // Marcar como activo en sidebar
+    document.querySelectorAll('.ticket-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.ticketId === ticketId);
+    });
+
+    const ticket = todosLosTickets.find(t => t.id === ticketId);
+    if (ticket) {
+        document.getElementById('chat-user-email').textContent = ticket.perfiles?.email || 'Usuario desconocido';
+        document.getElementById('chat-user-id').textContent = `ID: ${ticket.user_id}`;
+        actualizarBadgeStatus(ticket.status);
+
+        // Resetear unread
+        if (ticket.unread_admin > 0) {
+            ticket.unread_admin = 0;
+            await _supabase.from('support_tickets').update({ unread_admin: 0 }).eq('id', ticketId);
+            renderTicketsList();
+        }
+    }
+
+    // Cargar mensajes
+    await cargarMensajesChat(ticketId);
+
+    // Realtime
+    if (chatRealtimeChannel) _supabase.removeChannel(chatRealtimeChannel);
+    chatRealtimeChannel = _supabase
+        .channel(`admin-chat-${ticketId}`)
+        .on('postgres_changes', {
+            event: 'INSERT', schema: 'public', table: 'support_messages',
+            filter: `ticket_id=eq.${ticketId}`
+        }, payload => {
+            const ya = document.querySelector(`[data-msg-id="${payload.new.id}"]`);
+            if (!ya) {
+                renderMensajeAdmin(payload.new);
+                scrollChatAbajo();
+            }
+        })
+        .subscribe();
+
+    document.getElementById('admin-reply-input').focus();
+}
+
+async function cargarMensajesChat(ticketId) {
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = `<div class="flex justify-center py-4">
+        <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>`;
+
+    const { data: msgs } = await _supabase
+        .from('support_messages')
+        .select('*')
+        .eq('ticket_id', ticketId)
+        .order('created_at', { ascending: true });
+
+    container.innerHTML = '';
+    if (msgs && msgs.length > 0) {
+        msgs.forEach(m => renderMensajeAdmin(m));
+    } else {
+        container.innerHTML = `<div class="text-center py-8">
+            <i class="fa-solid fa-comment-slash text-slate-700 text-2xl mb-2"></i>
+            <p class="text-sm text-slate-500">Sin mensajes aún</p>
+        </div>`;
+    }
+    scrollChatAbajo();
+}
+
+function renderMensajeAdmin(msg) {
+    const container = document.getElementById('chat-messages');
+    const esAdmin = msg.sender === 'admin';
+    const hora = new Date(msg.created_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    const fecha = new Date(msg.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+
+    const div = document.createElement('div');
+    div.dataset.msgId = msg.id;
+    div.className = `flex ${esAdmin ? 'justify-end' : 'gap-2.5 items-end'} mb-1`;
+
+    let media = '';
+    if (msg.images && msg.images.length > 0) {
+        media = `<div class="flex flex-wrap gap-1.5 mt-2">
+            ${msg.images.map(url => `
+                <a href="${url}" target="_blank">
+                    <img src="${url}" class="w-24 h-24 object-cover rounded-xl border border-slate-600 hover:opacity-90 transition cursor-zoom-in" />
+                </a>`).join('')}
+        </div>`;
+    }
+
+    if (esAdmin) {
+        div.innerHTML = `
+            <div class="max-w-[72%]">
+                <p class="text-xs text-slate-500 text-right mb-1 mr-1">Tú · ${fecha} ${hora}</p>
+                <div class="msg-admin px-4 py-2.5">
+                    ${msg.message ? `<p class="text-sm text-slate-200 leading-relaxed">${escapeHtml(msg.message)}</p>` : ''}
+                    ${media}
+                </div>
+            </div>`;
+    } else {
+        div.innerHTML = `
+            <div class="w-7 h-7 rounded-full bg-purple-600/20 border border-purple-500/20 flex items-center justify-center flex-shrink-0 mb-1">
+                <i class="fa-solid fa-user text-purple-400 text-xs"></i>
+            </div>
+            <div class="max-w-[72%]">
+                <p class="text-xs text-slate-500 mb-1 ml-1">${fecha} ${hora}</p>
+                <div class="msg-user px-4 py-2.5">
+                    ${msg.message ? `<p class="text-sm text-white leading-relaxed">${escapeHtml(msg.message)}</p>` : ''}
+                    ${media}
+                </div>
+            </div>`;
+    }
+
+    container.appendChild(div);
+}
+
+async function enviarRespuestaAdmin() {
+    const input = document.getElementById('admin-reply-input');
+    const texto = input.value.trim();
+    if (!texto && adminFilesSelected.length === 0) return;
+    if (!ticketActivoId) return;
+
+    const btn = document.getElementById('admin-send-btn');
+    btn.disabled = true;
+
+    let imageUrls = [];
+    for (const file of adminFilesSelected) {
+        const ext = file.name.split('.').pop();
+        const path = `support/${ticketActivoId}/admin_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { data: uploadData, error: uploadError } = await _supabase.storage
+            .from('support-images')
+            .upload(path, file, { cacheControl: '3600', upsert: false });
+        if (!uploadError && uploadData) {
+            const { data: { publicUrl } } = _supabase.storage.from('support-images').getPublicUrl(path);
+            imageUrls.push(publicUrl);
+        }
+    }
+
+    await _supabase.from('support_messages').insert({
+        ticket_id: ticketActivoId,
+        sender: 'admin',
+        user_id: adminUser.id,
+        message: texto || null,
+        images: imageUrls.length > 0 ? imageUrls : null
+    });
+
+    // Actualizar updated_at del ticket
+    await _supabase.from('support_tickets').update({ updated_at: new Date().toISOString() }).eq('id', ticketActivoId);
+
+    input.value = '';
+    input.style.height = 'auto';
+    limpiarAdminFiles();
+    btn.disabled = false;
+    input.focus();
+}
+
+async function toggleEstadoTicket() {
+    if (!ticketActivoId) return;
+    const ticket = todosLosTickets.find(t => t.id === ticketActivoId);
+    if (!ticket) return;
+
+    const nuevoEstado = ticket.status === 'open' ? 'resolved' : 'open';
+    await _supabase.from('support_tickets').update({ status: nuevoEstado }).eq('id', ticketActivoId);
+    ticket.status = nuevoEstado;
+    actualizarBadgeStatus(nuevoEstado);
+    renderTicketsList();
+}
+
+function actualizarBadgeStatus(status) {
+    const badge = document.getElementById('chat-status-badge');
+    const btn = document.getElementById('toggle-status-btn');
+    if (status === 'open') {
+        badge.textContent = '● Abierto';
+        badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Marcar resuelto';
+    } else {
+        badge.textContent = '● Resuelto';
+        badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full border bg-slate-700/50 text-slate-400 border-slate-600';
+        btn.innerHTML = '<i class="fa-solid fa-rotate-left mr-1"></i>Reabrir';
+    }
+}
+
+// ══════════════════════════════════
+//         ARCHIVOS ADMIN
+// ══════════════════════════════════
+
+function handleAdminFiles(input) {
+    const files = Array.from(input.files);
+    for (const file of files) {
+        if (adminFilesSelected.length >= 4) { mostrarToast('Máximo 4 imágenes', 'error'); break; }
+        if (file.size > 5 * 1024 * 1024) { mostrarToast(`${file.name} supera 5MB`, 'error'); continue; }
+        adminFilesSelected.push(file);
+    }
+    renderAdminPreview();
+    input.value = '';
+}
+
+function renderAdminPreview() {
+    const container = document.getElementById('admin-preview-container');
+    const grid = document.getElementById('admin-preview-grid');
+    if (adminFilesSelected.length === 0) { container.classList.add('hidden'); grid.innerHTML = ''; return; }
+    container.classList.remove('hidden');
+    grid.innerHTML = adminFilesSelected.map((f, i) => {
+        const url = URL.createObjectURL(f);
+        return `<div class="relative">
+            <img src="${url}" class="w-16 h-16 object-cover rounded-xl border border-slate-600" />
+            <button onclick="quitarAdminFile(${i})" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-400 rounded-full text-white text-xs flex items-center justify-center shadow-lg transition">
+                <i class="fa-solid fa-xmark"></i></button></div>`;
+    }).join('');
+}
+
+function quitarAdminFile(idx) { adminFilesSelected.splice(idx, 1); renderAdminPreview(); }
+function limpiarAdminFiles() { adminFilesSelected = []; renderAdminPreview(); }
+
+// ══════════════════════════════════
+//           UTILS
+// ══════════════════════════════════
+
+function scrollChatAbajo() {
+    const c = document.getElementById('chat-messages');
+    if (c) setTimeout(() => { c.scrollTop = c.scrollHeight; }, 50);
+}
+
+function autoResizeAdmin(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function formatFecha(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const ahora = new Date();
+    const diff = ahora - d;
+    if (diff < 60000) return 'ahora';
+    if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
+    if (diff < 86400000) return `${Math.floor(diff/3600000)}h`;
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+}
+
+function mostrarToast(msg, tipo) {
+    const el = document.createElement('div');
+    const colores = { info: 'bg-slate-800 border-slate-700 text-white', error: 'bg-red-500/20 border-red-500/30 text-red-300', success: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300' };
+    el.className = `fixed top-4 right-4 z-[9999] px-4 py-3 rounded-xl border text-sm font-semibold shadow-2xl ${colores[tipo] || colores.info} transition-all`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+
+// ══════════════════════════════════
+//           INIT – verificar sesión
+// ══════════════════════════════════
+(async () => {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session?.user) {
+        adminUser = session.user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('admin-email-label').textContent = adminUser.email;
+        await cargarTickets();
+        suscribirTicketsRealtime();
+    }
+})();
+</script>
+</body>
+</html>
