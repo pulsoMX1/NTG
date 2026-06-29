@@ -1892,6 +1892,7 @@
                 generarEnlaceReferido(currentUser);
                 setTimeout(() => inicializarRuleta(), 500);
                 inicializarCPAlead();
+                verificarBadgeSoporte(currentUser.id);
             } else {
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("app-container").classList.add("hidden");
@@ -3754,6 +3755,19 @@
             await cargarEstadoPremium(user.id);
             programarModalPremiumAds();
         };
+
+        async function verificarBadgeSoporte(userId) {
+            const { data } = await _supabase
+                .from('support_tickets')
+                .select('unread_user')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+            if (data && data.unread_user > 0) {
+                document.getElementById('support-badge').classList.remove('hidden');
+            }
+        }
     </script>
     <!-- Anuncio flotante / popunder CPAnetwork -->
 
@@ -3903,7 +3917,13 @@ async function abrirSoporte() {
     }
     document.getElementById('support-modal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Limpiar badge al abrir
+    document.getElementById('support-badge').classList.add('hidden');
     await cargarConversacionSoporte();
+    // Marcar como leído en BD
+    if (supportTicketId) {
+        await _supabase.from('support_tickets').update({ unread_user: 0 }).eq('id', supportTicketId);
+    }
 }
 
 function cerrarSoporte() {
@@ -4014,14 +4034,28 @@ function suscribirSoporteRealtime() {
             schema: 'public',
             table: 'support_messages',
             filter: `ticket_id=eq.${supportTicketId}`
-        }, payload => {
+        }, async payload => {
             const ya = document.querySelector(`[data-msg-id="${payload.new.id}"]`);
             if (!ya) {
                 renderMensajeSoporte(payload.new);
                 scrollSoporteAbajo();
                 if (payload.new.sender === 'admin') {
                     mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
+                    // Mostrar badge en burbuja
                     document.getElementById('support-badge').classList.remove('hidden');
+                    // Si el chat está abierto, marcar leído inmediatamente
+                    const modalAbierto = !document.getElementById('support-modal').classList.contains('hidden');
+                    if (modalAbierto) {
+                        await _supabase.from('support_tickets').update({ unread_user: 0 }).eq('id', supportTicketId);
+                    } else {
+                        // Incrementar contador no leídos
+                        await _supabase.from('support_tickets').update({ 
+                            unread_user: _supabase.rpc ? undefined : 0
+                        }).eq('id', supportTicketId);
+                        // Usamos un increment simple
+                        const { data: t } = await _supabase.from('support_tickets').select('unread_user').eq('id', supportTicketId).single();
+                        await _supabase.from('support_tickets').update({ unread_user: (t?.unread_user || 0) + 1 }).eq('id', supportTicketId);
+                    }
                 }
             }
         })
