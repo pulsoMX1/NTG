@@ -2957,10 +2957,10 @@
             [783.99, 0.18], [659.25, 0.18], [523.25, 0.3], [0, 0]
         ];
 
-        // Melodía con más movimiento mientras se elige jugada (un poco más rápida, animosa)
+        // Melodía relajada y suave mientras se elige jugada (ritmo más lento, calmado)
         const MELODIA_JUGANDO = [
-            [659.25, 0.13], [783.99, 0.13], [880, 0.13], [783.99, 0.13],
-            [659.25, 0.13], [587.33, 0.13], [659.25, 0.2], [0, 0]
+            [392, 0.3], [0, 0], [493.88, 0.3], [0, 0],
+            [440, 0.3], [0, 0], [523.25, 0.45], [0, 0]
         ];
 
         const Sonidos = {
@@ -2993,9 +2993,9 @@
                 _tono(1568, 0.05, 'sine', 0.05, 0.06);
             },
 
-            // Música animosa mientras el jugador elige su jugada
+            // Música relajada mientras el jugador elige su jugada
             iniciarTensionJugada() {
-                _reproducirLoop('jugando', MELODIA_JUGANDO, 150, 0.038);
+                _reproducirLoop('jugando', MELODIA_JUGANDO, 260, 0.035);
             },
 
             // El jugador elige piedra/papel/tijeras — "pop" satisfactorio
