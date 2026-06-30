@@ -2905,6 +2905,64 @@
             freqs.forEach((f, i) => _tono(f, duracion, tipo, volumen, delayInicial + i * separacion));
         }
 
+        // ══════════════════════════════════════════
+        // MÚSICA DE FONDO — loops cortos y alegres
+        // ══════════════════════════════════════════
+        let _musicaTimer = null;
+        let _musicaActiva = null;
+
+        // Toca una nota de melodía con volumen bajo (para no tapar los efectos de sonido)
+        function _notaMusica(freq, duracion, tipo = 'triangle', volumen = 0.045, delay = 0) {
+            if (!_sonidosActivos) return;
+            const ctx = _getAudioCtx();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = tipo;
+            osc.frequency.value = freq;
+            const t0 = ctx.currentTime + delay;
+            gain.gain.setValueAtTime(0.0001, t0);
+            gain.gain.exponentialRampToValueAtTime(volumen, t0 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, t0 + duracion);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t0);
+            osc.stop(t0 + duracion + 0.05);
+        }
+
+        // Detiene cualquier melodía de fondo en curso
+        function _detenerMusica() {
+            if (_musicaTimer) { clearTimeout(_musicaTimer); _musicaTimer = null; }
+            _musicaActiva = null;
+        }
+
+        // Reproduce una melodía (array de [nota, duracion]) en loop hasta que se detenga
+        function _reproducirLoop(id, notas, tempoMs, volumen = 0.045) {
+            _detenerMusica();
+            _musicaActiva = id;
+            let i = 0;
+            const paso = () => {
+                if (_musicaActiva !== id || !_sonidosActivos) return;
+                const [freq, dur] = notas[i % notas.length];
+                if (freq) _notaMusica(freq, dur, 'triangle', volumen);
+                i++;
+                _musicaTimer = setTimeout(paso, tempoMs);
+            };
+            paso();
+        }
+
+        // Melodía alegre y simple mientras se busca rival (estilo "menú casual")
+        const MELODIA_BUSQUEDA = [
+            [523.25, 0.18], [0, 0], [659.25, 0.18], [0, 0],
+            [783.99, 0.18], [659.25, 0.18], [523.25, 0.3], [0, 0]
+        ];
+
+        // Melodía con más movimiento mientras se elige jugada (un poco más rápida, animosa)
+        const MELODIA_JUGANDO = [
+            [659.25, 0.13], [783.99, 0.13], [880, 0.13], [783.99, 0.13],
+            [659.25, 0.13], [587.33, 0.13], [659.25, 0.2], [0, 0]
+        ];
+
         const Sonidos = {
             // Click genérico de UI (botones, selección de apuesta)
             click() {
@@ -2912,13 +2970,15 @@
                 _tono(1320, 0.05, 'sine', 0.05, 0.015);
             },
 
-            // Iniciar búsqueda de rival — campanitas ascendentes alegres, sin drone
+            // Iniciar búsqueda de rival — campanitas ascendentes + melodía de fondo en loop
             buscando() {
                 _arpegio([523.25, 659.25, 783.99], 0.1, 0.08, 'sine', 0.11);
+                _reproducirLoop('busqueda', MELODIA_BUSQUEDA, 190, 0.04);
             },
 
-            // Rival encontrado — fanfarria brillante y juguetona
+            // Rival encontrado — fanfarria brillante y juguetona, detiene la música de búsqueda
             rivalEncontrado() {
+                _detenerMusica();
                 _arpegio([523.25, 659.25, 783.99, 1046.5], 0.12, 0.07, 'triangle', 0.15);
             },
 
@@ -2933,8 +2993,10 @@
                 _tono(1568, 0.05, 'sine', 0.05, 0.06);
             },
 
-            // (sin efecto de tensión — se deja vacío para mantener compatibilidad)
-            iniciarTensionJugada() {},
+            // Música animosa mientras el jugador elige su jugada
+            iniciarTensionJugada() {
+                _reproducirLoop('jugando', MELODIA_JUGANDO, 150, 0.038);
+            },
 
             // El jugador elige piedra/papel/tijeras — "pop" satisfactorio
             elegirJugada() {
@@ -2947,46 +3009,59 @@
                 _tono(700, 0.1, 'sine', 0.05);
             },
 
-            // Inicio de ronda ("Ronda X") — campanita alegre ascendente
+            // Inicio de ronda ("Ronda X") — campanita alegre ascendente, detiene música previa
             inicioRonda() {
+                _detenerMusica();
                 _arpegio([440, 554.37, 659.25], 0.1, 0.06, 'triangle', 0.12);
             },
 
             // Empate en la ronda — par de notas neutras pero suaves, no oscuras
             empate() {
+                _detenerMusica();
                 _tono(587.33, 0.14, 'sine', 0.1);
                 _tono(587.33, 0.14, 'sine', 0.08, 0.16);
             },
 
             // Gana la ronda (no el partido completo) — arpegio mayor feliz
             ganaRonda() {
+                _detenerMusica();
                 _arpegio([659.25, 830.6, 1046.5], 0.1, 0.07, 'triangle', 0.15);
             },
 
             // Pierde la ronda (no el partido completo) — "boing" descendente juguetón, no triste
             pierdeRonda() {
+                _detenerMusica();
                 _tonoDeslizante(523.25, 349.23, 0.22, 'sine', 0.11);
             },
 
-            // Victoria final del partido — fanfarria completa tipo celebración
+            // Victoria final del partido — fanfarria completa + jingle de celebración
             victoriaFinal() {
+                _detenerMusica();
                 _arpegio([523.25, 659.25, 783.99, 1046.5, 1318.5], 0.11, 0.08, 'triangle', 0.16);
                 _tono(1567.98, 0.4, 'triangle', 0.13, 0.5);
+                // Jingle corto de celebración después de la fanfarria
+                setTimeout(() => {
+                    _arpegio([783.99, 1046.5, 1318.5, 1567.98], 0.12, 0.1, 'triangle', 0.1);
+                }, 650);
             },
 
             // Derrota final del partido — caída corta pero amigable, sin ser deprimente
             derrotaFinal() {
+                _detenerMusica();
                 _tonoDeslizante(440, 293.66, 0.35, 'sine', 0.12);
                 _tono(349.23, 0.25, 'sine', 0.08, 0.2);
             },
 
             // No se encontró rival / cancelar búsqueda
             cancelar() {
+                _detenerMusica();
                 _tonoDeslizante(600, 400, 0.18, 'sine', 0.1);
             },
 
-            // Compatibilidad: ya no hay ambiente que detener, pero se mantiene la función
-            detenerTodo() {}
+            // Detiene cualquier música de fondo activa
+            detenerTodo() {
+                _detenerMusica();
+            }
         };
 
         function toggleSonidosJuego() {
@@ -2998,7 +3073,11 @@
                     ? '<i class="fa-solid fa-volume-high"></i>'
                     : '<i class="fa-solid fa-volume-xmark"></i>';
             }
-            if (_sonidosActivos) Sonidos.click();
+            if (!_sonidosActivos) {
+                _detenerMusica();
+            } else {
+                Sonidos.click();
+            }
         }
 
         // ══════════════════════════════════════════
