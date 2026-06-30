@@ -1067,11 +1067,6 @@
 
                 <!-- ══ MODAL BUSCANDO PARTIDA ══ -->
                 <div id="modal-buscando" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[6000] p-0 sm:p-4">
-                    <button id="btn-toggle-sonido" onclick="toggleSonidosJuego()"
-                        class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[6001] w-9 h-9 rounded-full bg-slate-800/90 border border-slate-600 flex items-center justify-center text-slate-300 hover:text-white transition active:scale-90"
-                        title="Activar/desactivar sonido">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
                     <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm shadow-2xl overflow-hidden">
 
                         <!-- ── FASE: BUSCANDO ── -->
@@ -2853,7 +2848,7 @@
         // SISTEMA DE SONIDOS ALEGRE — PIEDRA PAPEL TIJERAS
         // ══════════════════════════════════════════
         let _audioCtx = null;
-        let _sonidosActivos = (localStorage.getItem('netgamer_sonidos') !== 'false');
+        let _sonidosActivos = true;
 
         function _getAudioCtx() {
             if (!_audioCtx) {
@@ -3064,21 +3059,6 @@
             }
         };
 
-        function toggleSonidosJuego() {
-            _sonidosActivos = !_sonidosActivos;
-            localStorage.setItem('netgamer_sonidos', _sonidosActivos);
-            const btn = document.getElementById('btn-toggle-sonido');
-            if (btn) {
-                btn.innerHTML = _sonidosActivos
-                    ? '<i class="fa-solid fa-volume-high"></i>'
-                    : '<i class="fa-solid fa-volume-xmark"></i>';
-            }
-            if (!_sonidosActivos) {
-                _detenerMusica();
-            } else {
-                Sonidos.click();
-            }
-        }
 
         // ══════════════════════════════════════════
         // SISTEMA DE JUEGOS — AL MEJOR DE 3 RONDAS
@@ -3227,12 +3207,6 @@
             document.getElementById('modal-buscando').classList.remove('hidden');
             _ocultarTodasFases();
             document.getElementById('fase-buscando').classList.remove('hidden');
-            const btnSonido = document.getElementById('btn-toggle-sonido');
-            if (btnSonido) {
-                btnSonido.innerHTML = _sonidosActivos
-                    ? '<i class="fa-solid fa-volume-high"></i>'
-                    : '<i class="fa-solid fa-volume-xmark"></i>';
-            }
             Sonidos.buscando();
         }
 
