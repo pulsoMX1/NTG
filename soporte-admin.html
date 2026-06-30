@@ -2,7 +2,7 @@
 <html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Admin – Soporte NetGamer MX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -21,6 +21,31 @@
         #login-screen { display: flex; }
         #app-screen { display: none; }
         textarea { resize: none; }
+
+        /* ── Mobile: sidebar fullscreen, chat fullscreen ── */
+        @media (max-width: 767px) {
+            #sidebar-panel {
+                position: fixed; inset: 0; z-index: 10;
+                width: 100% !important;
+                display: flex; flex-direction: column;
+            }
+            #chat-panel {
+                position: fixed; inset: 0; z-index: 20;
+                width: 100% !important;
+                display: none; flex-direction: column;
+            }
+            #chat-panel.mobile-visible {
+                display: flex;
+            }
+            #main-body {
+                position: relative;
+            }
+        }
+        @media (min-width: 768px) {
+            #sidebar-panel { display: flex !important; flex-direction: column; }
+            #chat-panel { display: flex !important; flex-direction: column; }
+            #btn-back-mobile { display: none !important; }
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden">
@@ -63,7 +88,7 @@
 <div id="app-screen" class="h-screen flex flex-col">
 
     <!-- Topbar -->
-    <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/80 flex-shrink-0">
+    <div class="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-700/80 flex-shrink-0" style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                 <i class="fa-solid fa-headset text-white text-sm"></i>
@@ -86,10 +111,10 @@
     </div>
 
     <!-- Cuerpo principal -->
-    <div class="flex flex-1 overflow-hidden">
+    <div id="main-body" class="flex flex-1 overflow-hidden">
 
         <!-- ── SIDEBAR – Lista de tickets ── -->
-        <div class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 border-r border-slate-700/80 flex flex-col">
+        <div id="sidebar-panel" class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 border-r border-slate-700/80 flex flex-col">
 
             <!-- Búsqueda + filtros -->
             <div class="p-3 border-b border-slate-700/50 space-y-2">
@@ -126,7 +151,7 @@
         </div>
 
         <!-- ── CHAT PRINCIPAL ── -->
-        <div id="chat-area" class="flex-1 flex flex-col overflow-hidden bg-slate-950">
+        <div id="chat-panel" class="flex-1 flex flex-col overflow-hidden bg-slate-950">
 
             <!-- Estado vacío -->
             <div id="chat-empty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
@@ -141,8 +166,11 @@
             <div id="chat-active" class="hidden flex-1 flex flex-col overflow-hidden">
 
                 <!-- Header del chat -->
-                <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/50 flex-shrink-0">
+                <div class="flex items-center justify-between px-4 py-3.5 bg-slate-900 border-b border-slate-700/50 flex-shrink-0" style="padding-top: calc(0.875rem + env(safe-area-inset-top));">
                     <div class="flex items-center gap-3 min-w-0">
+                        <button id="btn-back-mobile" onclick="volverSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center flex-shrink-0 transition">
+                            <i class="fa-solid fa-arrow-left text-slate-300 text-sm"></i>
+                        </button>
                         <div class="w-9 h-9 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-user text-purple-400 text-sm"></i>
                         </div>
@@ -383,6 +411,11 @@ async function abrirTicket(ticketId) {
     document.getElementById('chat-active').classList.remove('hidden');
     document.getElementById('chat-active').classList.add('flex');
 
+    // En móvil: mostrar chat y ocultar sidebar
+    if (window.innerWidth < 768) {
+        document.getElementById('chat-panel').classList.add('mobile-visible');
+    }
+
     // Marcar como activo en sidebar
     document.querySelectorAll('.ticket-item').forEach(el => {
         el.classList.toggle('active', el.dataset.ticketId === ticketId);
@@ -600,7 +633,9 @@ async function toggleEstadoTicket() {
     document.getElementById('chat-active').classList.add('hidden');
     document.getElementById('chat-active').classList.remove('flex');
     document.getElementById('chat-empty').classList.remove('hidden');
-    // Resetear botón para que funcione en la siguiente conversación
+    // En móvil volver al sidebar
+    document.getElementById('chat-panel').classList.remove('mobile-visible');
+    // Resetear botón
     const btnReset = document.getElementById('toggle-status-btn');
     btnReset.disabled = false;
     btnReset.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Marcar resuelto';
@@ -657,6 +692,10 @@ function limpiarAdminFiles() { adminFilesSelected = []; renderAdminPreview(); }
 // ══════════════════════════════════
 //           UTILS
 // ══════════════════════════════════
+
+function volverSidebar() {
+    document.getElementById('chat-panel').classList.remove('mobile-visible');
+}
 
 function scrollChatAbajo() {
     const c = document.getElementById('chat-messages');
