@@ -221,10 +221,20 @@ async function iniciarSesionAdmin() {
     btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Entrando...';
     errorEl.classList.add('hidden');
 
+    const ADMIN_EMAIL = 'ed8108868@gmail.com';
+
     const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
     if (error || !data.user) {
         showLoginError('Credenciales incorrectas. Verifica tu email y contraseña.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i>Entrar al panel';
+        return;
+    }
+
+    if (data.user.email !== ADMIN_EMAIL) {
+        await _supabase.auth.signOut();
+        showLoginError('No tienes permiso para acceder a este panel.');
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i>Entrar al panel';
         return;
@@ -688,13 +698,15 @@ function mostrarToast(msg, tipo) {
 // ══════════════════════════════════
 (async () => {
     const { data: { session } } = await _supabase.auth.getSession();
-    if (session?.user) {
+    if (session?.user && session.user.email === 'ed8108868@gmail.com') {
         adminUser = session.user;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'flex';
         document.getElementById('admin-email-label').textContent = adminUser.email;
         await cargarTickets();
         suscribirTicketsRealtime();
+    } else if (session?.user) {
+        await _supabase.auth.signOut();
     }
 })();
 </script>
