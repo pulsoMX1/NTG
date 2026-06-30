@@ -590,6 +590,10 @@ async function toggleEstadoTicket() {
     document.getElementById('chat-active').classList.add('hidden');
     document.getElementById('chat-active').classList.remove('flex');
     document.getElementById('chat-empty').classList.remove('hidden');
+    // Resetear botón para que funcione en la siguiente conversación
+    const btnReset = document.getElementById('toggle-status-btn');
+    btnReset.disabled = false;
+    btnReset.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Marcar resuelto';
     renderTicketsList();
     mostrarToast('Conversación eliminada correctamente.', 'success');
 }
