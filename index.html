@@ -4442,5 +4442,141 @@ function escapeHtml(text) {
 }
 </script>
 
+<!-- ══════════════════════════════════════════════ -->
+<!--      ANUNCIOS PERSONALIZADOS — MODAL FULLSCREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="modal-anuncio-personalizado" class="hidden fixed inset-0 z-[9500] bg-black/95 flex items-center justify-center p-0">
+    <button id="btn-cerrar-anuncio" onclick="cerrarAnuncioPersonalizado()" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 z-[9510] w-10 h-10 rounded-full bg-slate-800/90 border border-slate-600 flex items-center justify-center text-white hover:bg-slate-700 transition active:scale-90 shadow-lg">
+        <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
+    <div id="anuncio-countdown-badge" class="absolute top-4 left-4 sm:top-6 sm:left-6 z-[9510] bg-slate-800/90 border border-slate-600 rounded-full px-3 py-1.5 text-xs font-bold text-slate-300 flex items-center gap-1.5">
+        <i class="fa-solid fa-clock text-amber-400"></i>
+        <span id="anuncio-countdown-num">10</span>s
+    </div>
+    <a id="anuncio-link" href="#" target="_blank" rel="noopener" onclick="registrarClicAnuncio()" class="w-full h-full flex items-center justify-center cursor-pointer">
+        <img id="anuncio-imagen" src="" alt="Anuncio" class="max-w-full max-h-full object-contain" />
+    </a>
+    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Publicidad</p>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//      SISTEMA DE ANUNCIOS PERSONALIZADOS
+// ══════════════════════════════════════════════
+let _anuncioIdActual = null;
+let _anuncioTimerProgramado = null;
+let _anuncioMostrandose = false;
+
+// Duración mínima antes de poder cerrar (segundos)
+const ANUNCIO_DURACION_MIN = 10;
+
+function _esPremiumActivo() {
+    return typeof isPremium !== 'undefined' && isPremium;
+}
+
+function programarSiguienteAnuncio() {
+    if (_anuncioTimerProgramado) clearTimeout(_anuncioTimerProgramado);
+    // Entre 2 y 3 minutos en milisegundos
+    const minMs = 2 * 60 * 1000;
+    const maxMs = 3 * 60 * 1000;
+    const espera = minMs + Math.random() * (maxMs - minMs);
+    _anuncioTimerProgramado = setTimeout(intentarMostrarAnuncio, espera);
+}
+
+async function intentarMostrarAnuncio() {
+    // No mostrar si: no hay usuario, es premium, ya se está mostrando uno, o hay otros modales abiertos
+    if (!currentUser || _esPremiumActivo() || _anuncioMostrandose) {
+        programarSiguienteAnuncio();
+        return;
+    }
+
+    // Evitar que se sobreponga a otros modales activos (soporte, juego, retiro, etc.)
+    const modalesAbiertos = [
+        'support-modal', 'modal-buscando', 'modal-bonus', 'modal-legal',
+        'modal-recargar-vidas', 'modal-premium-ads'
+    ];
+    const hayModalAbierto = modalesAbiertos.some(id => {
+        const el = document.getElementById(id);
+        if (!el) return false;
+        return !el.classList.contains('hidden') || el.classList.contains('activo');
+    });
+    if (hayModalAbierto) {
+        programarSiguienteAnuncio();
+        return;
+    }
+
+    const { data, error } = await _supabase
+        .from('anuncios_personalizados')
+        .select('id, imagen_url, link_destino')
+        .eq('activo', true);
+
+    if (error || !data || data.length === 0) {
+        programarSiguienteAnuncio();
+        return;
+    }
+
+    const anuncio = data[Math.floor(Math.random() * data.length)];
+    mostrarAnuncioPersonalizado(anuncio);
+}
+
+function mostrarAnuncioPersonalizado(anuncio) {
+    _anuncioMostrandose = true;
+    _anuncioIdActual = anuncio.id;
+
+    document.getElementById('anuncio-imagen').src = anuncio.imagen_url;
+    document.getElementById('anuncio-link').href = anuncio.link_destino;
+    document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Registrar impresión
+    _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
+        if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
+    });
+
+    // Countdown antes de poder cerrar
+    let seg = ANUNCIO_DURACION_MIN;
+    const badge = document.getElementById('anuncio-countdown-badge');
+    const numEl = document.getElementById('anuncio-countdown-num');
+    const btnCerrar = document.getElementById('btn-cerrar-anuncio');
+    badge.classList.remove('hidden');
+    btnCerrar.classList.add('hidden');
+    numEl.textContent = seg;
+
+    const intervalo = setInterval(() => {
+        seg--;
+        numEl.textContent = seg;
+        if (seg <= 0) {
+            clearInterval(intervalo);
+            badge.classList.add('hidden');
+            btnCerrar.classList.remove('hidden');
+        }
+    }, 1000);
+}
+
+function cerrarAnuncioPersonalizado() {
+    document.getElementById('modal-anuncio-personalizado').classList.add('hidden');
+    document.body.style.overflow = '';
+    document.getElementById('anuncio-imagen').src = '';
+    _anuncioMostrandose = false;
+    _anuncioIdActual = null;
+    programarSiguienteAnuncio();
+}
+
+function registrarClicAnuncio() {
+    if (!_anuncioIdActual) return;
+    const idAnuncio = _anuncioIdActual;
+    _supabase.from('anuncios_personalizados').select('clics').eq('id', idAnuncio).single().then(({ data }) => {
+        if (data) _supabase.from('anuncios_personalizados').update({ clics: (data.clics || 0) + 1 }).eq('id', idAnuncio);
+    });
+}
+
+// Iniciar el ciclo de anuncios cuando el usuario ya está autenticado
+const _verificarSesionActivaOriginalAds = verificarSesionActiva;
+verificarSesionActiva = async function() {
+    await _verificarSesionActivaOriginalAds();
+    if (currentUser) programarSiguienteAnuncio();
+};
+</script>
+
 </body>
 </html>
