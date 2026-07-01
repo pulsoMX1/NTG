@@ -4454,7 +4454,8 @@ function escapeHtml(text) {
         <span id="anuncio-countdown-num">10</span>s
     </div>
     <a id="anuncio-link" href="#" target="_blank" rel="noopener" onclick="registrarClicAnuncio()" class="w-full h-full flex items-center justify-center cursor-pointer">
-        <img id="anuncio-imagen" src="" alt="Anuncio" class="max-w-full max-h-full object-contain" />
+        <img id="anuncio-imagen" src="" alt="Anuncio" class="max-w-full max-h-full object-contain hidden" />
+        <video id="anuncio-video" class="max-w-full max-h-full object-contain hidden" controls autoplay muted playsinline></video>
     </a>
     <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Publicidad</p>
 </div>
@@ -4507,7 +4508,7 @@ async function intentarMostrarAnuncio() {
 
     const { data, error } = await _supabase
         .from('anuncios_personalizados')
-        .select('id, imagen_url, link_destino')
+        .select('id, imagen_url, media_url, tipo, link_destino')
         .eq('activo', true);
 
     if (error || !data || data.length === 0) {
@@ -4523,7 +4524,25 @@ function mostrarAnuncioPersonalizado(anuncio) {
     _anuncioMostrandose = true;
     _anuncioIdActual = anuncio.id;
 
-    document.getElementById('anuncio-imagen').src = anuncio.imagen_url;
+    const imgEl = document.getElementById('anuncio-imagen');
+    const vidEl = document.getElementById('anuncio-video');
+    
+    // Determinar si es video o imagen
+    const tipo = anuncio.tipo || (anuncio.media_url ? 'video' : 'imagen');
+    const mediaUrl = anuncio.media_url || anuncio.imagen_url;
+    
+    if (tipo === 'video' && anuncio.media_url) {
+        imgEl.classList.add('hidden');
+        imgEl.src = '';
+        vidEl.src = anuncio.media_url;
+        vidEl.classList.remove('hidden');
+    } else {
+        vidEl.classList.add('hidden');
+        vidEl.src = '';
+        imgEl.src = mediaUrl || '';
+        imgEl.classList.remove('hidden');
+    }
+    
     document.getElementById('anuncio-link').href = anuncio.link_destino;
     document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
@@ -4554,9 +4573,15 @@ function mostrarAnuncioPersonalizado(anuncio) {
 }
 
 function cerrarAnuncioPersonalizado() {
+    const vidEl = document.getElementById('anuncio-video');
+    const imgEl = document.getElementById('anuncio-imagen');
+    
+    vidEl.pause();
+    vidEl.src = '';
+    imgEl.src = '';
+    
     document.getElementById('modal-anuncio-personalizado').classList.add('hidden');
     document.body.style.overflow = '';
-    document.getElementById('anuncio-imagen').src = '';
     _anuncioMostrandose = false;
     _anuncioIdActual = null;
     programarSiguienteAnuncio();
