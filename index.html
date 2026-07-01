@@ -53,7 +53,28 @@
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
 
-        /* OTP inputs responsive */
+        /* Video de anuncios protegido */
+        #anuncio-video {
+            pointer-events: none;
+            user-select: none;
+        }
+        #anuncio-video::-webkit-media-controls { display: none !important; }
+        video::-webkit-media-controls-panel { display: none !important; }
+        video::-webkit-media-controls-play-button { display: none !important; }
+        video::-webkit-media-controls-volume-slider { display: none !important; }
+        video::-webkit-media-controls-mute-button { display: none !important; }
+        video::-webkit-media-controls-timeline { display: none !important; }
+
+        /* Deshabilitar click derecho en video */
+        #modal-anuncio-personalizado video { 
+            pointer-events: none;
+        }
+        #modal-anuncio-personalizado {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         .otp-input { width: 44px; height: 56px; }
         @media (max-width: 400px) {
             .otp-input { width: 36px; height: 48px; font-size: 1rem; }
@@ -4455,15 +4476,50 @@ function escapeHtml(text) {
     </div>
     <a id="anuncio-link" href="#" target="_blank" rel="noopener" onclick="registrarClicAnuncio()" class="w-full h-full flex items-center justify-center cursor-pointer">
         <img id="anuncio-imagen" src="" alt="Anuncio" class="max-w-full max-h-full object-contain hidden" />
-        <video id="anuncio-video" class="max-w-full max-h-full object-contain hidden" controls autoplay muted playsinline></video>
+        <video id="anuncio-video" class="max-w-full max-h-full object-contain hidden" autoplay muted playsinline disablePictureInPicture></video>
     </a>
     <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Publicidad</p>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+// Protección del video de anuncios contra manipulación y descarga
+// ══════════════════════════════════════════════════════════════════════════
+(function protegerVideoAnuncios() {
+    // Deshabilitar click derecho en el modal de anuncios
+    document.addEventListener('contextmenu', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Deshabilitar atajos de teclado en modal de anuncios
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden')) {
+            // Bloquear: Ctrl+S (guardar), Ctrl+D (descargar), F12 (dev tools)
+            if ((e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'S' || e.key === 'D')) || e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    // Bloquear inspección de elementos
+    document.addEventListener('mousedown', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden') && e.button === 2) {
+            e.preventDefault();
+            return false;
+        }
+    });
+})();
+
+// ══════════════════════════════════════════════════════════════════════════
 //      SISTEMA DE ANUNCIOS PERSONALIZADOS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
 let _anuncioIdActual = null;
 let _anuncioTimerProgramado = null;
 let _anuncioMostrandose = false;
