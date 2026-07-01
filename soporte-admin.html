@@ -841,8 +841,50 @@ function mostrarToast(msg, tipo) {
 //      MÓDULO ANUNCIOS PERSONALIZADOS
 // ══════════════════════════════════════════════
 let moduloActivo = 'soporte';
-let anuncioImagenFile = null;
+let anuncioMediaFile = null;
+let anuncioTipoMediaActual = 'imagen';
 let todosLosAnuncios = [];
+
+function seleccionarTipoMedia(tipo) {
+    anuncioTipoMediaActual = tipo;
+    document.getElementById('anuncio-tipo-media').value = tipo;
+    
+    // Actualizar botones
+    const btnImg = document.getElementById('btn-tipo-imagen');
+    const btnVid = document.getElementById('btn-tipo-video');
+    if (tipo === 'imagen') {
+        btnImg.classList.remove('bg-slate-700', 'text-slate-400');
+        btnImg.classList.add('bg-purple-600', 'text-white');
+        btnVid.classList.add('bg-slate-700', 'text-slate-400');
+        btnVid.classList.remove('bg-purple-600', 'text-white');
+    } else {
+        btnVid.classList.remove('bg-slate-700', 'text-slate-400');
+        btnVid.classList.add('bg-purple-600', 'text-white');
+        btnImg.classList.add('bg-slate-700', 'text-slate-400');
+        btnImg.classList.remove('bg-purple-600', 'text-white');
+    }
+    
+    // Cambiar label y accept del input
+    const label = document.getElementById('label-anuncio-archivo');
+    const texto = document.getElementById('texto-anuncio-archivo');
+    const input = document.getElementById('input-anuncio-imagen');
+    
+    if (tipo === 'video') {
+        label.textContent = 'Video del anuncio';
+        texto.textContent = 'Click para subir video (MP4, máx 20MB)';
+        input.accept = 'video/mp4,.mp4';
+    } else {
+        label.textContent = 'Imagen del anuncio';
+        texto.textContent = 'Click para subir imagen (recomendado vertical, máx 5MB)';
+        input.accept = 'image/*';
+    }
+    
+    // Limpiar previews y archivo
+    anuncioMediaFile = null;
+    document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
+    document.getElementById('preview-anuncio-video-container').classList.add('hidden');
+    input.value = '';
+}
 
 function cambiarModulo(modulo) {
     moduloActivo = modulo;
@@ -936,8 +978,11 @@ function abrirFormNuevoAnuncio() {
     document.getElementById('input-anunciante-nombre').value = '';
     document.getElementById('input-anuncio-link').value = '';
     document.getElementById('anuncio-imagen-url-existente').value = '';
+    anuncioMediaFile = null;
+    anuncioTipoMediaActual = 'imagen';
+    seleccionarTipoMedia('imagen');
     document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
-    anuncioImagenFile = null;
+    document.getElementById('preview-anuncio-video-container').classList.add('hidden');
     document.getElementById('form-anuncio-container').classList.remove('hidden');
     document.getElementById('form-anuncio-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -953,11 +998,26 @@ function editarAnuncio(id) {
     document.getElementById('anuncio-edit-id').value = a.id;
     document.getElementById('input-anunciante-nombre').value = a.anunciante_nombre || '';
     document.getElementById('input-anuncio-link').value = a.link_destino || '';
-    document.getElementById('anuncio-imagen-url-existente').value = a.imagen_url || '';
-    anuncioImagenFile = null;
-    if (a.imagen_url) {
-        document.getElementById('preview-anuncio-imagen').src = a.imagen_url;
-        document.getElementById('preview-anuncio-imagen-container').classList.remove('hidden');
+    
+    // Determinar tipo de media
+    const tipo = a.tipo || (a.media_url ? 'video' : 'imagen');
+    const mediaUrl = a.media_url || a.imagen_url;
+    
+    document.getElementById('anuncio-imagen-url-existente').value = mediaUrl || '';
+    anuncioMediaFile = null;
+    anuncioTipoMediaActual = tipo;
+    seleccionarTipoMedia(tipo);
+    
+    if (mediaUrl) {
+        if (tipo === 'video') {
+            document.getElementById('preview-anuncio-video').src = mediaUrl;
+            document.getElementById('preview-anuncio-video-container').classList.remove('hidden');
+            document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
+        } else {
+            document.getElementById('preview-anuncio-imagen').src = mediaUrl;
+            document.getElementById('preview-anuncio-imagen-container').classList.remove('hidden');
+            document.getElementById('preview-anuncio-video-container').classList.add('hidden');
+        }
     }
     document.getElementById('form-anuncio-container').classList.remove('hidden');
     document.getElementById('form-anuncio-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -966,52 +1026,75 @@ function editarAnuncio(id) {
 function previewImagenAnuncio(input) {
     const file = input.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-        mostrarToast('La imagen supera los 5MB', 'error');
+    
+    const maxSize = anuncioTipoMediaActual === 'video' ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+    const maxSizeLabel = anuncioTipoMediaActual === 'video' ? '20MB' : '5MB';
+    
+    if (file.size > maxSize) {
+        mostrarToast(`El archivo supera los ${maxSizeLabel}`, 'error');
         input.value = '';
         return;
     }
-    anuncioImagenFile = file;
+    
+    anuncioMediaFile = file;
     const url = URL.createObjectURL(file);
-    document.getElementById('preview-anuncio-imagen').src = url;
-    document.getElementById('preview-anuncio-imagen-container').classList.remove('hidden');
+    
+    if (anuncioTipoMediaActual === 'video') {
+        document.getElementById('preview-anuncio-video').src = url;
+        document.getElementById('preview-anuncio-video-container').classList.remove('hidden');
+        document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
+    } else {
+        document.getElementById('preview-anuncio-imagen').src = url;
+        document.getElementById('preview-anuncio-imagen-container').classList.remove('hidden');
+        document.getElementById('preview-anuncio-video-container').classList.add('hidden');
+    }
 }
 
 async function guardarAnuncio() {
     const id = document.getElementById('anuncio-edit-id').value;
     const nombre = document.getElementById('input-anunciante-nombre').value.trim();
     const link = document.getElementById('input-anuncio-link').value.trim();
-    const imagenExistente = document.getElementById('anuncio-imagen-url-existente').value;
+    const mediaExistente = document.getElementById('anuncio-imagen-url-existente').value;
+    const tipo = anuncioTipoMediaActual;
 
     if (!link) { mostrarToast('Falta el link de destino', 'error'); return; }
-    if (!anuncioImagenFile && !imagenExistente) { mostrarToast('Falta la imagen del anuncio', 'error'); return; }
+    if (!anuncioMediaFile && !mediaExistente) { 
+        mostrarToast(`Falta ${tipo === 'video' ? 'el video' : 'la imagen'} del anuncio`, 'error'); 
+        return; 
+    }
 
     const btn = document.getElementById('btn-guardar-anuncio');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Guardando...';
 
-    let imagenUrl = imagenExistente;
+    let mediaUrl = mediaExistente;
 
-    if (anuncioImagenFile) {
-        const ext = anuncioImagenFile.name.split('.').pop();
+    if (anuncioMediaFile) {
+        const ext = anuncioMediaFile.name.split('.').pop();
+        const carpeta = tipo === 'video' ? 'anuncios-videos' : 'anuncios-imagenes';
         const path = `anuncios/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        
         const { data: uploadData, error: uploadError } = await _supabase.storage
-            .from('anuncios-imagenes')
-            .upload(path, anuncioImagenFile, { cacheControl: '3600', upsert: false });
+            .from(carpeta)
+            .upload(path, anuncioMediaFile, { cacheControl: '3600', upsert: false });
+        
         if (uploadError) {
-            mostrarToast('Error al subir la imagen', 'error');
+            mostrarToast(`Error al subir el ${tipo}`, 'error');
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Anuncio';
             return;
         }
-        const { data: { publicUrl } } = _supabase.storage.from('anuncios-imagenes').getPublicUrl(path);
-        imagenUrl = publicUrl;
+        
+        const { data: { publicUrl } } = _supabase.storage.from(carpeta).getPublicUrl(path);
+        mediaUrl = publicUrl;
     }
 
     const payload = {
         anunciante_nombre: nombre || null,
         link_destino: link,
-        imagen_url: imagenUrl
+        tipo: tipo,
+        media_url: mediaUrl,
+        imagen_url: tipo === 'imagen' ? mediaUrl : null  // Mantener compatibilidad hacia atrás
     };
 
     let error;
@@ -1045,12 +1128,15 @@ async function eliminarAnuncio(id) {
     if (!confirmar) return;
 
     const anuncio = todosLosAnuncios.find(a => a.id === id);
+    const tipo = anuncio?.tipo || (anuncio?.media_url ? 'video' : 'imagen');
+    const mediaUrl = anuncio?.media_url || anuncio?.imagen_url;
 
-    // Intentar borrar la imagen del storage también
-    if (anuncio?.imagen_url) {
-        const match = anuncio.imagen_url.match(/\/object\/public\/anuncios-imagenes\/(.+)$/);
+    // Intentar borrar el archivo del storage también
+    if (mediaUrl) {
+        const carpeta = tipo === 'video' ? 'anuncios-videos' : 'anuncios-imagenes';
+        const match = mediaUrl.match(/\/object\/public\/(anuncios-videos|anuncios-imagenes)\/(.+)$/);
         if (match) {
-            await _supabase.storage.from('anuncios-imagenes').remove([decodeURIComponent(match[1])]);
+            await _supabase.storage.from(carpeta).remove([decodeURIComponent(match[2])]);
         }
     }
 
