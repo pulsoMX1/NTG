@@ -74,13 +74,16 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            z-index: 99999 !important;
+            z-index: 2147483647 !important;
         }
         #btn-cerrar-anuncio {
-            z-index: 999999 !important;
+            z-index: 2147483647 !important;
         }
         #anuncio-countdown-badge {
-            z-index: 999999 !important;
+            z-index: 2147483647 !important;
+        }
+        #anuncio-link {
+            z-index: 2147483646 !important;
         }
         .otp-input { width: 44px; height: 56px; }
         @media (max-width: 400px) {
@@ -4473,7 +4476,7 @@ function escapeHtml(text) {
 <!-- ══════════════════════════════════════════════ -->
 <!--      ANUNCIOS PERSONALIZADOS — MODAL FULLSCREEN -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="modal-anuncio-personalizado" class="hidden fixed inset-0 z-[99999] bg-black/95 flex items-center justify-center p-0">
+<div id="modal-anuncio-personalizado" class="hidden fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-0">
     <button id="btn-cerrar-anuncio" onclick="cerrarAnuncioPersonalizado()" class="hidden absolute top-4 right-4 sm:top-6 sm:right-6 z-[999999] w-10 h-10 rounded-full bg-slate-800/90 border border-slate-600 flex items-center justify-center text-white hover:bg-slate-700 transition active:scale-90 shadow-lg">
         <i class="fa-solid fa-xmark text-lg"></i>
     </button>
@@ -4607,8 +4610,22 @@ function mostrarAnuncioPersonalizado(anuncio) {
     }
     
     document.getElementById('anuncio-link').href = anuncio.link_destino;
-    document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
+    const modal = document.getElementById('modal-anuncio-personalizado');
+    modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    
+    // 🔥 FORZAR Z-INDEX MÁXIMO EN TODO
+    modal.style.zIndex = '2147483647';
+    
+    // Bloquear Adsterra y otros anuncios mientras se muestra el modal
+    document.querySelectorAll(
+        '[id*="adsterra"], [id*="social-bar"], [id*="aso-"], ' +
+        'iframe[src*="adsterra"], iframe[src*="socialbar"], ' +
+        '.adsterra, .social-bar, .aso-container'
+    ).forEach(el => {
+        el.style.zIndex = '0';
+        el.style.position = 'relative';
+    });
 
     // Registrar impresión
     _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
@@ -4643,8 +4660,21 @@ function cerrarAnuncioPersonalizado() {
     vidEl.src = '';
     imgEl.src = '';
     
-    document.getElementById('modal-anuncio-personalizado').classList.add('hidden');
+    const modal = document.getElementById('modal-anuncio-personalizado');
+    modal.classList.add('hidden');
+    modal.style.zIndex = '';  // Restaurar z-index
     document.body.style.overflow = '';
+    
+    // 🔄 RESTAURAR Z-INDEX DE ADSTERRA
+    document.querySelectorAll(
+        '[id*="adsterra"], [id*="social-bar"], [id*="aso-"], ' +
+        'iframe[src*="adsterra"], iframe[src*="socialbar"], ' +
+        '.adsterra, .social-bar, .aso-container'
+    ).forEach(el => {
+        el.style.zIndex = '';
+        el.style.position = '';
+    });
+    
     _anuncioMostrandose = false;
     _anuncioIdActual = null;
     programarSiguienteAnuncio();
