@@ -4614,18 +4614,36 @@ function mostrarAnuncioPersonalizado(anuncio) {
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
     
-    // 🔥 FORZAR Z-INDEX MÁXIMO EN TODO
-    modal.style.zIndex = '2147483647';
+    // 🔥 BLOQUEAR ADSTERRA MIENTRAS SE MUESTRA EL ANUNCIO (igual que premium)
+    console.log('🎬 Anuncio personalizado abierto → Bloqueando Adsterra...');
+    _limpiarAnunciosDom();  // Eliminar Adsterra del DOM
+    _iniciarAdObserver();   // Vigilar que no inyecte nada nuevo
     
-    // Bloquear Adsterra y otros anuncios mientras se muestra el modal
-    document.querySelectorAll(
-        '[id*="adsterra"], [id*="social-bar"], [id*="aso-"], ' +
-        'iframe[src*="adsterra"], iframe[src*="socialbar"], ' +
-        '.adsterra, .social-bar, .aso-container'
-    ).forEach(el => {
-        el.style.zIndex = '0';
-        el.style.position = 'relative';
-    });
+    // Inyectar CSS blocker temporal para Adsterra
+    if (!document.getElementById('temp-ad-blocker')) {
+        const styleEl = document.createElement('style');
+        styleEl.id = 'temp-ad-blocker';
+        styleEl.textContent = `
+            /* Bloquear Adsterra mientras hay anuncio personalizado */
+            div[id*="social-bar"], div[class*="social-bar"],
+            div[id*="socialbar"], div[class*="socialbar"],
+            div[id*="aso-"], div[class*="aso-"],
+            div[id*="adsterra"], div[class*="adsterra"],
+            iframe[src*="effectivecpmnetwork"],
+            iframe[src*="highperformanceformat"],
+            iframe[src*="adsterra"],
+            body > div[style*="position: fixed"],
+            body > div[style*="position:fixed"],
+            body > iframe[style*="position: fixed"],
+            body > iframe[style*="position:fixed"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+        `;
+        document.head.appendChild(styleEl);
+    }
 
     // Registrar impresión
     _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
@@ -4665,7 +4683,17 @@ function cerrarAnuncioPersonalizado() {
     modal.style.zIndex = '';  // Restaurar z-index
     document.body.style.overflow = '';
     
-    // 🔄 RESTAURAR Z-INDEX DE ADSTERRA
+    // 🔄 REMOVER BLOQUEO DE ADSTERRA
+    console.log('❌ Anuncio personalizado cerrado → Desbloqueando Adsterra...');
+    
+    // Remover CSS blocker temporal
+    const tempBlocker = document.getElementById('temp-ad-blocker');
+    if (tempBlocker) tempBlocker.remove();
+    
+    // Detener vigilancia de Adsterra
+    _detenerAdObserver();
+    
+    // Restaurar z-index de Adsterra
     document.querySelectorAll(
         '[id*="adsterra"], [id*="social-bar"], [id*="aso-"], ' +
         'iframe[src*="adsterra"], iframe[src*="socialbar"], ' +
