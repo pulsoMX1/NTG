@@ -293,7 +293,7 @@
                             <img id="preview-anuncio-imagen" class="max-h-64 rounded-xl border border-slate-700 mx-auto" />
                         </div>
                         <div id="preview-anuncio-video-container" class="hidden mt-3">
-                            <video id="preview-anuncio-video" controls muted class="max-h-64 rounded-xl border border-slate-700 mx-auto w-full"></video>
+                            <video id="preview-anuncio-video" controls class="max-h-64 rounded-xl border border-slate-700 mx-auto w-full"></video>
                         </div>
                         <input type="hidden" id="anuncio-imagen-url-existente">
                     </div>
@@ -859,7 +859,6 @@ function validarDuracionVideoAnuncio(file) {
         videoPreview.src = videoUrl;
         videoPreview.controls = false;
         videoPreview.autoplay = false;
-        videoPreview.muted = true;
         videoPreview.style.maxWidth = '100%';
         videoPreview.style.maxHeight = '200px';
         videoPreview.style.borderRadius = '0.5rem';
