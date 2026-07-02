@@ -4556,7 +4556,9 @@ let _anuncioIdActual = null;
 let _anuncioTimerProgramado = null;
 let _anuncioMostrandose = false;
 
-// Duración mínima antes de poder cerrar (segundos)
+// Duración de countdown para anuncios personalizados:
+// - VIDEO: duración del video (detectado automáticamente)
+// - IMAGEN: 10 segundos (fijo)
 const ANUNCIO_DURACION_MIN = 10;
 
 function _esPremiumActivo() {
@@ -4619,16 +4621,52 @@ function mostrarAnuncioPersonalizado(anuncio) {
     const tipo = anuncio.tipo || (anuncio.media_url ? 'video' : 'imagen');
     const mediaUrl = anuncio.media_url || anuncio.imagen_url;
     
+    // Función para iniciar el countdown
+    const iniciarCountdown = (duracion) => {
+        let seg = Math.ceil(duracion); // Redondear hacia arriba
+        const badge = document.getElementById('anuncio-countdown-badge');
+        const numEl = document.getElementById('anuncio-countdown-num');
+        const btnCerrar = document.getElementById('btn-cerrar-anuncio');
+        badge.classList.remove('hidden');
+        btnCerrar.classList.add('hidden');
+        numEl.textContent = seg;
+
+        const intervalo = setInterval(() => {
+            seg--;
+            numEl.textContent = seg;
+            if (seg <= 0) {
+                clearInterval(intervalo);
+                badge.classList.add('hidden');
+                btnCerrar.classList.remove('hidden');
+            }
+        }, 1000);
+    };
+    
     if (tipo === 'video' && anuncio.media_url) {
         imgEl.classList.add('hidden');
         imgEl.src = '';
         vidEl.src = anuncio.media_url;
         vidEl.classList.remove('hidden');
+        
+        // Esperar a que se carguen los metadatos para obtener la duración
+        vidEl.addEventListener('loadedmetadata', function() {
+            iniciarCountdown(vidEl.duration);
+        }, { once: true });
+        
+        // Si no se cargan los metadatos rápido, usar 10 segundos como fallback
+        setTimeout(() => {
+            if (!vidEl.duration) {
+                iniciarCountdown(10);
+            }
+        }, 2000);
     } else {
         vidEl.classList.add('hidden');
         vidEl.src = '';
         imgEl.src = mediaUrl || '';
         imgEl.classList.remove('hidden');
+        
+        // Para imágenes, siempre 10 segundos
+        iniciarCountdown(10);
     }
     
     document.getElementById('anuncio-link').href = anuncio.link_destino;
@@ -4639,25 +4677,6 @@ function mostrarAnuncioPersonalizado(anuncio) {
     _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
         if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
     });
-
-    // Countdown antes de poder cerrar
-    let seg = ANUNCIO_DURACION_MIN;
-    const badge = document.getElementById('anuncio-countdown-badge');
-    const numEl = document.getElementById('anuncio-countdown-num');
-    const btnCerrar = document.getElementById('btn-cerrar-anuncio');
-    badge.classList.remove('hidden');
-    btnCerrar.classList.add('hidden');
-    numEl.textContent = seg;
-
-    const intervalo = setInterval(() => {
-        seg--;
-        numEl.textContent = seg;
-        if (seg <= 0) {
-            clearInterval(intervalo);
-            badge.classList.add('hidden');
-            btnCerrar.classList.remove('hidden');
-        }
-    }, 1000);
 }
 
 function cerrarAnuncioPersonalizado() {
