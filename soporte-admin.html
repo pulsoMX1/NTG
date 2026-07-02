@@ -1117,6 +1117,7 @@ async function guardarAnuncio() {
     const nombre = document.getElementById('input-anunciante-nombre').value.trim();
     const link = document.getElementById('input-anuncio-link').value.trim();
     const imagenExistente = document.getElementById('anuncio-imagen-url-existente').value;
+    const tipo = document.getElementById('anuncio-tipo-media').value;
 
     if (!link) { mostrarToast('Falta el link de destino', 'error'); return; }
     if (!anuncioImagenFile && !imagenExistente) { mostrarToast('Falta la imagen del anuncio', 'error'); return; }
@@ -1129,7 +1130,6 @@ async function guardarAnuncio() {
 
     if (anuncioImagenFile) {
         const ext = anuncioImagenFile.name.split('.').pop();
-        const tipo = document.getElementById('anuncio-tipo-media').value;
         const bucketName = tipo === 'video' ? 'anuncios-videos' : 'anuncios-imagenes';
         const path = `anuncios/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
         
@@ -1142,13 +1142,10 @@ async function guardarAnuncio() {
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Anuncio';
             return;
         }
-        const tipo = document.getElementById('anuncio-tipo-media').value;
-        const bucketName = tipo === 'video' ? 'anuncios-videos' : 'anuncios-imagenes';
         const { data: { publicUrl } } = _supabase.storage.from(bucketName).getPublicUrl(path);
         imagenUrl = publicUrl;
     }
 
-    const tipo = document.getElementById('anuncio-tipo-media').value;
     const payload = {
         anunciante_nombre: nombre || null,
         link_destino: link,
