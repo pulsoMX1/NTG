@@ -53,7 +53,38 @@
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
 
-        /* OTP inputs responsive */
+        /* Video de anuncios protegido */
+        #anuncio-video {
+            pointer-events: none;
+            user-select: none;
+        }
+        #anuncio-video::-webkit-media-controls { display: none !important; }
+        video::-webkit-media-controls-panel { display: none !important; }
+        video::-webkit-media-controls-play-button { display: none !important; }
+        video::-webkit-media-controls-volume-slider { display: none !important; }
+        video::-webkit-media-controls-mute-button { display: none !important; }
+        video::-webkit-media-controls-timeline { display: none !important; }
+
+        /* Deshabilitar click derecho en video */
+        #modal-anuncio-personalizado video { 
+            pointer-events: none;
+        }
+        #modal-anuncio-personalizado {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            z-index: 2147483647 !important;
+        }
+        #btn-cerrar-anuncio {
+            z-index: 2147483647 !important;
+        }
+        #anuncio-countdown-badge {
+            z-index: 2147483647 !important;
+        }
+        #anuncio-link {
+            /* z-index removido - permite que el texto "Publicidad" esté arriba */
+        }
         .otp-input { width: 44px; height: 56px; }
         @media (max-width: 400px) {
             .otp-input { width: 36px; height: 48px; font-size: 1rem; }
@@ -3781,6 +3812,43 @@
             if (_adObserver) { _adObserver.disconnect(); _adObserver = null; }
         }
 
+        function _limpiarAnunciosDom() {
+            // Eliminar todos los elementos inyectados por Adsterra/Social Bar del DOM
+            document.querySelectorAll(
+                'body > div[style*="position: fixed"], body > div[style*="position:fixed"],' +
+                'body > iframe[style*="position: fixed"], body > iframe[style*="position:fixed"],' +
+                'div[id*="social-bar"], div[class*="social-bar"],' +
+                'div[id*="socialbar"], div[class*="socialbar"],' +
+                'div[id*="aso-"], div[id*="adsterra"],' +
+                '[id^="container-08103591"]'
+            ).forEach(el => el.remove());
+
+            // Scripts del social bar
+            ['sb-script-1','sb-script-2'].forEach(id => {
+                const s = document.getElementById(id); if (s) s.remove();
+            });
+
+            // Ocultar iframes de redes de anuncios
+            document.querySelectorAll('iframe').forEach(f => {
+                const src = f.src || f.getAttribute('src') || '';
+                if (src.includes('effectivecpmnetwork') || src.includes('highperformanceformat') || src.includes('adsterra')) {
+                    f.remove();
+                }
+            });
+        }
+
+        function _iniciarAdObserver() {
+            if (_adObserver) return;
+            _adObserver = new MutationObserver(() => {
+                if (isPremium) _limpiarAnunciosDom();
+            });
+            _adObserver.observe(document.body, { childList: true, subtree: true });
+        }
+
+        function _detenerAdObserver() {
+            if (_adObserver) { _adObserver.disconnect(); _adObserver = null; }
+        }
+
         async function aplicarEstadoPremium() {
             // Inyectar/quitar CSS global para ocultar social bar y ads externos
             const styleId = 'premium-ad-blocker';
@@ -3827,8 +3895,20 @@
                 _iniciarAdObserver(); // vigilar y eliminar lo que se inyecte después
             }
 
-            // Social Bar de Adsterra - ELIMINADO COMPLETAMENTE
-            // Ya no se inyectan scripts de Social Bar
+            // 🗑️  SOCIAL BAR ELIMINADO - NO SE CARGA NI COMO PREMIUM NI COMO NO PREMIUM
+            // Las líneas que cargaban sb-script-1 y sb-script-2 fueron ELIMINADAS
+
+            // Si es premium, remover scripts y contenedores del social bar
+            if (isPremium) {
+                ['sb-script-1', 'sb-script-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                });
+                // Remover elementos inyectados por el social bar
+                document.querySelectorAll('body > div[style*="position: fixed"], body > div[style*="position:fixed"], body > iframe[style*="position: fixed"], body > iframe[style*="position:fixed"]').forEach(el => el.remove());
+                const sb = document.getElementById('container-08103591ba362aeb7a7ee360f307d4ac');
+                if (sb) sb.innerHTML = '';
+            }
 
             // Elementos de anuncios a ocultar/mostrar
             const adEls = [
@@ -4053,7 +4133,7 @@
 
 <!-- Burbuja flotante -->
 <button id="support-bubble" onclick="abrirSoporte()"
-    class="fixed top-[72%] -translate-y-1/2 right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 border-2 border-purple-400/30"
+    class="fixed bottom-24 right-4 sm:bottom-8 sm:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 border-2 border-purple-400/30"
     title="Soporte Técnico">
     <i class="fa-solid fa-headset text-white text-xl"></i>
     <span id="support-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center text-white border-2 border-slate-900">!</span>
@@ -4432,18 +4512,53 @@ function escapeHtml(text) {
         <img id="anuncio-imagen" src="" alt="Anuncio" class="max-w-full max-h-full object-contain hidden" />
         <video id="anuncio-video" class="max-w-full max-h-full object-contain hidden" autoplay playsinline disablePictureInPicture></video>
     </a>
-    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Publicidad</p>
+    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest z-[9999]">Publicidad</p>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-//      SISTEMA DE ANUNCIOS PERSONALIZADOS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+// Protección del video de anuncios contra manipulación y descarga
+// ══════════════════════════════════════════════════════════════════════════
+(function protegerVideoAnuncios() {
+    // Deshabilitar click derecho en el modal de anuncios
+    document.addEventListener('contextmenu', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Deshabilitar atajos de teclado en modal de anuncios
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden')) {
+            // Bloquear: Ctrl+S (guardar), Ctrl+D (descargar), F12 (dev tools)
+            if ((e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'S' || e.key === 'D')) || e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+
+    // Bloquear inspección de elementos
+    document.addEventListener('mousedown', (e) => {
+        const modal = document.getElementById('modal-anuncio-personalizado');
+        if (modal && !modal.classList.contains('hidden') && e.button === 2) {
+            e.preventDefault();
+            return false;
+        }
+    });
+})();
+
+// ══════════════════════════════════════════════════════════════════════════
 let _anuncioIdActual = null;
 let _anuncioTimerProgramado = null;
 let _anuncioMostrandose = false;
 
-// Duración mínima antes de poder cerrar (segundos)
+// Duración de countdown para anuncios personalizados:
+// - VIDEO: duración del video (detectado automáticamente)
+// - IMAGEN: 10 segundos (fijo)
 const ANUNCIO_DURACION_MIN = 10;
 
 function _esPremiumActivo() {
@@ -4483,7 +4598,7 @@ async function intentarMostrarAnuncio() {
 
     const { data, error } = await _supabase
         .from('anuncios_personalizados')
-        .select('id, imagen_url, link_destino')
+        .select('id, imagen_url, media_url, tipo, link_destino')
         .eq('activo', true);
 
     if (error || !data || data.length === 0) {
@@ -4508,7 +4623,7 @@ function mostrarAnuncioPersonalizado(anuncio) {
     
     // Función para iniciar el countdown
     const iniciarCountdown = (duracion) => {
-        let seg = Math.ceil(duracion);
+        let seg = Math.ceil(duracion); // Redondear hacia arriba
         const badge = document.getElementById('anuncio-countdown-badge');
         const numEl = document.getElementById('anuncio-countdown-num');
         const btnCerrar = document.getElementById('btn-cerrar-anuncio');
@@ -4538,7 +4653,7 @@ function mostrarAnuncioPersonalizado(anuncio) {
             iniciarCountdown(vidEl.duration);
         }, { once: true });
         
-        // Fallback: si no se cargan metadatos en 2s, usar 10 segundos
+        // Si no se cargan los metadatos rápido, usar 10 segundos como fallback
         setTimeout(() => {
             if (!vidEl.duration) {
                 iniciarCountdown(10);
@@ -4572,8 +4687,10 @@ function cerrarAnuncioPersonalizado() {
     vidEl.src = '';
     imgEl.src = '';
     
-    document.getElementById('modal-anuncio-personalizado').classList.add('hidden');
+    const modal = document.getElementById('modal-anuncio-personalizado');
+    modal.classList.add('hidden');
     document.body.style.overflow = '';
+    
     _anuncioMostrandose = false;
     _anuncioIdActual = null;
     programarSiguienteAnuncio();
@@ -4587,12 +4704,19 @@ function registrarClicAnuncio() {
     });
 }
 
-// Iniciar el ciclo de anuncios cuando el usuario ya está autenticado
-const _verificarSesionActivaOriginalAds = verificarSesionActiva;
-verificarSesionActiva = async function() {
-    await _verificarSesionActivaOriginalAds();
-    if (currentUser) programarSiguienteAnuncio();
-};
+// ══════════════════════════════════════════════════════════════════════════
+// Iniciar el ciclo de anuncios personalizados cuando el usuario se autentica
+// ══════════════════════════════════════════════════════════════════════════
+if (typeof verificarSesionActiva !== 'undefined') {
+    const _verificarSesionActivaOriginal = verificarSesionActiva;
+    verificarSesionActiva = async function() {
+        await _verificarSesionActivaOriginal();
+        if (currentUser && typeof programarSiguienteAnuncio === 'function') {
+            programarSiguienteAnuncio();
+        }
+    };
+}
+
 </script>
 
 </body>
