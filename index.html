@@ -307,6 +307,77 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+
+        /* ════════════════════════════════════════════════════════════ */
+        /* SCROLL ANIMATIONS */
+        /* ════════════════════════════════════════════════════════════ */
+        
+        .scroll-fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scroll-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-slide-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scroll-slide-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scroll-slide-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scroll-slide-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scroll-scale {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scroll-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Stagger effect para elementos múltiples */
+        .scroll-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .scroll-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays */
+        .scroll-item:nth-child(1) { transition-delay: 0s; }
+        .scroll-item:nth-child(2) { transition-delay: 0.1s; }
+        .scroll-item:nth-child(3) { transition-delay: 0.2s; }
+        .scroll-item:nth-child(4) { transition-delay: 0.3s; }
+
+        .scroll-item.visible:nth-child(1) { transition-delay: 0s; }
+        .scroll-item.visible:nth-child(2) { transition-delay: 0.1s; }
+        .scroll-item.visible:nth-child(3) { transition-delay: 0.2s; }
+        .scroll-item.visible:nth-child(4) { transition-delay: 0.3s; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
@@ -2066,6 +2137,9 @@
                 document.getElementById('referido-detectado').classList.remove('hidden');
                 toggleAuthViews(false);
             }
+
+            // Inicializar animaciones de scroll
+            setTimeout(() => inicializarScrollAnimations(), 100);
         });
 
         // ════════════════════════════════════════════════════════════
@@ -2083,6 +2157,65 @@
             document.getElementById('auth-container').classList.remove('hidden');
             document.getElementById('register-view').classList.remove('hidden');
             document.getElementById('login-view').classList.add('hidden');
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // SCROLL ANIMATIONS CON INTERSECTION OBSERVER
+        // ════════════════════════════════════════════════════════════
+        function inicializarScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Agregar animaciones a secciones
+            const sections = document.querySelectorAll('section');
+            sections.forEach((section, index) => {
+                if (index === 0) {
+                    section.classList.add('scroll-fade-in');
+                } else if (index % 3 === 0) {
+                    section.classList.add('scroll-slide-left');
+                } else if (index % 3 === 1) {
+                    section.classList.add('scroll-fade-in');
+                } else {
+                    section.classList.add('scroll-slide-right');
+                }
+                observer.observe(section);
+            });
+
+            // Agregar animaciones a cards en grids
+            const cards = document.querySelectorAll('.group');
+            cards.forEach((card) => {
+                card.classList.add('scroll-item');
+                observer.observe(card);
+            });
+
+            // Agregar animaciones a hero content
+            const heroContent = document.querySelector('#landing-container h2');
+            if (heroContent) {
+                heroContent.classList.add('scroll-fade-in');
+                observer.observe(heroContent);
+            }
+
+            const heroParagraph = document.querySelector('#landing-container section:first-child p');
+            if (heroParagraph) {
+                heroParagraph.classList.add('scroll-fade-in');
+                observer.observe(heroParagraph);
+            }
+
+            const heroButtons = document.querySelectorAll('#landing-container section:first-child button');
+            heroButtons.forEach((btn) => {
+                btn.classList.add('scroll-fade-in');
+                observer.observe(btn);
+            });
         }
 
         function regresarAlLanding() {
