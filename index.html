@@ -1973,17 +1973,6 @@
         }
 
 
-        function mostrarPantallaVerificacion(email) {
-            document.getElementById("login-view").classList.add("hidden");
-            document.getElementById("register-view").classList.add("hidden");
-            document.getElementById("verify-email-view").classList.remove("hidden");
-            document.getElementById("verify-email-address").innerText = email;
-            document.getElementById("otp-error").classList.add("hidden");
-            document.querySelectorAll('.otp-input').forEach(i => i.value = '');
-            setTimeout(() => document.querySelectorAll('.otp-input')[0].focus(), 100);
-            configurarOTPInputs();
-        }
-
         function configurarOTPInputs() {
             const inputs = document.querySelectorAll('.otp-input');
             inputs.forEach((input, index) => {
