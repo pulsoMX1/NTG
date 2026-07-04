@@ -676,20 +676,6 @@
 
                 <div id="tab-canjear" class="tab-content space-y-4 sm:space-y-6">
 
-                    <!-- Banner Premium (se oculta si ya es premium) -->
-                    <div id="canjear-banner-premium" class="bg-gradient-to-r from-amber-900/30 to-yellow-900/20 border border-amber-500/30 rounded-2xl p-4 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="text-2xl shrink-0">👑</span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-extrabold text-amber-300">Hazte Premium</p>
-                                <p class="text-xs text-slate-400 truncate">Elimina todos los anuncios por $49 MXN/mes</p>
-                            </div>
-                        </div>
-                        <button onclick="switchTab('tab-premium', null)" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs px-4 py-2 rounded-xl transition active:scale-95 whitespace-nowrap">
-                            Ver plan
-                        </button>
-                    </div>
-
                     <div id="canje-catalogo">
                         <div class="border-b border-slate-700 pb-3 sm:pb-4 mb-4 sm:mb-6">
                             <h2 class="text-xl sm:text-2xl font-extrabold">Centro de Canjes</h2>
@@ -1891,6 +1877,7 @@
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                document.getElementById("support-bubble").classList.remove("hidden");
                 const refCode = sessionStorage.getItem('ref_code');
                 if (refCode && refCode !== currentUser.id) {
                     await procesarBonoReferido(currentUser.id, refCode);
@@ -2800,6 +2787,8 @@
                 currentUser = null;
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("app-container").classList.add("hidden");
+                // Reiniciar la página después de cerrar sesión
+                setTimeout(() => location.reload(), 500);
             });
         }
 
@@ -4133,7 +4122,7 @@
 
 <!-- Burbuja flotante -->
 <button id="support-bubble" onclick="abrirSoporte()"
-    class="fixed bottom-32 right-4 sm:bottom-8 sm:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 border-2 border-purple-400/30"
+    class="hidden fixed bottom-32 right-4 sm:bottom-8 sm:right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 border-2 border-purple-400/30"
     title="Soporte Técnico">
     <i class="fa-solid fa-headset text-white text-xl"></i>
     <span id="support-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center text-white border-2 border-slate-900">!</span>
