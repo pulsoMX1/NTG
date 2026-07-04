@@ -247,6 +247,93 @@
         </div>
     </div>
 
+    <!-- LANDING PAGE -->
+    <div id="landing-container" class="flex flex-col min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+        <div class="max-w-6xl mx-auto px-4 py-16 flex-1">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl font-black text-white mb-4">NetGamer <span class="text-purple-500">MX</span></h1>
+                <p class="text-xl text-slate-300">Gana dinero real completando tareas y jugando</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-4xl font-black text-purple-400 mb-2" id="stat-usuarios">5000+</div>
+                    <p class="text-slate-400">Usuarios registrados</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-4xl font-black text-emerald-400 mb-2" id="stat-pagos">$50,000+</div>
+                    <p class="text-slate-400">Pagados a usuarios</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-4xl font-black text-amber-400 mb-2" id="stat-activos">1200+</div>
+                    <p class="text-slate-400">Usuarios activos hoy</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-12 mb-16">
+                <h2 class="text-2xl font-black text-white mb-6 text-center">¿Cómo funciona?</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-pen-to-square text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-2">1. Regístrate</h3>
+                        <p class="text-slate-400 text-sm">Crea tu cuenta en 2 minutos</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-tasks text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-2">2. Completa tareas</h3>
+                        <p class="text-slate-400 text-sm">Juega y completa ofertas</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-money-bill-wave text-white text-xl"></i>
+                        </div>
+                        <h3 class="font-bold text-white mb-2">3. Retira</h3>
+                        <p class="text-slate-400 text-sm">Transforma en dinero real</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-12 mb-16">
+                <h2 class="text-2xl font-black text-white mb-6 text-center">Formas de pago</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-slate-900 rounded-xl p-6 text-center border border-slate-700">
+                        <i class="fa-brands fa-paypal text-3xl text-blue-500 mb-3 block"></i>
+                        <p class="font-bold text-white text-sm">PayPal</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-xl p-6 text-center border border-slate-700">
+                        <i class="fa-solid fa-bank text-3xl text-emerald-500 mb-3 block"></i>
+                        <p class="font-bold text-white text-sm">SPEI</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-xl p-6 text-center border border-slate-700">
+                        <i class="fa-brands fa-bitcoin text-3xl text-amber-500 mb-3 block"></i>
+                        <p class="font-bold text-white text-sm">Bitcoin</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-xl p-6 text-center border border-slate-700">
+                        <i class="fa-solid fa-gamepad text-3xl text-pink-500 mb-3 block"></i>
+                        <p class="font-bold text-white text-sm">Robux</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="irALogin()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-xl mr-4 mb-4">
+                    Iniciar sesión
+                </button>
+                <button onclick="irARegistro()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-xl">
+                    Registrarse gratis
+                </button>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-700 py-6 text-center text-slate-500 text-sm">
+            <p>&copy; 2026 NetGamer MX. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
     <div id="auth-container" class="hidden flex items-center justify-center min-h-screen px-4 py-8">
         <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
             <div class="text-center mb-6 sm:mb-8">
@@ -1715,6 +1802,10 @@
         if (refCode) sessionStorage.setItem('ref_code', refCode);
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Mostrar landing por defecto
+            document.getElementById('landing-container').classList.remove('hidden');
+            document.getElementById('auth-container').classList.add('hidden');
+            
             configurarEventosAuth();
             verificarSesionActiva();
             if (sessionStorage.getItem('ref_code')) {
@@ -1885,6 +1976,7 @@
                     sessionStorage.removeItem('ref_code');
                     sessionStorage.removeItem('ref_pending_user');
                 }
+                document.getElementById("landing-container").classList.add("hidden");
                 document.getElementById("auth-container").classList.add("hidden");
                 document.getElementById("app-container").classList.remove("hidden");
                 document.getElementById("user-display-name").innerText = currentUser.user_metadata.username || currentUser.email;
@@ -4704,6 +4796,23 @@ if (typeof verificarSesionActiva !== 'undefined') {
             programarSiguienteAnuncio();
         }
     };
+}
+
+// ══════════════════════════════════════════════
+// FUNCIONES LANDING PAGE
+// ══════════════════════════════════════════════
+function irALogin() {
+    document.getElementById('landing-container').classList.add('hidden');
+    document.getElementById('auth-container').classList.remove('hidden');
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('register-view').classList.add('hidden');
+}
+
+function irARegistro() {
+    document.getElementById('landing-container').classList.add('hidden');
+    document.getElementById('auth-container').classList.remove('hidden');
+    document.getElementById('register-view').classList.remove('hidden');
+    document.getElementById('login-view').classList.add('hidden');
 }
 
 </script>
