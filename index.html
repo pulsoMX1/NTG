@@ -16,7 +16,7 @@
         * { box-sizing: border-box; }
 
         /* ════════════════════════════════════════════════════════════ */
-        /* RESPONSIVE Y COMPATIBILIDAD NAVEGADORES */
+        /* RESPONSIVE Y COMPATIBILIDAD - MISMO DISEÑO EN TODOS LOS DISPOSITIVOS */
         /* ════════════════════════════════════════════════════════════ */
         
         html {
@@ -41,138 +41,89 @@
             padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
         }
 
-        /* OPTIMIZACIÓN PARA MÓVIL */
-        @media (max-width: 640px) {
-            /* Hero section responsivo */
-            #landing-container h2 {
-                font-size: clamp(2rem, 8vw, 3.5rem) !important;
-                line-height: 1.1;
-            }
-
-            /* Textos responsivos */
-            #landing-container .text-xl {
-                font-size: clamp(0.875rem, 3vw, 1.25rem) !important;
-            }
-
-            #landing-container .text-4xl {
-                font-size: clamp(1.875rem, 6vw, 2.25rem) !important;
-            }
-
-            #landing-container .text-5xl {
-                font-size: clamp(1.875rem, 7vw, 2.25rem) !important;
-            }
-
-            /* Botones más grandes en móvil (mínimo 44px de altura para touch) */
-            #landing-container button {
-                min-height: 44px;
-                padding: 0.75rem 1rem !important;
-            }
-
-            /* Modal responsivo en móvil */
-            #auth-container .bg-slate-800 {
-                width: 95vw !important;
-                max-width: 100% !important;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-
-            /* Header responsivo */
-            #landing-container header {
-                padding: 1rem !important;
-            }
-
-            #landing-container header .flex {
-                flex-direction: column;
-                gap: 1rem !important;
-            }
-
-            #landing-container header button {
-                width: 100%;
-                font-size: 0.875rem;
-            }
-
-            /* Stats grid en móvil - 1 columna */
-            #landing-container .grid.md\\:grid-cols-3 {
-                grid-template-columns: 1fr !important;
-            }
-
-            /* Hero grid en móvil */
-            #landing-container .grid.lg\\:grid-cols-2 {
-                grid-template-columns: 1fr !important;
-                gap: 2rem !important;
-            }
-
-            /* Reducir padding en móvil */
-            #landing-container .px-6 {
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-            }
-
-            #landing-container .py-24 {
-                padding-top: 3rem !important;
-                padding-bottom: 3rem !important;
-            }
-
-            /* Cards más pequeñas en móvil */
-            #landing-container .p-8 {
-                padding: 1.5rem !important;
-            }
-
-            #landing-container .p-12 {
-                padding: 1.5rem !important;
-            }
-
-            #landing-container .p-16 {
-                padding: 1.5rem !important;
-            }
-
-            /* Regresar button en móvil */
-            #auth-container button:has(span:contains("<")) {
-                font-size: 0.875rem;
-            }
+        /* FLUID TYPOGRAPHY - Mismo diseño, escalado fluido en todos los dispositivos */
+        #landing-container h2 {
+            font-size: clamp(2rem, 5vw, 3.75rem);
+            line-height: 1.1;
         }
 
-        /* TABLETS */
-        @media (min-width: 641px) and (max-width: 1024px) {
-            #landing-container h2 {
-                font-size: clamp(2.5rem, 6vw, 3.5rem) !important;
-            }
-
-            #landing-container .grid.md\\:grid-cols-3 {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-
-            #auth-container .bg-slate-800 {
-                max-height: 85vh;
-                overflow-y: auto;
-            }
+        #landing-container .text-6xl {
+            font-size: clamp(2rem, 5vw, 3.75rem);
         }
 
-        /* DESKTOPS */
-        @media (min-width: 1025px) {
-            body {
-                overflow-x: hidden;
-            }
+        #landing-container .text-5xl {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+        }
 
-            /* Animaciones suave en desktop */
-            * {
-                transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
-            }
+        #landing-container .text-4xl {
+            font-size: clamp(1.25rem, 3vw, 2.25rem);
+        }
+
+        #landing-container .text-2xl {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+        }
+
+        #landing-container .text-xl {
+            font-size: clamp(0.875rem, 2vw, 1.25rem);
+        }
+
+        #landing-container .text-lg {
+            font-size: clamp(0.8rem, 1.8vw, 1.125rem);
+        }
+
+        /* Botones accesibles (mínimo 44px de altura para touch) */
+        #landing-container button,
+        #auth-container button {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        /* Modal accesible en todos los dispositivos */
+        #auth-container .bg-slate-800 {
+            width: clamp(280px, 95vw, 600px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Padding fluido */
+        #landing-container .px-6 {
+            padding-left: clamp(1rem, 5vw, 1.5rem);
+            padding-right: clamp(1rem, 5vw, 1.5rem);
+        }
+
+        #landing-container .py-24 {
+            padding-top: clamp(2rem, 6vw, 6rem);
+            padding-bottom: clamp(2rem, 6vw, 6rem);
+        }
+
+        #landing-container .p-8 {
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        #landing-container .p-12 {
+            padding: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        #landing-container .p-16 {
+            padding: clamp(1.5rem, 5vw, 4rem);
+        }
+
+        #landing-container .gap-8 {
+            gap: clamp(1rem, 3vw, 2rem);
+        }
+
+        #landing-container .gap-6 {
+            gap: clamp(0.75rem, 2vw, 1.5rem);
+        }
+
+        #landing-container .gap-4 {
+            gap: clamp(0.5rem, 1.5vw, 1rem);
         }
 
         /* COMPATIBILIDAD NAVEGADORES */
         
         /* Firefox */
         @-moz-document url-prefix() {
-            #landing-container {
-                -moz-user-select: none;
-            }
-
-            input, textarea, button {
-                -moz-user-select: text;
-            }
-
-            /* Scroll smooth en Firefox */
             html {
                 scroll-behavior: auto;
             }
@@ -180,27 +131,19 @@
 
         /* Safari */
         @supports (-webkit-appearance: none) {
-            #landing-container {
-                -webkit-user-select: none;
-            }
-
-            input, textarea, button {
-                -webkit-user-select: text;
-            }
-
-            /* Fix para Safari en iPad */
             #auth-container {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
+                -webkit-user-select: none;
             }
         }
 
         /* Edge/Chrome */
         @supports (-ms-ime-align:auto) {
-            #landing-container {
+            * {
                 -ms-user-select: none;
             }
         }
