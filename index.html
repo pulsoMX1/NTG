@@ -455,7 +455,13 @@
     </div>
 
     <div id="auth-container" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 py-8">
-        <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+        <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700 relative">
+            <!-- Botón regresar -->
+            <button onclick="regresarAlLanding()" class="absolute top-6 left-6 flex items-center gap-2 text-purple-400 hover:text-purple-300 transition font-bold">
+                <span class="text-xl">&lt;</span>
+                <span class="text-sm">Regresar</span>
+            </button>
+
             <div class="text-center mb-6 sm:mb-8">
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-purple-500 tracking-wide">NetGamer <span class="text-white">MX</span></h1>
                 <p class="text-slate-400 text-xs sm:text-sm mt-2">Gana recompensas leyendo noticias y completando tareas</p>
@@ -1949,6 +1955,11 @@
             document.getElementById('auth-container').classList.remove('hidden');
             document.getElementById('register-view').classList.remove('hidden');
             document.getElementById('login-view').classList.add('hidden');
+        }
+
+        function regresarAlLanding() {
+            document.getElementById('landing-container').classList.remove('hidden');
+            document.getElementById('auth-container').classList.add('hidden');
         }
 
         function toggleAuthViews(showLogin) {
