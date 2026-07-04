@@ -247,6 +247,234 @@
         </div>
     </div>
 
+    <!-- LANDING PAGE — DARK GAMER PREMIUM -->
+    <div id="landing-container" class="hidden flex flex-col min-h-screen bg-slate-950 text-white overflow-hidden">
+        
+        <!-- Animated background -->
+        <div class="fixed inset-0 -z-10 overflow-hidden">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+            <div class="absolute top-1/2 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 4s;"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="relative z-10 border-b border-slate-800/50 backdrop-blur-xl bg-slate-950/50">
+            <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/50">
+                        <span class="text-white font-black text-xl">NG</span>
+                    </div>
+                    <div>
+                        <h1 class="font-black text-2xl bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">NetGamer</h1>
+                        <p class="text-xs text-slate-500">MX Edition</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="irALogin()" class="px-6 py-2.5 rounded-lg text-sm font-bold border border-slate-700 hover:border-purple-500/50 text-slate-300 hover:text-white transition">
+                        Iniciar sesión
+                    </button>
+                    <button onclick="irARegistro()" class="px-6 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-lg hover:shadow-purple-500/50 transition">
+                        Registrarse
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="relative z-10 flex-1 overflow-y-auto">
+            
+            <!-- Hero Section -->
+            <section class="max-w-7xl mx-auto px-6 py-24">
+                <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+                    <div class="space-y-8">
+                        <div class="space-y-4">
+                            <div class="inline-block px-4 py-2 bg-purple-600/20 border border-purple-500/30 rounded-full text-purple-300 text-sm font-bold">
+                                🎮 La plataforma gamer #1 de México
+                            </div>
+                            <h2 class="text-6xl font-black leading-tight">
+                                Gana dinero
+                                <span class="bg-gradient-to-r from-purple-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent"> jugando y</span>
+                                <br/>completando tareas
+                            </h2>
+                        </div>
+                        <p class="text-xl text-slate-400 leading-relaxed">
+                            Únete a miles de jugadores mexicanos que ganan dinero real sin invertir un peso. Retira cuando quieras por PayPal, SPEI, Diamantes Freefire o Robux.
+                        </p>
+                        <div class="flex gap-4 pt-4">
+                            <button onclick="irARegistro()" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-black text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition transform hover:scale-105">
+                                Empezar ahora (gratis)
+                            </button>
+                            <button onclick="irALogin()" class="px-8 py-4 border-2 border-slate-700 hover:border-purple-500/50 rounded-xl font-bold text-lg transition">
+                                Ya tengo cuenta
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3D-like stats card -->
+                    <div class="relative group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition"></div>
+                        <div class="relative bg-slate-900 border border-slate-800 rounded-3xl p-12 backdrop-blur-xl">
+                            <div class="space-y-8">
+                                <div class="space-y-2">
+                                    <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Tu potencial de ingresos</p>
+                                    <div class="text-5xl font-black bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">$49/mes</div>
+                                    <p class="text-slate-400 text-sm">Ganancia promedio de nuestros usuarios</p>
+                                </div>
+                                <div class="space-y-3 pt-6 border-t border-slate-800">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                        <span class="text-slate-300">0 depósitos mínimos requeridos</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                        <span class="text-slate-300">Retiros diarios sin límite</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                        <span class="text-slate-300">100% seguro y verificado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid md:grid-cols-3 gap-8 mb-24">
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-purple-500/50 transition backdrop-blur-xl">
+                        <p class="text-slate-500 text-sm font-bold uppercase mb-2">Usuarios activos</p>
+                        <div class="text-5xl font-black mb-2">
+                            <span id="stat-usuarios" class="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">5000+</span>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
+                    </div>
+
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-emerald-500/50 transition backdrop-blur-xl">
+                        <p class="text-slate-500 text-sm font-bold uppercase mb-2">Pagado a usuarios</p>
+                        <div class="text-5xl font-black mb-2">
+                            <span id="stat-pagos" class="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">$50K+</span>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
+                    </div>
+
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-amber-500/50 transition backdrop-blur-xl">
+                        <p class="text-slate-500 text-sm font-bold uppercase mb-2">En línea ahora</p>
+                        <div class="text-5xl font-black mb-2">
+                            <span id="stat-activos" class="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">1200+</span>
+                        </div>
+                        <div class="h-1 bg-gradient-to-r from-amber-600 to-amber-500 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cómo funciona -->
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-800/50">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-black mb-4">¿Cómo funciona?</h3>
+                    <p class="text-xl text-slate-400">3 pasos simples para comenzar a ganar</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="group relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-purple-600/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="relative bg-slate-900/50 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl group-hover:border-purple-500/50 transition">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center mb-6 text-2xl">
+                                01
+                            </div>
+                            <h4 class="text-2xl font-black mb-3">Regístrate</h4>
+                            <p class="text-slate-400">Crea tu cuenta en menos de 2 minutos con email y contraseña</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="relative bg-slate-900/50 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl group-hover:border-indigo-500/50 transition">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center mb-6 text-2xl">
+                                02
+                            </div>
+                            <h4 class="text-2xl font-black mb-3">Completa tareas</h4>
+                            <p class="text-slate-400">Juega, lee noticias, completa ofertas y gana NetCoins</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-emerald-600/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="relative bg-slate-900/50 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl group-hover:border-emerald-500/50 transition">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center mb-6 text-2xl">
+                                03
+                            </div>
+                            <h4 class="text-2xl font-black mb-3">Retira dinero</h4>
+                            <p class="text-slate-400">Canjea tus NetCoins por dinero real sin límites</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Métodos de pago -->
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-800/50">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-black mb-4">Retira de forma segura</h3>
+                    <p class="text-xl text-slate-400">Múltiples opciones de pago disponibles</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center hover:border-blue-500/50 transition backdrop-blur-xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🌐</div>
+                        <h4 class="font-bold text-white">PayPal</h4>
+                        <p class="text-xs text-slate-500 mt-1">Internacional</p>
+                    </div>
+
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center hover:border-emerald-500/50 transition backdrop-blur-xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🏦</div>
+                        <h4 class="font-bold text-white">SPEI</h4>
+                        <p class="text-xs text-slate-500 mt-1">Bancos Mexico</p>
+                    </div>
+
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center hover:border-red-500/50 transition backdrop-blur-xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">💎</div>
+                        <h4 class="font-bold text-white">Diamantes</h4>
+                        <p class="text-xs text-slate-500 mt-1">Freefire</p>
+                    </div>
+
+                    <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center hover:border-pink-500/50 transition backdrop-blur-xl">
+                        <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🎮</div>
+                        <h4 class="font-bold text-white">Robux</h4>
+                        <p class="text-xs text-slate-500 mt-1">Roblox</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA final -->
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-800/50">
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition"></div>
+                    <div class="relative bg-gradient-to-br from-slate-900 to-slate-950 border border-purple-500/30 rounded-3xl p-16 text-center backdrop-blur-xl">
+                        <h3 class="text-5xl font-black mb-6">Empieza a ganar hoy</h3>
+                        <p class="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
+                            No hay depósito mínimo, sin verificación complicada, solo crea tu cuenta y comienza.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="irARegistro()" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-black text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition transform hover:scale-105">
+                                Registrarse gratis
+                            </button>
+                            <button onclick="irALogin()" class="px-10 py-4 border-2 border-slate-700 hover:border-purple-500/50 rounded-xl font-bold text-lg transition">
+                                Iniciar sesión
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="relative z-10 border-t border-slate-800/50 backdrop-blur-xl bg-slate-950/50 mt-24">
+            <div class="max-w-7xl mx-auto px-6 py-8 text-center text-slate-500 text-sm">
+                <p>&copy; 2026 NetGamer MX. 🎮 Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
     <div id="auth-container" class="hidden flex items-center justify-center min-h-screen px-4 py-8">
         <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
             <div class="text-center mb-6 sm:mb-8">
@@ -1715,6 +1943,10 @@
         if (refCode) sessionStorage.setItem('ref_code', refCode);
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Mostrar landing por defecto
+            document.getElementById('landing-container').classList.remove('hidden');
+            document.getElementById('auth-container').classList.add('hidden');
+            
             configurarEventosAuth();
             verificarSesionActiva();
             if (sessionStorage.getItem('ref_code')) {
@@ -1722,6 +1954,23 @@
                 toggleAuthViews(false);
             }
         });
+
+        // ════════════════════════════════════════════════════════════
+        // FUNCIONES LANDING PAGE
+        // ════════════════════════════════════════════════════════════
+        function irALogin() {
+            document.getElementById('landing-container').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('register-view').classList.add('hidden');
+        }
+
+        function irARegistro() {
+            document.getElementById('landing-container').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('register-view').classList.remove('hidden');
+            document.getElementById('login-view').classList.add('hidden');
+        }
 
         function toggleAuthViews(showLogin) {
             document.getElementById("login-view").classList.toggle("hidden", !showLogin);
@@ -1885,6 +2134,7 @@
                     sessionStorage.removeItem('ref_code');
                     sessionStorage.removeItem('ref_pending_user');
                 }
+                document.getElementById("landing-container").classList.add("hidden");
                 document.getElementById("auth-container").classList.add("hidden");
                 document.getElementById("app-container").classList.remove("hidden");
                 document.getElementById("user-display-name").innerText = currentUser.user_metadata.username || currentUser.email;
