@@ -575,7 +575,7 @@
                     <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-purple-500/50 transition backdrop-blur-xl">
                         <p class="text-slate-500 text-sm font-bold uppercase mb-2">Usuarios activos</p>
                         <div class="text-5xl font-black mb-2">
-                            <span id="stat-usuarios" class="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">5000+</span>
+                            <span id="stat-usuarios" class="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">100</span>
                         </div>
                         <div class="h-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
                     </div>
@@ -583,7 +583,7 @@
                     <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-emerald-500/50 transition backdrop-blur-xl">
                         <p class="text-slate-500 text-sm font-bold uppercase mb-2">Pagado a usuarios</p>
                         <div class="text-5xl font-black mb-2">
-                            <span id="stat-pagos" class="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">$50K+</span>
+                            <span id="stat-pagos" class="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">$2000</span>
                         </div>
                         <div class="h-1 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
                     </div>
@@ -591,7 +591,7 @@
                     <div class="group bg-slate-900/50 border border-slate-800 rounded-2xl p-8 hover:border-amber-500/50 transition backdrop-blur-xl">
                         <p class="text-slate-500 text-sm font-bold uppercase mb-2">En línea ahora</p>
                         <div class="text-5xl font-black mb-2">
-                            <span id="stat-activos" class="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">1200+</span>
+                            <span id="stat-online" class="bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">100+</span>
                         </div>
                         <div class="h-1 bg-gradient-to-r from-amber-600 to-amber-500 rounded-full w-24 group-hover:w-full transition-all duration-500"></div>
                     </div>
@@ -2163,6 +2163,73 @@
         // ==========================================
         // SISTEMA DE NOTIFICACIONES (TOASTS)
         // ==========================================
+        function actualizarEstadisticas() {
+            const estatUsuarios = document.getElementById('stat-usuarios');
+            const estatPagos = document.getElementById('stat-pagos');
+            const estatOnline = document.getElementById('stat-online');
+
+            if (estatUsuarios) estatUsuarios.textContent = statsContadores.usuariosRegistrados + '+';
+            if (estatPagos) estatPagos.textContent = '$' + statsContadores.pagadoAUsuarios.toLocaleString('es-MX');
+            if (estatOnline) estatOnline.textContent = statsContadores.usuariosOnline + '+';
+        }
+
+        function inicializarEscuchasEstadisticas() {
+            if (!_supabase) return;
+
+            // Escuchar nuevos usuarios registrados
+            const usuariosChannel = _supabase.channel('usuarios-realtime')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'usuarios' }, (payload) => {
+                    statsContadores.usuariosRegistrados++;
+                    actualizarEstadisticas();
+                })
+                .subscribe();
+
+            // Escuchar retirosaprobados exitosos (canjes)
+            const retiroChannel = _supabase.channel('retiros-realtime')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'retirosaprobados' }, (payload) => {
+                    if (payload.new && payload.new.monto) {
+                        statsContadores.pagadoAUsuarios += payload.new.monto;
+                        actualizarEstadisticas();
+                    }
+                })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retirosaprobados' }, (payload) => {
+                    if (payload.new && payload.new.status === 'exitoso' && payload.old.status !== 'exitoso') {
+                        if (payload.new.monto) {
+                            statsContadores.pagadoAUsuarios += payload.new.monto;
+                            actualizarEstadisticas();
+                        }
+                    }
+                })
+                .subscribe();
+
+            // Escuchar cambios de presencia online
+            const presenciaChannel = _supabase.channel('presencia-usuarios')
+                .on('presence', { event: 'sync' }, () => {
+                    const presencia = presenciaChannel.presenceState();
+                    let usuariosRealesOnline = 0;
+                    for (const userId in presencia) {
+                        if (presencia[userId].length > 0) usuariosRealesOnline++;
+                    }
+                    statsContadores.usuariosOnline = 100 + usuariosRealesOnline;
+                    actualizarEstadisticas();
+                })
+                .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+                    statsContadores.usuariosOnline++;
+                    actualizarEstadisticas();
+                })
+                .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+                    if (statsContadores.usuariosOnline > 100) {
+                        statsContadores.usuariosOnline--;
+                        actualizarEstadisticas();
+                    }
+                })
+                .subscribe(async (status) => {
+                    if (status === 'SUBSCRIBED' && currentUser) {
+                        await presenciaChannel.track({ user_id: currentUser.id, online_at: new Date() });
+                    }
+                });
+        }
+
         function mostrarNotificacion(mensaje, tipo = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -2204,6 +2271,13 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentUser = null;
+        
+        // Contadores de estadísticas con bases ficticias
+        let statsContadores = {
+            usuariosRegistrados: 100,  // Base ficticia
+            pagadoAUsuarios: 2000,     // Base ficticia en MXN
+            usuariosOnline: 100        // Base ficticia
+        };
 
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
@@ -2213,6 +2287,8 @@
             document.getElementById('landing-container').classList.remove('hidden');
             document.getElementById('auth-container').classList.add('hidden');
             
+            cargarEstadisticas();
+            inicializarEscuchasEstadisticas();
             configurarEventosAuth();
             verificarSesionActiva();
             if (sessionStorage.getItem('ref_code')) {
@@ -2415,6 +2491,10 @@
                 if (refCode) {
                     await procesarBonoReferido(data.user.id, refCode);
                 }
+                // Incrementar usuarios activos
+                await incrementarUsuariosActivos();
+                // Incrementar en línea (nuevo usuario conectado)
+                await actualizarEnLinea(true);
             }
             mostrarSplashYluego(async () => {
                 await verificarSesionActiva();
@@ -2431,6 +2511,114 @@
             else mostrarNotificacion("¡Código reenviado! Revisa tu correo o bandeja de spam.", "success");
         }
 
+        // ════════════════════════════════════════════════════════════
+        // ESTADÍSTICAS GLOBALES EN TIEMPO REAL
+        // ════════════════════════════════════════════════════════════
+        
+        let statsListener = null;
+        
+        async function cargarEstadisticas() {
+            try {
+                const { data, error } = await _supabase
+                    .from('estadisticas_globales')
+                    .select('*')
+                    .single();
+                    
+                if (error) throw error;
+                
+                actualizarEstadisticasUI(data);
+                
+                // Escuchar cambios en tiempo real
+                if (!statsListener) {
+                    statsListener = _supabase
+                        .channel('estadisticas')
+                        .on('postgres_changes', {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'estadisticas_globales'
+                        }, payload => {
+                            actualizarEstadisticasUI(payload.new);
+                        })
+                        .subscribe();
+                }
+            } catch (err) {
+                console.log('Estadísticas con valores por defecto');
+                actualizarEstadisticasUI({
+                    usuarios_activos: 100,
+                    pagado_a_usuarios: 2000,
+                    en_linea: 100
+                });
+            }
+        }
+        
+        function actualizarEstadisticasUI(stats) {
+            if (stats.usuarios_activos !== undefined) {
+                const elem = document.getElementById('stat-usuarios');
+                if (elem) elem.innerText = stats.usuarios_activos.toLocaleString();
+            }
+            if (stats.pagado_a_usuarios !== undefined) {
+                const elem = document.getElementById('stat-pagos');
+                if (elem) elem.innerText = '$' + Math.round(stats.pagado_a_usuarios).toLocaleString();
+            }
+            if (stats.en_linea !== undefined) {
+                const elem = document.getElementById('stat-activos');
+                if (elem) elem.innerText = stats.en_linea.toLocaleString() + '+';
+            }
+        }
+        
+        async function incrementarUsuariosActivos() {
+            try {
+                const { data } = await _supabase
+                    .from('estadisticas_globales')
+                    .select('usuarios_activos')
+                    .single();
+                    
+                await _supabase
+                    .from('estadisticas_globales')
+                    .update({ usuarios_activos: (data?.usuarios_activos || 100) + 1 })
+                    .eq('id', 1);
+            } catch (err) {
+                console.log('Error incrementando usuarios activos:', err);
+            }
+        }
+        
+        async function incrementarPagadoAUsuarios(montoMXN) {
+            try {
+                const { data } = await _supabase
+                    .from('estadisticas_globales')
+                    .select('pagado_a_usuarios')
+                    .single();
+                    
+                const nuevoMonto = (parseFloat(data?.pagado_a_usuarios) || 2000) + parseFloat(montoMXN);
+                
+                await _supabase
+                    .from('estadisticas_globales')
+                    .update({ pagado_a_usuarios: nuevoMonto })
+                    .eq('id', 1);
+            } catch (err) {
+                console.log('Error incrementando pagado a usuarios:', err);
+            }
+        }
+        
+        async function actualizarEnLinea(increment = true) {
+            try {
+                const { data } = await _supabase
+                    .from('estadisticas_globales')
+                    .select('en_linea')
+                    .single();
+                    
+                const valor = increment ? 1 : -1;
+                const nuevoValor = Math.max(100, (data?.en_linea || 100) + valor);
+                
+                await _supabase
+                    .from('estadisticas_globales')
+                    .update({ en_linea: nuevoValor })
+                    .eq('id', 1);
+            } catch (err) {
+                console.log('Error actualizando en línea:', err);
+            }
+        }
+
         function configurarEventosAuth() {
             document.getElementById("login-form").addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -2443,6 +2631,7 @@
                 if (error) {
                     mostrarNotificacion("Credenciales incorrectas. Verifica tu correo y contraseña.", "error");
                 } else {
+                    await actualizarEnLinea(true);
                     mostrarSplashYluego(async () => {
                         await verificarSesionActiva();
                         setTimeout(() => {
@@ -2979,6 +3168,10 @@
             // Éxito
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Enviar Solicitud de Canje';
+            
+            // Incrementar pagado a usuarios
+            await incrementarPagadoAUsuarios(montoMXN);
+            
             mostrarToastSesion('success', '¡Solicitud enviada!', 'Tu canje está en revisión. En 24–72 hrs hábiles recibirás tu recompensa.');
             cerrarFormularioRetiro();
             volverCatalogo();
@@ -3412,12 +3605,16 @@
 
         async function cerrarSesion() {
             historialCargado = { ganancias: false, canjes: false };
+            if (statsContadores.usuariosOnline > 100) {
+                statsContadores.usuariosOnline--;
+                actualizarEstadisticas();
+            }
+            await actualizarEnLinea(false);
             mostrarSplashYluego(async () => {
                 await _supabase.auth.signOut();
                 currentUser = null;
                 document.getElementById("auth-container").classList.remove("hidden");
                 document.getElementById("app-container").classList.add("hidden");
-                // Reiniciar la página después de cerrar sesión
                 setTimeout(() => location.reload(), 500);
             });
         }
