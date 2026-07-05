@@ -2288,38 +2288,88 @@
         async function cargarRetirosProcesados() {
             console.log('📥 Cargando retiros ya procesados...');
             try {
-                // Cargar todos los retiros con estatus "Procesado"
-                const { data, error } = await _supabase
+                // PASO 1: Cargar TODOS los retiros sin filtro
+                console.log('🔍 Cargando TODOS los retiros (sin filtro)...');
+                const { data: todos, error: errorTodos } = await _supabase
+                    .from('retiros_pendientes')
+                    .select('*');
+
+                if (errorTodos) {
+                    console.log('❌ Error cargando todos:', errorTodos);
+                    return;
+                }
+
+                console.log(`📋 Total de retiros en tabla: ${todos?.length || 0}`);
+                if (todos && todos.length > 0) {
+                    console.log('🔍 PRIMEROS 5 RETIROS:');
+                    todos.slice(0, 5).forEach((retiro, i) => {
+                        console.log(`${i + 1}. ${JSON.stringify(retiro)}`);
+                    });
+                } else {
+                    console.log('⚠️ La tabla está vacía');
+                    return;
+                }
+
+                // PASO 2: Cargar con estatus exacto como "Procesado"
+                console.log('\n🔍 Buscando estatus = "Procesado"...');
+                const { data: procesados, error: error1 } = await _supabase
                     .from('retiros_pendientes')
                     .select('id, estatus, netcoins_deducidos')
                     .eq('estatus', 'Procesado');
 
-                if (error) {
-                    console.log('❌ Error al cargar retiros:', error.message);
-                    return;
+                if (error1) {
+                    console.log('❌ Error 1:', error1.message);
+                } else {
+                    console.log(`✅ Resultados: ${procesados?.length || 0} registros`);
+                    procesados?.forEach(r => console.log(`  ID: ${r.id}, Estatus: "${r.estatus}", NC: ${r.netcoins_deducidos}`));
                 }
 
-                if (data && data.length > 0) {
-                    console.log(`✅ Retiros procesados encontrados: ${data.length}`);
-                    
-                    // Sumar usando la conversión: 10,000 NC = $100
-                    const totalMXN = data.reduce((sum, retiro) => {
-                        const netcoins = parseFloat(retiro.netcoins_deducidos) || 0;
-                        const monto = (netcoins / 10000) * 100;
-                        console.log(`  Retiro ${retiro.id}: ${netcoins} NC = $${monto}`);
-                        return sum + monto;
-                    }, 0);
+                // PASO 3: Cargar con estatus en minúsculas
+                console.log('\n🔍 Buscando estatus = "procesado" (minúsculas)...');
+                const { data: procesados2, error: error2 } = await _supabase
+                    .from('retiros_pendientes')
+                    .select('id, estatus, netcoins_deducidos')
+                    .eq('estatus', 'procesado');
 
-                    console.log(`💰 Total de retiros procesados: $${totalMXN}`);
+                if (error2) {
+                    console.log('❌ Error 2:', error2.message);
+                } else {
+                    console.log(`✅ Resultados: ${procesados2?.length || 0} registros`);
+                    procesados2?.forEach(r => console.log(`  ID: ${r.id}, Estatus: "${r.estatus}", NC: ${r.netcoins_deducidos}`));
+                }
+
+                // PASO 4: Usar ilike para búsqueda case-insensitive
+                console.log('\n🔍 Buscando con ilike %procesado%...');
+                const { data: procesados3, error: error3 } = await _supabase
+                    .from('retiros_pendientes')
+                    .select('id, estatus, netcoins_deducidos')
+                    .ilike('estatus', '%procesado%');
+
+                if (error3) {
+                    console.log('❌ Error 3:', error3.message);
+                } else {
+                    console.log(`✅ Resultados: ${procesados3?.length || 0} registros`);
+                    procesados3?.forEach(r => console.log(`  ID: ${r.id}, Estatus: "${r.estatus}", NC: ${r.netcoins_deducidos}`));
                     
-                    if (totalMXN > 0) {
+                    // Si encontramos con ilike, usar estos
+                    if (procesados3 && procesados3.length > 0) {
+                        const totalMXN = procesados3.reduce((sum, retiro) => {
+                            const netcoins = parseFloat(retiro.netcoins_deducidos) || 0;
+                            const monto = (netcoins / 10000) * 100;
+                            console.log(`  Retiro ${retiro.id}: ${netcoins} NC = $${monto}`);
+                            return sum + monto;
+                        }, 0);
+
+                        console.log(`💰 Total: $${totalMXN}`);
                         statsContadores.pagadoAUsuarios = 2000 + totalMXN;
                         console.log(`📊 Total actualizado a: $${statsContadores.pagadoAUsuarios}`);
                         actualizarEstadisticas();
+                        return;
                     }
-                } else {
-                    console.log('ℹ️ No hay retiros procesados aún');
                 }
+
+                console.log('⚠️ No se encontraron retiros procesados en ninguna búsqueda');
+
             } catch (err) {
                 console.log('❌ Error crítico:', err);
             }
