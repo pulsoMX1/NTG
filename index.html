@@ -2184,18 +2184,13 @@
                 })
                 .subscribe();
 
-            // Escuchar retirosaprobados exitosos (canjes)
-            const retiroChannel = _supabase.channel('retiros-realtime')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'retirosaprobados' }, (payload) => {
-                    if (payload.new && payload.new.monto) {
-                        statsContadores.pagadoAUsuarios += payload.new.monto;
-                        actualizarEstadisticas();
-                    }
-                })
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retirosaprobados' }, (payload) => {
-                    if (payload.new && payload.new.status === 'exitoso' && payload.old.status !== 'exitoso') {
-                        if (payload.new.monto) {
-                            statsContadores.pagadoAUsuarios += payload.new.monto;
+            // Escuchar cambios en retiros pendientes (cuando pasan a procesado)
+            const retirosChannel = _supabase.channel('retiros-realtime')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retiros_pendientes' }, (payload) => {
+                    // Si cambió a 'Procesado' desde otro estado
+                    if (payload.new && payload.new.estatus === 'Procesado' && payload.old && payload.old.estatus !== 'Procesado') {
+                        if (payload.new.monto_mxn) {
+                            statsContadores.pagadoAUsuarios += payload.new.monto_mxn;
                             actualizarEstadisticas();
                         }
                     }
