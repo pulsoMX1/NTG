@@ -386,6 +386,7 @@
         .carousel-container {
             overflow: hidden;
             padding: 0 1rem;
+            contain: layout style paint;
         }
 
         .carousel-track {
@@ -393,20 +394,25 @@
             gap: clamp(0.75rem, 2vw, 1.5rem);
             animation: carouselSlide 50s linear infinite;
             width: max-content;
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
         }
 
         @keyframes carouselSlide {
             0% {
-                transform: translateX(0);
+                transform: translate3d(0, 0, 0);
             }
             100% {
-                transform: translateX(-66.666%);
+                transform: translate3d(-66.666%, 0, 0);
             }
         }
 
         .carousel-item {
             flex: 0 0 clamp(150px, 20vw, 280px);
             display: flex;
+            will-change: auto;
         }
     </style>
 </head>
@@ -2271,8 +2277,8 @@
 
         function inicializarScrollAnimations() {
             const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
+                threshold: 0,
+                rootMargin: '100px 0px 100px 0px'
             };
 
             const observer = new IntersectionObserver((entries) => {
