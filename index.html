@@ -640,7 +640,7 @@
             </section>
 
             <!-- Métodos de pago - Carrusel -->
-            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-800/50 visible">
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-800/50">
                 <div class="text-center mb-16">
                     <h3 class="text-4xl font-black mb-4">Retira de forma segura</h3>
                     <p class="text-xl text-slate-400">Múltiples opciones de pago disponibles</p>
@@ -2272,7 +2272,7 @@
         function inicializarScrollAnimations() {
             const observerOptions = {
                 threshold: 0.1,
-                rootMargin: '500px 0px 500px 0px'
+                rootMargin: '0px 0px -50px 0px'
             };
 
             const observer = new IntersectionObserver((entries) => {
