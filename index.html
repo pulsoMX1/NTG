@@ -15,9 +15,7 @@
         
         * { box-sizing: border-box; }
 
-        /* ════════════════════════════════════════════════════════════ */
         /* RESPONSIVE Y COMPATIBILIDAD - MISMO DISEÑO EN TODOS LOS DISPOSITIVOS */
-        /* ════════════════════════════════════════════════════════════ */
         
         html {
             scroll-behavior: smooth;
@@ -308,9 +306,7 @@
             opacity: 1;
         }
 
-        /* ════════════════════════════════════════════════════════════ */
         /* SCROLL ANIMATIONS */
-        /* ════════════════════════════════════════════════════════════ */
         
         .scroll-fade-in {
             opacity: 0;
@@ -379,9 +375,7 @@
         .scroll-item.visible:nth-child(3) { transition-delay: 0.2s; }
         .scroll-item.visible:nth-child(4) { transition-delay: 0.3s; }
 
-        /* ════════════════════════════════════════════════════════════ */
         /* CARRUSEL DE MÉTODOS DE PAGO */
-        /* ════════════════════════════════════════════════════════════ */
         
         .carousel-container {
             overflow: hidden;
@@ -2216,7 +2210,6 @@
         if (refCode) sessionStorage.setItem('ref_code', refCode);
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Mostrar landing por defecto
             document.getElementById('landing-container').classList.remove('hidden');
             document.getElementById('auth-container').classList.add('hidden');
             
@@ -2227,19 +2220,14 @@
                 toggleAuthViews(false);
             }
 
-            // Inicializar carrusel infinito
             inicializarCarruselInfinito();
             
-            // Forzar rendering continuo en móviles
             setTimeout(() => forzarRenderingCarrusel(), 500);
 
-            // Inicializar animaciones de scroll
             setTimeout(() => inicializarScrollAnimations(), 100);
         });
 
-        // ════════════════════════════════════════════════════════════
         // FUNCIONES LANDING PAGE
-        // ════════════════════════════════════════════════════════════
         function irALogin() {
             document.getElementById('landing-container').classList.add('hidden');
             document.getElementById('auth-container').classList.remove('hidden');
@@ -2254,12 +2242,8 @@
             document.getElementById('login-view').classList.add('hidden');
         }
 
-        // ════════════════════════════════════════════════════════════
         // SCROLL ANIMATIONS CON INTERSECTION OBSERVER
-        // ════════════════════════════════════════════════════════════
-        // ════════════════════════════════════════════════════════════
         // CARRUSEL INFINITO
-        // ════════════════════════════════════════════════════════════
         function inicializarCarruselInfinito() {
             const carousel = document.getElementById('paymentCarousel');
             if (!carousel) return;
@@ -2284,13 +2268,10 @@
             carousel.style.transform = 'translateZ(0)';
             carousel.style.webkitTransform = 'translateZ(0)';
             
-            // Forzar repaint en móviles
             carousel.offsetHeight;
         }
 
-        // ════════════════════════════════════════════════════════════
         // FORZAR RENDERING CONTINUO EN MÓVILES
-        // ════════════════════════════════════════════════════════════
         function forzarRenderingCarrusel() {
             const carousel = document.getElementById('paymentCarousel');
             if (!carousel) return;
@@ -3003,9 +2984,7 @@
             volverCatalogo();
         }
 
-        // ══════════════════════════════════════════
         // RULETA DIARIA
-        // ══════════════════════════════════════════
         const RULETA_PREMIOS = [
             { label: '50 NC',  nc: 50,  color: '#7c3aed' },
             { label: '100 NC', nc: 100, color: '#2563eb' },
@@ -3270,9 +3249,7 @@
             }, 400);
         }
 
-        // ══════════════════════════════════════════
         // HISTORIAL
-        // ══════════════════════════════════════════
         let historialCargado = { ganancias: false, canjes: false };
 
         function mostrarSubHistorial(tipo) {
@@ -3517,9 +3494,7 @@
         }
 
 
-        // ══════════════════════════════════════════
         // SISTEMA DE SONIDOS ALEGRE — PIEDRA PAPEL TIJERAS
-        // ══════════════════════════════════════════
         let _audioCtx = null;
         let _sonidosActivos = true;
 
@@ -3573,9 +3548,7 @@
             freqs.forEach((f, i) => _tono(f, duracion, tipo, volumen, delayInicial + i * separacion));
         }
 
-        // ══════════════════════════════════════════
         // MÚSICA DE FONDO — loops cortos y alegres
-        // ══════════════════════════════════════════
         let _musicaTimer = null;
         let _musicaActiva = null;
 
@@ -3733,13 +3706,9 @@
         };
 
 
-        // ══════════════════════════════════════════
         // SISTEMA DE JUEGOS — AL MEJOR DE 3 RONDAS
-        // ══════════════════════════════════════════
 
-        // ══════════════════════════════════════════
         // SISTEMA DE JUEGOS — AL MEJOR DE 3 RONDAS
-        // ══════════════════════════════════════════
         let _partidaActual = null;
         let _jugadorNum    = null;
         let _apuestaActual = 0;
@@ -4334,9 +4303,7 @@
             if (tabId === 'tab-juegos') cargarVidas();
         };
 
-        // ══════════════════════════════════════════
         // RECARGAR VIDAS
-        // ══════════════════════════════════════════
         async function comprarVidasIlimitadas() {
             cerrarRecargarVidas();
             try {
@@ -4397,9 +4364,7 @@
             }
         }
 
-        // ══════════════════════════════════════════
         // SISTEMA PREMIUM
-        // ══════════════════════════════════════════
         let isPremium = false;
         let _premiumFechas = null;
         // Llama esto desde cargarDatosPerfil — ya inyectamos el hook abajo
@@ -4858,9 +4823,7 @@
 </div>
 
 <script>
-// ══════════════════════════════════════════════
 //         SOPORTE TÉCNICO - LÓGICA
-// ══════════════════════════════════════════════
 
 let supportTicketId = null;
 let supportRealtimeChannel = null;
@@ -5158,9 +5121,7 @@ function escapeHtml(text) {
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════════════
 // Protección del video de anuncios contra manipulación y descarga
-// ══════════════════════════════════════════════════════════════════════════
 (function protegerVideoAnuncios() {
     // Deshabilitar click derecho en el modal de anuncios
     document.addEventListener('contextmenu', (e) => {
@@ -5193,7 +5154,6 @@ function escapeHtml(text) {
     });
 })();
 
-// ══════════════════════════════════════════════════════════════════════════
 let _anuncioIdActual = null;
 let _anuncioTimerProgramado = null;
 let _anuncioMostrandose = false;
@@ -5346,9 +5306,7 @@ function registrarClicAnuncio() {
     });
 }
 
-// ══════════════════════════════════════════════════════════════════════════
 // Iniciar el ciclo de anuncios personalizados cuando el usuario se autentica
-// ══════════════════════════════════════════════════════════════════════════
 if (typeof verificarSesionActiva !== 'undefined') {
     const _verificarSesionActivaOriginal = verificarSesionActiva;
     verificarSesionActiva = async function() {
