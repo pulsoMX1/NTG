@@ -2230,8 +2230,8 @@
             // Inicializar carrusel infinito
             inicializarCarruselInfinito();
             
-            // Monitor para asegurar que el carrusel no desaparezca en móviles
-            setTimeout(() => monitorCarruselMobil(), 500);
+            // Forzar rendering continuo en móviles
+            setTimeout(() => forzarRenderingCarrusel(), 500);
 
             // Inicializar animaciones de scroll
             setTimeout(() => inicializarScrollAnimations(), 100);
@@ -2289,29 +2289,28 @@
         }
 
         // ════════════════════════════════════════════════════════════
-        // MONITOR DE CARRUSEL PARA MÓVILES
+        // FORZAR RENDERING CONTINUO EN MÓVILES
         // ════════════════════════════════════════════════════════════
-        function monitorCarruselMobil() {
+        function forzarRenderingCarrusel() {
             const carousel = document.getElementById('paymentCarousel');
-            const container = document.querySelector('.carousel-container');
-            if (!carousel || !container) return;
+            if (!carousel) return;
 
-            // Forzar GPU acceleration
-            carousel.style.willChange = 'transform';
-            container.style.willChange = 'contents';
-
-            // Cada 2 segundos, verificar que el carrusel está visible
-            setInterval(() => {
-                const rect = container.getBoundingClientRect();
-                // Si está en el viewport, asegurarse de que siga animando
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    // Está visible, asegurar que tenga la animación activa
-                    carousel.style.animationPlayState = 'running';
-                } else {
-                    // Aunque no esté visible, la animación debe seguir
-                    carousel.style.animationPlayState = 'running';
-                }
-            }, 2000);
+            // Usar requestAnimationFrame para forzar rendering continuo
+            let animationFrameId;
+            
+            function mantenerRendering() {
+                // Acceder a una propiedad que force reflow
+                carousel.offsetHeight;
+                
+                // Asegurar que la animación nunca esté pausada
+                carousel.style.animationPlayState = 'running';
+                
+                // Continuar forzando rendering
+                animationFrameId = requestAnimationFrame(mantenerRendering);
+            }
+            
+            // Iniciar el forcing de rendering
+            mantenerRendering();
         }
 
         function inicializarScrollAnimations() {
