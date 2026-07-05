@@ -81,8 +81,8 @@
         /* Modal accesible en todos los dispositivos */
         #auth-container .bg-slate-800 {
             width: clamp(280px, 95vw, 600px);
-            max-height: none;
-            overflow: visible;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         /* Padding fluido */
@@ -743,105 +743,105 @@
             <span>Regresar</span>
         </button>
 
-        <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
-            <div class="text-center mb-6 sm:mb-8">
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-purple-500 tracking-wide">NetGamer <span class="text-white">MX</span></h1>
-                <p class="text-slate-400 text-xs sm:text-sm mt-2">Gana recompensas leyendo noticias y completando tareas</p>
+        <div class="bg-slate-800 p-4 sm:p-5 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+            <div class="text-center mb-3 sm:mb-4">
+                <h1 class="text-lg sm:text-xl font-extrabold text-purple-500 tracking-wide">NetGamer <span class="text-white">MX</span></h1>
+                <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Gana recompensas leyendo noticias y completando tareas</p>
             </div>
 
             <div id="login-view">
-                <h2 class="text-lg sm:text-xl font-bold mb-4 text-center">Iniciar Sesión</h2>
-                <form id="login-form" class="space-y-4">
+                <h2 class="text-base sm:text-lg font-bold mb-2.5 text-center">Iniciar Sesión</h2>
+                <form id="login-form" class="space-y-2.5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Correo Electrónico</label>
                         <input type="email" id="login-email" autocomplete="email"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Contraseña</label>
                         <input type="password" id="login-password" autocomplete="current-password"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
                     </div>
-                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-3 rounded-xl shadow-lg shadow-purple-600/30 transition duration-200 text-sm sm:text-base">
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-2.5 rounded-xl shadow-lg shadow-purple-600/30 transition duration-200 text-sm sm:text-base">
                         Ingresar
                     </button>
                 </form>
-                <p class="text-center text-xs sm:text-sm text-slate-400 mt-5">
+                <p class="text-center text-xs text-slate-400 mt-2">
                     ¿No tienes cuenta? <button type="button" onclick="toggleAuthViews(false)" class="text-amber-400 hover:underline font-semibold">¡Regístrate y recibe 1,000 NC gratis!</button>
                 </p>
             </div>
 
             <div id="register-view" class="hidden">
-                <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/40 rounded-2xl px-4 py-3 mb-5 text-center">
-                    <p class="text-amber-400 font-extrabold text-base">🎁 ¡Regístrate ahora y recibe</p>
-                    <p class="text-3xl font-black text-amber-300">1,000 NetCoins</p>
-                    <p class="text-amber-400/70 text-xs mt-0.5">de regalo al verificar tu cuenta</p>
+                <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/40 rounded-2xl px-3 py-2 mb-3 text-center">
+                    <p class="text-amber-400 font-extrabold text-xs sm:text-sm">🎁 ¡Regístrate y recibe</p>
+                    <p class="text-2xl sm:text-3xl font-black text-amber-300">1,000 NC</p>
+                    <p class="text-amber-400/70 text-xs mt-0">de regalo al verificar</p>
                 </div>
-                <h2 class="text-lg sm:text-xl font-bold mb-4 text-center">Crear Cuenta</h2>
-                <form id="register-form" class="space-y-4">
+                <h2 class="text-base sm:text-lg font-bold mb-2.5 text-center">Crear Cuenta</h2>
+                <form id="register-form" class="space-y-2.5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nombre de Usuario</label>
                         <input type="text" id="register-username" autocomplete="username"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Correo Electrónico</label>
                         <input type="email" id="register-email" autocomplete="email"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Contraseña</label>
                         <input type="password" id="register-password" autocomplete="new-password"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
                     </div>
-                    <div id="referido-detectado" class="hidden bg-purple-900/30 border border-purple-500/40 rounded-xl px-4 py-2.5 text-xs text-purple-300 flex items-center gap-2">
+                    <div id="referido-detectado" class="hidden bg-purple-900/30 border border-purple-500/40 rounded-xl px-3 py-2 text-xs text-purple-300 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-purple-400 shrink-0"></i>
-                        <span>¡Fuiste invitado! Ambos recibirán <strong>500 NetCoins</strong> al registrarte.</span>
+                        <span>¡Invitado! Ambos reciben <strong>500 NC</strong></span>
                     </div>
                     <button type="submit" id="btn-registrarse"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200 text-sm sm:text-base">
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 font-bold py-2.5 rounded-xl shadow-lg shadow-emerald-600/30 transition duration-200 text-sm sm:text-base">
                         Registrarse
                     </button>
                 </form>
-                <p class="text-center text-xs sm:text-sm text-slate-400 mt-5">
+                <p class="text-center text-xs text-slate-400 mt-2">
                     ¿Ya tienes cuenta? <button type="button" onclick="toggleAuthViews(true)" class="text-purple-400 hover:underline font-semibold">Inicia Sesión</button>
                 </p>
             </div>
 
-            <div id="verify-email-view" class="hidden text-center space-y-5">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto">
-                    <i class="fa-solid fa-shield-halved text-purple-400 text-2xl sm:text-3xl"></i>
+            <div id="verify-email-view" class="hidden text-center space-y-3">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-shield-halved text-purple-400 text-xl sm:text-2xl"></i>
                 </div>
                 <div>
                     <h2 class="text-lg sm:text-xl font-bold">Verifica tu correo</h2>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-1">Código de 6 dígitos enviado a:</p>
-                    <p id="verify-email-address" class="text-purple-400 font-bold text-xs sm:text-sm mt-1 break-all"></p>
+                    <p class="text-slate-400 text-xs mt-1">Código de 6 dígitos enviado a:</p>
+                    <p id="verify-email-address" class="text-purple-400 font-bold text-xs mt-0.5 break-all"></p>
                 </div>
-                <div class="flex justify-center gap-1.5 sm:gap-2" id="otp-inputs">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
-                    <input type="text" maxlength="1" class="otp-input text-center text-lg sm:text-xl font-black bg-slate-900 border-2 border-slate-600 rounded-xl focus:outline-none focus:border-purple-500 transition" inputmode="numeric">
+                <div class="flex justify-center gap-1 sm:gap-1.5" id="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
                 </div>
                 <div id="otp-error" class="hidden bg-rose-900/30 border border-rose-500/40 rounded-xl px-4 py-2 text-xs text-rose-400">
                     <i class="fa-solid fa-circle-xmark mr-1"></i> Código incorrecto o expirado.
                 </div>
                 <button onclick="verificarOTP()" id="btn-verificar-otp"
-                    class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-3 rounded-xl transition text-sm sm:text-base">
+                    class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-2.5 rounded-xl transition text-sm sm:text-base">
                     Verificar Código
                 </button>
                 <p class="text-xs text-slate-400">¿No llegó? Revisa spam o
                     <button onclick="reenviarCodigo()" class="text-purple-400 hover:underline font-semibold">reenviar</button>
                 </p>
-                <button onclick="toggleAuthViews(false)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver al registro</button>
+                <button onclick="toggleAuthViews(false)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver</button>
             </div>
 
-            <div class="mt-8 pt-5 border-t border-slate-700/50 flex justify-center gap-4 text-xs text-slate-500">
-                <button type="button" onclick="abrirPrivacidad()" class="hover:text-purple-400 transition">Política de Privacidad</button>
+            <div class="mt-5 pt-3 border-t border-slate-700/50 flex justify-center gap-3 text-xs text-slate-500">
+                <button type="button" onclick="abrirPrivacidad()" class="hover:text-purple-400 transition">Privacidad</button>
                 <span>&bull;</span>
-                <button type="button" onclick="abrirTerminos()" class="hover:text-purple-400 transition">Términos de Uso</button>
+                <button type="button" onclick="abrirTerminos()" class="hover:text-purple-400 transition">Términos</button>
             </div>
         </div>
     </div>
