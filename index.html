@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Anuncio CPAnetwork invoke --->
+    <!-- Anuncio CPAnetwork invoke -->
     <style>
         
         * { box-sizing: border-box; }
@@ -2164,13 +2164,36 @@
         // SISTEMA DE NOTIFICACIONES (TOASTS)
         // ==========================================
         function actualizarEstadisticas() {
+            console.log('📊 Actualizando estadísticas en el DOM');
+            console.log('Contadores actuales:', statsContadores);
+            
             const estatUsuarios = document.getElementById('stat-usuarios');
             const estatPagos = document.getElementById('stat-pagos');
             const estatOnline = document.getElementById('stat-online');
 
-            if (estatUsuarios) estatUsuarios.textContent = statsContadores.usuariosRegistrados + '+';
-            if (estatPagos) estatPagos.textContent = '$' + statsContadores.pagadoAUsuarios.toLocaleString('es-MX');
-            if (estatOnline) estatOnline.textContent = statsContadores.usuariosOnline + '+';
+            console.log('Elementos encontrados:', {
+                usuariosFondo: !!estatUsuarios,
+                pagosFondo: !!estatPagos,
+                onlineFondo: !!estatOnline
+            });
+
+            if (estatUsuarios) {
+                const nuevoValor = statsContadores.usuariosRegistrados + '+';
+                estatUsuarios.textContent = nuevoValor;
+                console.log('✅ Usuarios actualizado a:', nuevoValor);
+            }
+            
+            if (estatPagos) {
+                const nuevoValor = '$' + statsContadores.pagadoAUsuarios.toLocaleString('es-MX');
+                estatPagos.textContent = nuevoValor;
+                console.log('✅ Pagado a usuarios actualizado a:', nuevoValor);
+            }
+            
+            if (estatOnline) {
+                const nuevoValor = statsContadores.usuariosOnline + '+';
+                estatOnline.textContent = nuevoValor;
+                console.log('✅ En línea actualizado a:', nuevoValor);
+            }
         }
 
         function inicializarEscuchasEstadisticas() {
@@ -2179,23 +2202,61 @@
             // Escuchar nuevos usuarios registrados
             const usuariosChannel = _supabase.channel('usuarios-realtime')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'usuarios' }, (payload) => {
+                    console.log('✅ Nuevo usuario registrado:', payload.new);
                     statsContadores.usuariosRegistrados++;
                     actualizarEstadisticas();
                 })
                 .subscribe();
 
-            // Escuchar cambios en retiros pendientes (cuando pasan a procesado)
+            // Escuchar cambios en retiros pendientes
             const retirosChannel = _supabase.channel('retiros-realtime')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retiros_pendientes' }, (payload) => {
-                    // Si cambió a 'Procesado' desde otro estado
-                    if (payload.new && payload.new.estatus === 'Procesado' && payload.old && payload.old.estatus !== 'Procesado') {
-                        if (payload.new.monto_mxn) {
-                            statsContadores.pagadoAUsuarios += payload.new.monto_mxn;
+                    console.log('🔄 UPDATE detectado en retiros_pendientes');
+                    console.log('Payload completo:', JSON.stringify(payload, null, 2));
+                    
+                    if (!payload.new) {
+                        console.log('⚠️ No hay payload.new');
+                        return;
+                    }
+                    
+                    // Log de todos los campos para ver qué hay
+                    console.log('📋 Todos los campos del registro:');
+                    Object.keys(payload.new).forEach(key => {
+                        console.log(`  ${key}: ${payload.new[key]}`);
+                    });
+                    
+                    // Verificar si cambió a Procesado
+                    const estatus = String(payload.new.estatus || '').trim();
+                    console.log(`✍️ Estatus actual: "${estatus}"`);
+                    
+                    if (estatus.toLowerCase() === 'procesado') {
+                        console.log('✅ ¡Detectado PROCESADO!');
+                        
+                        // Buscar el monto en todos los campos posibles
+                        let monto = payload.new.monto_mxn 
+                                 || payload.new.monto 
+                                 || payload.new.cantidad 
+                                 || payload.new.monto_retiro
+                                 || payload.new.amount
+                                 || 0;
+                        
+                        monto = parseFloat(monto);
+                        console.log(`💰 Monto encontrado: ${monto}`);
+                        
+                        if (monto > 0) {
+                            statsContadores.pagadoAUsuarios += monto;
+                            console.log(`📊 Total actualizado a: ${statsContadores.pagadoAUsuarios}`);
                             actualizarEstadisticas();
+                        } else {
+                            console.log('❌ Monto es 0 o no válido');
                         }
+                    } else {
+                        console.log(`ℹ️ Estatus no es "Procesado", es: "${estatus}"`);
                     }
                 })
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('📡 Estado de conexión retiros channel:', status);
+                });
 
             // Escuchar cambios de presencia online
             const presenciaChannel = _supabase.channel('presencia-usuarios')
@@ -2209,10 +2270,12 @@
                     actualizarEstadisticas();
                 })
                 .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+                    console.log('👤 Usuario conectado:', key);
                     statsContadores.usuariosOnline++;
                     actualizarEstadisticas();
                 })
                 .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+                    console.log('👤 Usuario desconectado:', key);
                     if (statsContadores.usuariosOnline > 100) {
                         statsContadores.usuariosOnline--;
                         actualizarEstadisticas();
