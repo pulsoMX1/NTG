@@ -391,7 +391,7 @@
         .carousel-track {
             display: flex;
             gap: clamp(0.75rem, 2vw, 1.5rem);
-            animation: carouselSlide 200s linear infinite;
+            animation: carouselSlide 50s linear infinite;
             width: max-content;
         }
 
@@ -2272,7 +2272,7 @@
         function inicializarScrollAnimations() {
             const observerOptions = {
                 threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
+                rootMargin: '500px 0px 500px 0px'
             };
 
             const observer = new IntersectionObserver((entries) => {
