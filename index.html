@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Anuncio CPAnetwork invoke --->
+    <!-- Anuncio CPAnetwork invoke -->
     <style>
         
         * { box-sizing: border-box; }
@@ -2197,78 +2197,57 @@
         }
 
         function inicializarEscuchasEstadisticas() {
-            if (!_supabase) return;
+            console.log('🚀 Inicializando escuchas de estadísticas');
+            if (!_supabase) {
+                console.log('❌ Supabase no está disponible');
+                return;
+            }
+
+            // PRIMERO: Cargar retiros ya procesados
+            cargarRetirosProcesados();
 
             // Escuchar nuevos usuarios registrados
+            console.log('👥 Inicializando escucha de usuarios...');
             const usuariosChannel = _supabase.channel('usuarios-realtime')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'usuarios' }, (payload) => {
                     console.log('✅ Nuevo usuario registrado:', payload.new);
                     statsContadores.usuariosRegistrados++;
                     actualizarEstadisticas();
                 })
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('📡 Estado usuarios channel:', status);
+                });
 
             // Escuchar cambios en retiros pendientes
-            const retirosChannel = _supabase.channel('retiros-realtime')
+            console.log('💰 Inicializando escucha de retiros...');
+            const retirosChannel = _supabase.channel('retiros-realtime-' + Date.now())
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retiros_pendientes' }, (payload) => {
                     console.log('🔄 UPDATE detectado en retiros_pendientes');
-                    console.log('Payload completo:', JSON.stringify(payload, null, 2));
+                    console.log('Datos completos:', payload.new);
                     
-                    if (!payload.new) {
-                        console.log('⚠️ No hay payload.new');
-                        return;
-                    }
-                    
-                    // Log de todos los campos para ver qué hay
-                    console.log('📋 Todos los campos del registro:');
-                    Object.keys(payload.new).forEach(key => {
-                        console.log(`  ${key}: ${payload.new[key]}`);
-                    });
-                    
-                    // Verificar si cambió a Procesado
-                    const estatus = String(payload.new.estatus || '').trim();
-                    console.log(`✍️ Estatus actual: "${estatus}"`);
-                    
-                    if (estatus.toLowerCase() === 'procesado') {
-                        console.log('✅ ¡Detectado PROCESADO!');
+                    if (payload.new && payload.new.estatus) {
+                        const estatus = String(payload.new.estatus).toLowerCase().trim();
+                        console.log(`Estado: "${estatus}"`);
                         
-                        // Buscar el monto en todos los campos posibles
-                        let monto = payload.new.monto_mxn 
-                                 || payload.new.monto 
-                                 || payload.new.cantidad 
-                                 || payload.new.monto_retiro
-                                 || payload.new.amount
-                                 || 0;
-                        
-                        monto = parseFloat(monto);
-                        console.log(`💰 Monto encontrado: ${monto}`);
-                        
-                        if (monto > 0) {
-                            statsContadores.pagadoAUsuarios += monto;
-                            console.log(`📊 Total actualizado a: ${statsContadores.pagadoAUsuarios}`);
-                            actualizarEstadisticas();
-                        } else {
-                            console.log('❌ Monto es 0 o no válido');
+                        if (estatus === 'procesado') {
+                            const monto = parseFloat(payload.new.monto_mxn) || 0;
+                            console.log(`💰 Sumando monto: ${monto}`);
+                            
+                            if (monto > 0) {
+                                statsContadores.pagadoAUsuarios += monto;
+                                console.log(`📊 Nuevo total: ${statsContadores.pagadoAUsuarios}`);
+                                actualizarEstadisticas();
+                            }
                         }
-                    } else {
-                        console.log(`ℹ️ Estatus no es "Procesado", es: "${estatus}"`);
                     }
                 })
                 .subscribe((status) => {
-                    console.log('📡 Estado de conexión retiros channel:', status);
+                    console.log('📡 Estado retiros channel:', status);
                 });
 
-            // Escuchar cambios de presencia online
+            // Escuchar presencia online
+            console.log('🟢 Inicializando escucha de presencia...');
             const presenciaChannel = _supabase.channel('presencia-usuarios')
-                .on('presence', { event: 'sync' }, () => {
-                    const presencia = presenciaChannel.presenceState();
-                    let usuariosRealesOnline = 0;
-                    for (const userId in presencia) {
-                        if (presencia[userId].length > 0) usuariosRealesOnline++;
-                    }
-                    statsContadores.usuariosOnline = 100 + usuariosRealesOnline;
-                    actualizarEstadisticas();
-                })
                 .on('presence', { event: 'join' }, ({ key, newPresences }) => {
                     console.log('👤 Usuario conectado:', key);
                     statsContadores.usuariosOnline++;
@@ -2282,10 +2261,42 @@
                     }
                 })
                 .subscribe(async (status) => {
+                    console.log('📡 Estado presencia channel:', status);
                     if (status === 'SUBSCRIBED' && currentUser) {
                         await presenciaChannel.track({ user_id: currentUser.id, online_at: new Date() });
                     }
                 });
+        }
+
+        async function cargarRetirosProcesados() {
+            console.log('📥 Cargando retiros ya procesados...');
+            try {
+                const { data, error } = await _supabase
+                    .from('retiros_pendientes')
+                    .select('monto_mxn')
+                    .eq('estatus', 'Procesado');
+
+                if (error) {
+                    console.log('❌ Error al cargar retiros:', error);
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    const totalProcesado = data.reduce((sum, retiro) => sum + (parseFloat(retiro.monto_mxn) || 0), 0);
+                    console.log(`✅ Retiros procesados encontrados: ${data.length}`);
+                    console.log(`💰 Total procesado: ${totalProcesado}`);
+                    
+                    if (totalProcesado > 0) {
+                        statsContadores.pagadoAUsuarios = 2000 + totalProcesado;
+                        console.log(`📊 Total actualizado a: ${statsContadores.pagadoAUsuarios}`);
+                        actualizarEstadisticas();
+                    }
+                } else {
+                    console.log('ℹ️ No hay retiros procesados aún');
+                }
+            } catch (err) {
+                console.log('❌ Error crítico al cargar retiros:', err);
+            }
         }
 
         function mostrarNotificacion(mensaje, tipo = 'success') {
