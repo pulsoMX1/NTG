@@ -386,6 +386,9 @@
         .carousel-container {
             overflow: hidden;
             padding: 0 1rem;
+            will-change: contents;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
         .carousel-track {
@@ -393,14 +396,19 @@
             gap: clamp(0.75rem, 2vw, 1.5rem);
             animation: carouselSlide 50s linear infinite;
             width: max-content;
+            will-change: transform;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         @keyframes carouselSlide {
             0% {
-                transform: translateX(0);
+                transform: translateX(0) translateZ(0);
             }
             100% {
-                transform: translateX(-66.666%);
+                transform: translateX(-66.666%) translateZ(0);
             }
         }
 
@@ -2221,6 +2229,9 @@
 
             // Inicializar carrusel infinito
             inicializarCarruselInfinito();
+            
+            // Monitor para asegurar que el carrusel no desaparezca en móviles
+            setTimeout(() => monitorCarruselMobil(), 500);
 
             // Inicializar animaciones de scroll
             setTimeout(() => inicializarScrollAnimations(), 100);
@@ -2267,6 +2278,40 @@
 
             // Posicionar en el segundo set de items (inicio sin salto visual)
             carousel.style.transform = `translateX(0)`;
+            
+            // Optimizaciones de rendering para móvil
+            carousel.style.willChange = 'transform';
+            carousel.style.transform = 'translateZ(0)';
+            carousel.style.webkitTransform = 'translateZ(0)';
+            
+            // Forzar repaint en móviles
+            carousel.offsetHeight;
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // MONITOR DE CARRUSEL PARA MÓVILES
+        // ════════════════════════════════════════════════════════════
+        function monitorCarruselMobil() {
+            const carousel = document.getElementById('paymentCarousel');
+            const container = document.querySelector('.carousel-container');
+            if (!carousel || !container) return;
+
+            // Forzar GPU acceleration
+            carousel.style.willChange = 'transform';
+            container.style.willChange = 'contents';
+
+            // Cada 2 segundos, verificar que el carrusel está visible
+            setInterval(() => {
+                const rect = container.getBoundingClientRect();
+                // Si está en el viewport, asegurarse de que siga animando
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    // Está visible, asegurar que tenga la animación activa
+                    carousel.style.animationPlayState = 'running';
+                } else {
+                    // Aunque no esté visible, la animación debe seguir
+                    carousel.style.animationPlayState = 'running';
+                }
+            }, 2000);
         }
 
         function inicializarScrollAnimations() {
