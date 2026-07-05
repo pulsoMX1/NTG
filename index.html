@@ -2223,22 +2223,39 @@
             const retirosChannel = _supabase.channel('retiros-realtime-' + Date.now())
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'retiros_pendientes' }, (payload) => {
                     console.log('🔄 UPDATE detectado en retiros_pendientes');
-                    console.log('Datos completos:', payload.new);
+                    console.log('Payload:', payload);
                     
-                    if (payload.new && payload.new.estatus) {
-                        const estatus = String(payload.new.estatus).toLowerCase().trim();
-                        console.log(`Estado: "${estatus}"`);
+                    if (!payload.new || !payload.old) {
+                        console.log('⚠️ Falta payload.new o payload.old');
+                        return;
+                    }
+                    
+                    const estatusAnterior = String(payload.old.estatus || '').toLowerCase().trim();
+                    const estatusNuevo = String(payload.new.estatus || '').toLowerCase().trim();
+                    
+                    console.log(`Estado anterior: "${estatusAnterior}" → Estado nuevo: "${estatusNuevo}"`);
+                    
+                    // Si cambió a "procesado"
+                    if (estatusNuevo === 'procesado' && estatusAnterior !== 'procesado') {
+                        console.log('✅ ¡Cambio detectado a PROCESADO!');
                         
-                        if (estatus === 'procesado') {
-                            const monto = parseFloat(payload.new.monto_mxn) || 0;
-                            console.log(`💰 Sumando monto: ${monto}`);
-                            
-                            if (monto > 0) {
-                                statsContadores.pagadoAUsuarios += monto;
-                                console.log(`📊 Nuevo total: ${statsContadores.pagadoAUsuarios}`);
-                                actualizarEstadisticas();
-                            }
+                        // Obtener netcoins_deducidos
+                        const netcoinsDeducidos = parseFloat(payload.new.netcoins_deducidos) || 0;
+                        console.log(`🪙 NetCoins deducidos: ${netcoinsDeducidos}`);
+                        
+                        // Conversión: 10,000 NC = $100
+                        const montoMXN = (netcoinsDeducidos / 10000) * 100;
+                        console.log(`💵 Conversión: ${netcoinsDeducidos} NC = $${montoMXN}`);
+                        
+                        if (montoMXN > 0) {
+                            statsContadores.pagadoAUsuarios += montoMXN;
+                            console.log(`📊 Nuevo total pagado a usuarios: $${statsContadores.pagadoAUsuarios}`);
+                            actualizarEstadisticas();
+                        } else {
+                            console.log('⚠️ Monto es 0, no se suma');
                         }
+                    } else {
+                        console.log(`ℹ️ Cambio ignorado: No es cambio a "procesado"`);
                     }
                 })
                 .subscribe((status) => {
@@ -2271,31 +2288,40 @@
         async function cargarRetirosProcesados() {
             console.log('📥 Cargando retiros ya procesados...');
             try {
+                // Cargar todos los retiros con estatus "Procesado"
                 const { data, error } = await _supabase
                     .from('retiros_pendientes')
-                    .select('monto_mxn')
+                    .select('id, estatus, netcoins_deducidos')
                     .eq('estatus', 'Procesado');
 
                 if (error) {
-                    console.log('❌ Error al cargar retiros:', error);
+                    console.log('❌ Error al cargar retiros:', error.message);
                     return;
                 }
 
                 if (data && data.length > 0) {
-                    const totalProcesado = data.reduce((sum, retiro) => sum + (parseFloat(retiro.monto_mxn) || 0), 0);
                     console.log(`✅ Retiros procesados encontrados: ${data.length}`);
-                    console.log(`💰 Total procesado: ${totalProcesado}`);
                     
-                    if (totalProcesado > 0) {
-                        statsContadores.pagadoAUsuarios = 2000 + totalProcesado;
-                        console.log(`📊 Total actualizado a: ${statsContadores.pagadoAUsuarios}`);
+                    // Sumar usando la conversión: 10,000 NC = $100
+                    const totalMXN = data.reduce((sum, retiro) => {
+                        const netcoins = parseFloat(retiro.netcoins_deducidos) || 0;
+                        const monto = (netcoins / 10000) * 100;
+                        console.log(`  Retiro ${retiro.id}: ${netcoins} NC = $${monto}`);
+                        return sum + monto;
+                    }, 0);
+
+                    console.log(`💰 Total de retiros procesados: $${totalMXN}`);
+                    
+                    if (totalMXN > 0) {
+                        statsContadores.pagadoAUsuarios = 2000 + totalMXN;
+                        console.log(`📊 Total actualizado a: $${statsContadores.pagadoAUsuarios}`);
                         actualizarEstadisticas();
                     }
                 } else {
                     console.log('ℹ️ No hay retiros procesados aún');
                 }
             } catch (err) {
-                console.log('❌ Error crítico al cargar retiros:', err);
+                console.log('❌ Error crítico:', err);
             }
         }
 
