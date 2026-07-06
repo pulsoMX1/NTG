@@ -2206,13 +2206,15 @@
             // Esperar a cargar retiros ya procesados
             await cargarRetirosProcesados();
 
-            // Escuchar nuevos usuarios registrados
+            // Escuchar cambios en usuarios_registrados desde estadisticas_landing
             console.log('👥 Inicializando escucha de usuarios...');
-            const usuariosChannel = _supabase.channel('usuarios-realtime')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'usuarios' }, (payload) => {
-                    console.log('✅ Nuevo usuario registrado:', payload.new);
-                    statsContadores.usuariosRegistrados++;
-                    actualizarEstadisticas();
+            const usuariosChannel = _supabase.channel('usuarios-actualizado')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estadisticas_landing' }, (payload) => {
+                    if (payload.new && payload.new.usuarios_registrados) {
+                        console.log('✅ Nuevo usuario registrado. Total:', payload.new.usuarios_registrados);
+                        statsContadores.usuariosRegistrados = payload.new.usuarios_registrados;
+                        actualizarEstadisticas();
+                    }
                 })
                 .subscribe((status) => {
                     console.log('📡 Estado usuarios channel:', status);
@@ -2580,35 +2582,27 @@
         
         async function cargarEstadisticas() {
             try {
+                // Cargar desde estadisticas_landing
                 const { data, error } = await _supabase
-                    .from('estadisticas_globales')
+                    .from('estadisticas_landing')
                     .select('*')
+                    .eq('id', 1)
                     .single();
                     
                 if (error) throw error;
                 
-                actualizarEstadisticasUI(data);
-                
-                // Escuchar cambios en tiempo real
-                if (!statsListener) {
-                    statsListener = _supabase
-                        .channel('estadisticas')
-                        .on('postgres_changes', {
-                            event: 'UPDATE',
-                            schema: 'public',
-                            table: 'estadisticas_globales'
-                        }, payload => {
-                            actualizarEstadisticasUI(payload.new);
-                        })
-                        .subscribe();
+                // Actualizar contadores desde los datos cargados
+                if (data) {
+                    statsContadores.usuariosRegistrados = data.usuarios_registrados || 100;
+                    statsContadores.pagadoAUsuarios = parseFloat(data.pagado_a_usuarios) || 2000;
+                    actualizarEstadisticas();
+                    console.log('✅ Estadísticas cargadas:', data);
                 }
             } catch (err) {
                 console.log('Estadísticas con valores por defecto');
-                actualizarEstadisticasUI({
-                    usuarios_activos: 100,
-                    pagado_a_usuarios: 2000,
-                    en_linea: 100
-                });
+                actualizarEstadisticas();
+            }
+        }
             }
         }
         
