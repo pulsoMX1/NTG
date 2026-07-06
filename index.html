@@ -2703,12 +2703,23 @@
                 const refCodeGuardado = sessionStorage.getItem('ref_code');
                 const btn = document.getElementById("btn-registrarse");
                 btn.disabled = true; btn.innerText = "Creando cuenta...";
+                
+                console.log('📝 Intentando registrar:', { email, username, passwordLength: password.length });
+                
                 const { data, error } = await _supabase.auth.signUp({
                     email, password,
                     options: { data: { username, referred_by: refCodeGuardado || null }, emailRedirectTo: null }
                 });
                 btn.disabled = false; btn.innerText = "Registrarse";
-                if (error) { mostrarNotificacion("Error al registrarte. El correo ya está en uso o la contraseña es débil.", "error"); return; }
+                
+                if (error) { 
+                    console.log('❌ Error de Supabase:', error);
+                    console.log('Mensaje:', error.message);
+                    mostrarNotificacion(`Error: ${error.message}`, "error"); 
+                    return; 
+                }
+                
+                console.log('✅ Usuario registrado exitosamente');
                 if (refCodeGuardado) sessionStorage.setItem('ref_pending_user', data.user?.id || '');
                 mostrarPantallaVerificacion(email);
             });
