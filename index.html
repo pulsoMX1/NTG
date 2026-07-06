@@ -2591,20 +2591,22 @@
                     
                 if (error) throw error;
                 
-                // Contar usuarios registrados directamente de la tabla perfiles
-                const { count: totalPerfiles } = await _supabase
+                // Contar usuarios registrados - método simple
+                const { data: perfiles } = await _supabase
                     .from('perfiles')
-                    .select('*', { count: 'exact', head: true });
+                    .select('id');
+                
+                const totalPerfiles = perfiles ? perfiles.length : 0;
                 
                 // Actualizar contadores
                 if (data) {
-                    statsContadores.usuariosRegistrados = totalPerfiles || 0;
+                    statsContadores.usuariosRegistrados = totalPerfiles;
                     statsContadores.pagadoAUsuarios = parseFloat(data.pagado_a_usuarios) || 2000;
                     actualizarEstadisticas();
                     console.log('✅ Estadísticas cargadas:', { usuariosRegistrados: totalPerfiles, pagadoAUsuarios: data.pagado_a_usuarios });
                 }
             } catch (err) {
-                console.log('Estadísticas con valores por defecto');
+                console.log('Estadísticas con valores por defecto', err);
                 actualizarEstadisticas();
             }
         }
