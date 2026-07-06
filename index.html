@@ -2164,42 +2164,38 @@
         // SISTEMA DE NOTIFICACIONES (TOASTS)
         // ==========================================
         function actualizarEstadisticas() {
-            console.log('📊 Actualizando estadísticas en el DOM');
-            console.log('Contadores actuales:', statsContadores);
+            // removed;
+            // removed;
             
             const estatUsuarios = document.getElementById('stat-usuarios');
             const estatPagos = document.getElementById('stat-pagos');
             const estatOnline = document.getElementById('stat-online');
 
-            console.log('Elementos encontrados:', {
-                usuariosFondo: !!estatUsuarios,
-                pagosFondo: !!estatPagos,
-                onlineFondo: !!estatOnline
-            });
+            
 
             if (estatUsuarios) {
                 const nuevoValor = statsContadores.usuariosRegistrados + '+';
                 estatUsuarios.textContent = nuevoValor;
-                console.log('✅ Usuarios actualizado a:', nuevoValor);
+                // removed;
             }
             
             if (estatPagos) {
                 const nuevoValor = '$' + statsContadores.pagadoAUsuarios.toLocaleString('es-MX');
                 estatPagos.textContent = nuevoValor;
-                console.log('✅ Pagado a usuarios actualizado a:', nuevoValor);
+                // removed;
             }
             
             if (estatOnline) {
                 const nuevoValor = statsContadores.usuariosOnline + '+';
                 estatOnline.textContent = nuevoValor;
-                console.log('✅ En línea actualizado a:', nuevoValor);
+                // removed;
             }
         }
 
         async function inicializarEscuchasEstadisticas() {
-            console.log('🚀 Inicializando escuchas de estadísticas');
+            // removed;
             if (!_supabase) {
-                console.log('❌ Supabase no está disponible');
+                // removed;
                 return;
             }
 
@@ -2207,78 +2203,66 @@
             await cargarRetirosProcesados();
 
             // Escuchar cambios en usuarios_registrados desde estadisticas_landing
-            console.log('👥 Inicializando escucha de usuarios...');
+            // removed;
             const usuariosChannel = _supabase.channel('usuarios-actualizado')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estadisticas_landing' }, (payload) => {
                     if (payload.new && payload.new.usuarios_registrados) {
-                        console.log('✅ Nuevo usuario registrado. Total:', payload.new.usuarios_registrados);
+                        // removed;
                         statsContadores.usuariosRegistrados = payload.new.usuarios_registrados;
                         actualizarEstadisticas();
                     }
                 })
                 .subscribe((status) => {
-                    console.log('📡 Estado usuarios channel:', status);
+                    // removed;
                 });
 
             // Escuchar cambios en estadísticas landing (tabla separada y segura)
-            console.log('📊 Inicializando escucha de estadísticas...');
+            // removed;
             const estadisticasChannel = _supabase.channel('estadisticas-realtime')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estadisticas_landing' }, (payload) => {
-                    console.log('📊 Actualización de estadísticas detectada:', payload.new);
+                    // removed;
                     
                     if (payload.new && payload.new.pagado_a_usuarios) {
                         const nuevaMonto = parseFloat(payload.new.pagado_a_usuarios);
-                        console.log(`💰 Pagado a usuarios actualizado a: $${nuevaMonto}`);
+                        // removed;
                         
                         statsContadores.pagadoAUsuarios = nuevaMonto;
                         actualizarEstadisticas();
                     }
                 })
                 .subscribe((status) => {
-                    console.log('📡 Estado estadísticas channel:', status);
+                    // removed;
                 });
 
             // Escuchar presencia online
-            console.log('🟢 Inicializando escucha de presencia...');
+            // removed;
             const presenciaChannel = _supabase.channel('presencia-usuarios')
                 .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-                    console.log('👤 Usuario conectado:', key);
+                    // removed;
                     statsContadores.usuariosOnline++;
                     actualizarEstadisticas();
                 })
                 .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-                    console.log('👤 Usuario desconectado:', key);
+                    // removed;
                     if (statsContadores.usuariosOnline > 100) {
                         statsContadores.usuariosOnline--;
                         actualizarEstadisticas();
                     }
                 })
                 .subscribe(async (status) => {
-                    console.log('📡 Estado presencia channel:', status);
+                    // removed;
                     if (status === 'SUBSCRIBED' && currentUser) {
                         await presenciaChannel.track({ user_id: currentUser.id, online_at: new Date() });
                     }
                 });
-
-            // Escuchar nuevos perfiles (usuarios registrados)
-            console.log('👥 Inicializando escucha de nuevos perfiles...');
-            const perfilesChannel = _supabase.channel('perfiles-realtime')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'perfiles' }, (payload) => {
-                    console.log('✅ Nuevo perfil registrado:', payload.new);
-                    statsContadores.usuariosRegistrados++;
-                    actualizarEstadisticas();
-                })
-                .subscribe((status) => {
-                    console.log('📡 Estado perfiles channel:', status);
-                });
         }
 
         async function cargarRetirosProcesados() {
-            console.log('📥 Cargando estadísticas iniciales...');
+            // removed;
             
             try {
                 // Cargar desde tabla estadisticas_landing
-                console.log('🔍 Cargando estadísticas_landing...');
+                // removed;
                 const { data, error } = await _supabase
                     .from('estadisticas_landing')
                     .select('pagado_a_usuarios')
@@ -2286,22 +2270,22 @@
                     .single();
 
                 if (error) {
-                    console.log('❌ Error cargando estadísticas:', error.message);
+                    // removed;
                     return;
                 }
 
                 if (data && data.pagado_a_usuarios) {
                     const monto = parseFloat(data.pagado_a_usuarios);
-                    console.log(`✅ Estadísticas cargadas: $${monto}`);
+                    // removed;
                     
                     statsContadores.pagadoAUsuarios = monto;
-                    console.log(`📊 Total actualizado a: $${statsContadores.pagadoAUsuarios}`);
+                    // removed;
                     actualizarEstadisticas();
                 } else {
-                    console.log('⚠️ No se encontraron estadísticas');
+                    // removed;
                 }
             } catch (err) {
-                console.log('❌ Error crítico:', err);
+                // removed;
             }
         }
 
@@ -2608,21 +2592,21 @@
                     .from('perfiles')
                     .select('id');
                 
-                console.log('DEBUG - Perfiles data:', perfiles);
-                console.log('DEBUG - Perfiles error:', errorPerfiles);
+                // removed;
+                // removed;
                 
                 const totalPerfiles = perfiles ? perfiles.length : 0;
-                console.log('DEBUG - Total perfiles calculado:', totalPerfiles);
+                // removed;
                 
                 // Actualizar contadores
                 if (data) {
                     statsContadores.usuariosRegistrados = totalPerfiles;
                     statsContadores.pagadoAUsuarios = parseFloat(data.pagado_a_usuarios) || 2000;
                     actualizarEstadisticas();
-                    console.log('✅ Estadísticas cargadas:', { usuariosRegistrados: totalPerfiles, pagadoAUsuarios: data.pagado_a_usuarios });
+                    // removed;
                 }
             } catch (err) {
-                console.log('❌ Error cargarEstadisticas:', err);
+                // removed;
                 actualizarEstadisticas();
             }
         }
@@ -2654,7 +2638,7 @@
                     .update({ usuarios_activos: (data?.usuarios_activos || 100) + 1 })
                     .eq('id', 1);
             } catch (err) {
-                console.log('Error incrementando usuarios activos:', err);
+                // removed;
             }
         }
         
@@ -2672,7 +2656,7 @@
                     .update({ pagado_a_usuarios: nuevoMonto })
                     .eq('id', 1);
             } catch (err) {
-                console.log('Error incrementando pagado a usuarios:', err);
+                // removed;
             }
         }
         
@@ -2691,7 +2675,7 @@
                     .update({ en_linea: nuevoValor })
                     .eq('id', 1);
             } catch (err) {
-                console.log('Error actualizando en línea:', err);
+                // removed;
             }
         }
 
@@ -2727,7 +2711,7 @@
                 const btn = document.getElementById("btn-registrarse");
                 btn.disabled = true; btn.innerText = "Creando cuenta...";
                 
-                console.log('📝 Intentando registrar:', { email, username, passwordLength: password.length });
+                // removed;
                 
                 const { data, error } = await _supabase.auth.signUp({
                     email, password,
@@ -2736,13 +2720,13 @@
                 btn.disabled = false; btn.innerText = "Registrarse";
                 
                 if (error) { 
-                    console.log('❌ Error de Supabase:', error);
-                    console.log('Mensaje:', error.message);
+                    // removed;
+                    // removed;
                     mostrarNotificacion(`Error: ${error.message}`, "error"); 
                     return; 
                 }
                 
-                console.log('✅ Usuario registrado exitosamente');
+                // removed;
                 if (refCodeGuardado) sessionStorage.setItem('ref_pending_user', data.user?.id || '');
                 mostrarPantallaVerificacion(email);
             });
@@ -2775,7 +2759,7 @@
                 sessionStorage.removeItem('ref_code');
                 sessionStorage.removeItem('ref_pending_user');
             } catch(err) {
-                console.error("Error procesando bono referido:", err);
+                
                 sessionStorage.removeItem('ref_code');
                 sessionStorage.removeItem('ref_pending_user');
             }
@@ -4601,7 +4585,7 @@
                 const url = resData.url || resData.init_point;
                 if (url) window.location.href = url;
             } catch(e) {
-                console.error(e);
+                
                 mostrarNotificacion('Error al procesar el pago. Intenta de nuevo.', 'error');
             }
         }
