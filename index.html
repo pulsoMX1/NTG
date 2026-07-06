@@ -2592,11 +2592,15 @@
                 if (error) throw error;
                 
                 // Contar usuarios registrados - método simple
-                const { data: perfiles } = await _supabase
+                const { data: perfiles, error: errorPerfiles } = await _supabase
                     .from('perfiles')
                     .select('id');
                 
+                console.log('DEBUG - Perfiles data:', perfiles);
+                console.log('DEBUG - Perfiles error:', errorPerfiles);
+                
                 const totalPerfiles = perfiles ? perfiles.length : 0;
+                console.log('DEBUG - Total perfiles calculado:', totalPerfiles);
                 
                 // Actualizar contadores
                 if (data) {
@@ -2606,7 +2610,7 @@
                     console.log('✅ Estadísticas cargadas:', { usuariosRegistrados: totalPerfiles, pagadoAUsuarios: data.pagado_a_usuarios });
                 }
             } catch (err) {
-                console.log('Estadísticas con valores por defecto', err);
+                console.log('❌ Error cargarEstadisticas:', err);
                 actualizarEstadisticas();
             }
         }
