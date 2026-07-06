@@ -2605,16 +2605,16 @@
         }
 
         function actualizarEstadisticasUI(stats) {
-            if (stats.usuarios_activos !== undefined) {
+            if (stats.usuarios_registrados !== undefined) {
                 const elem = document.getElementById('stat-usuarios');
-                if (elem) elem.innerText = stats.usuarios_activos.toLocaleString();
+                if (elem) elem.innerText = stats.usuarios_registrados.toLocaleString();
             }
             if (stats.pagado_a_usuarios !== undefined) {
                 const elem = document.getElementById('stat-pagos');
                 if (elem) elem.innerText = '$' + Math.round(stats.pagado_a_usuarios).toLocaleString();
             }
             if (stats.en_linea !== undefined) {
-                const elem = document.getElementById('stat-activos');
+                const elem = document.getElementById('stat-online');
                 if (elem) elem.innerText = stats.en_linea.toLocaleString() + '+';
             }
         }
