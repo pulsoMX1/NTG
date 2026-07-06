@@ -2259,6 +2259,18 @@
                         await presenciaChannel.track({ user_id: currentUser.id, online_at: new Date() });
                     }
                 });
+
+            // Escuchar nuevos perfiles (usuarios registrados)
+            console.log('👥 Inicializando escucha de nuevos perfiles...');
+            const perfilesChannel = _supabase.channel('perfiles-realtime')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'perfiles' }, (payload) => {
+                    console.log('✅ Nuevo perfil registrado:', payload.new);
+                    statsContadores.usuariosRegistrados++;
+                    actualizarEstadisticas();
+                })
+                .subscribe((status) => {
+                    console.log('📡 Estado perfiles channel:', status);
+                });
         }
 
         async function cargarRetirosProcesados() {
