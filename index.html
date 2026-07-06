@@ -2265,8 +2265,6 @@
             console.log('📥 Cargando estadísticas iniciales...');
             
             try {
-                // Cargar desde tabla estadisticas_landing
-                console.log('🔍 Cargando estadísticas_landing...');
                 const { data, error } = await _supabase
                     .from('estadisticas_landing')
                     .select('pagado_a_usuarios')
@@ -2290,6 +2288,31 @@
                 }
             } catch (err) {
                 console.log('❌ Error crítico:', err);
+            }
+        }
+
+        // Función para recargar estadísticas manualmente
+        async function refrescarEstadisticas() {
+            try {
+                const { data, error } = await _supabase
+                    .from('estadisticas_landing')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (error) {
+                    console.log('Error refrescando:', error);
+                    return;
+                }
+
+                if (data) {
+                    console.log('🔄 Estadísticas refrescadas:', data);
+                    statsContadores.usuariosRegistrados = data.usuarios_registrados || 100;
+                    statsContadores.pagadoAUsuarios = parseFloat(data.pagado_a_usuarios) || 2000;
+                    actualizarEstadisticas();
+                }
+            } catch (err) {
+                console.log('Error crítico al refrescar:', err);
             }
         }
 
@@ -2360,6 +2383,9 @@
             }
 
             inicializarCarruselInfinito();
+            
+            // Refrescar estadísticas cada 3 segundos (como backup del listener)
+            setInterval(() => refrescarEstadisticas(), 3000);
             
             setTimeout(() => forzarRenderingCarrusel(), 500);
 
@@ -2721,6 +2747,10 @@
                 
                 console.log('✅ Usuario registrado exitosamente');
                 if (refCodeGuardado) sessionStorage.setItem('ref_pending_user', data.user?.id || '');
+                
+                // Refrescar estadísticas después de registrarse
+                setTimeout(() => refrescarEstadisticas(), 1000);
+                
                 mostrarPantallaVerificacion(email);
             });
 
