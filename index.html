@@ -2582,21 +2582,26 @@
         
         async function cargarEstadisticas() {
             try {
-                // Cargar desde estadisticas_landing
+                // Cargar pagado_a_usuarios desde estadisticas_landing
                 const { data, error } = await _supabase
                     .from('estadisticas_landing')
-                    .select('*')
+                    .select('pagado_a_usuarios')
                     .eq('id', 1)
                     .single();
                     
                 if (error) throw error;
                 
-                // Actualizar contadores desde los datos cargados
+                // Contar usuarios registrados directamente de la tabla perfiles
+                const { count: totalPerfiles } = await _supabase
+                    .from('perfiles')
+                    .select('*', { count: 'exact', head: true });
+                
+                // Actualizar contadores
                 if (data) {
-                    statsContadores.usuariosRegistrados = data.usuarios_registrados || 100;
+                    statsContadores.usuariosRegistrados = totalPerfiles || 0;
                     statsContadores.pagadoAUsuarios = parseFloat(data.pagado_a_usuarios) || 2000;
                     actualizarEstadisticas();
-                    console.log('✅ Estadísticas cargadas:', data);
+                    console.log('✅ Estadísticas cargadas:', { usuariosRegistrados: totalPerfiles, pagadoAUsuarios: data.pagado_a_usuarios });
                 }
             } catch (err) {
                 console.log('Estadísticas con valores por defecto');
