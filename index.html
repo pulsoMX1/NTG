@@ -3072,11 +3072,20 @@
             document.getElementById('detalle-subtitulo').innerText = cfg.subtitulo;
 
             const grid = document.getElementById('detalle-montos');
+            
+            // Mapear URLs de imágenes según el tipo de canje
+            const imagenes = {
+                paypal: 'https://pngimg.com/uploads/paypal/paypal_PNG7.png',
+                spei: 'https://seeklogo.com/images/S/spei-logo-3BFB0A560B-seeklogo.com.png',
+                robux: 'https://cdn3.emoji.gg/emojis/79718-robux.png',
+                freefire: 'https://1.bp.blogspot.com/-TdUX5b7Caq8/XOwOun9Bq8I/AAAAAAAABvE/SoQnWkyMhHQDAcPmLAUmR7uF4HnsVSMsQCLcBGAs/s1600/DIAMANTES.png'
+            };
+            
             grid.innerHTML = cfg.montos.map(m => `
                 <button onclick="seleccionarMonto(${m.nc}, ${m.mxn}, '${m.label}', '${tipo}')"
                     class="group relative bg-slate-800 border ${c.border} hover:${c.bg} rounded-2xl p-4 sm:p-5 flex flex-col items-center gap-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 w-full">
                     <div class="w-12 h-12 ${c.bg} rounded-xl flex items-center justify-center mb-1">
-                        <i class="fa-solid fa-coins ${c.text} text-xl"></i>
+                        <img src="${imagenes[tipo]}" alt="${cfg.titulo}" class="w-10 h-10 object-contain">
                     </div>
                     <p class="${c.text} font-black text-xl">${m.label}</p>
                     <p class="text-slate-400 text-xs font-semibold">${m.nc.toLocaleString()} NetCoins</p>
