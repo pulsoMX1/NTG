@@ -410,6 +410,17 @@
             flex: 0 0 clamp(150px, 20vw, 280px);
             display: flex;
         }
+        input[readonly] {
+            background-color: rgba(71, 85, 105, 0.5) !important;
+            cursor: not-allowed !important;
+            color: rgba(148, 163, 184, 0.7) !important;
+            border-color: rgba(71, 85, 105, 0.7) !important;
+        }
+        
+        input[readonly]:focus {
+            border-color: rgba(71, 85, 105, 0.7) !important;
+            outline: none !important;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
@@ -3197,11 +3208,27 @@
             } else {
                 // Si son otros canjes, mostramos los campos y los hacemos obligatorios
                 divBancoBen.classList.remove('hidden');
-                inputBanco.setAttribute('required', 'true');
                 inputBeneficiario.setAttribute('required', 'true');
-                inputBanco.value = '';
+                inputBeneficiario.removeAttribute('readonly');
                 inputBeneficiario.value = '';
-                inputBanco.placeholder = cfg.placeholderBanco || '';
+                inputBeneficiario.placeholder = cfg.placeholderDestino || '';
+                
+                // Para PayPal, SPEI y Robux - el campo de banco es solo lectura y prefijado
+                if (tipo === 'paypal' || tipo === 'spei' || tipo === 'robux') {
+                    inputBanco.setAttribute('readonly', 'true');
+                    inputBanco.removeAttribute('required');
+                    inputBanco.value = cfg.titulo;
+                    inputBanco.classList.add('bg-slate-700', 'cursor-not-allowed');
+                    inputBanco.style.pointerEvents = 'none';
+                } else {
+                    // Para otros (si los hay)
+                    inputBanco.removeAttribute('readonly');
+                    inputBanco.setAttribute('required', 'true');
+                    inputBanco.value = '';
+                    inputBanco.placeholder = cfg.placeholderBanco || '';
+                    inputBanco.classList.remove('bg-slate-700', 'cursor-not-allowed');
+                    inputBanco.style.pointerEvents = 'auto';
+                }
             }
 
             document.getElementById('label-destino').innerText = cfg.labelDestino;
