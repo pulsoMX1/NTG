@@ -1294,7 +1294,7 @@
                                 
                                 <div id="div-banco-beneficiario" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Banco / Plataforma</label>
+                                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1" id="label-banco-plataforma">Banco / Plataforma</label>
                                         <input type="text" id="retiro-banco" placeholder="BBVA, Santander, PayPal..."
                                             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition">
                                     </div>
@@ -3197,6 +3197,7 @@
             const divBancoBen = document.getElementById('div-banco-beneficiario');
             const inputBanco = document.getElementById('retiro-banco');
             const inputBeneficiario = document.getElementById('retiro-beneficiario');
+            const labelBanco = document.getElementById('label-banco-plataforma');
 
             if (cfg.esSoloId) {
                 // Si es Free Fire, ocultamos los campos extra y les asignamos un valor por defecto
@@ -3213,13 +3214,26 @@
                 inputBeneficiario.value = '';
                 inputBeneficiario.placeholder = cfg.placeholderDestino || '';
                 
-                // Para PayPal, SPEI y Robux - el campo de banco es solo lectura y prefijado
-                if (tipo === 'paypal' || tipo === 'spei' || tipo === 'robux') {
+                // Para PayPal y Robux - el campo de banco es solo lectura y prefijado
+                // Para SPEI - el campo de banco es editable
+                if (tipo === 'paypal' || tipo === 'robux') {
                     inputBanco.setAttribute('readonly', 'true');
                     inputBanco.removeAttribute('required');
                     inputBanco.value = cfg.titulo;
                     inputBanco.classList.add('bg-slate-700', 'cursor-not-allowed');
                     inputBanco.style.pointerEvents = 'none';
+                    // Cambiar el label según el tipo
+                    labelBanco.innerText = tipo === 'robux' ? 'Plataforma' : 'Banco / Plataforma';
+                } else if (tipo === 'spei') {
+                    // SPEI: el campo es EDITABLE
+                    inputBanco.removeAttribute('readonly');
+                    inputBanco.setAttribute('required', 'true');
+                    inputBanco.value = '';
+                    inputBanco.placeholder = cfg.placeholderBanco || '';
+                    inputBanco.classList.remove('bg-slate-700', 'cursor-not-allowed');
+                    inputBanco.style.pointerEvents = 'auto';
+                    // Label solo dice "Banco"
+                    labelBanco.innerText = 'Banco';
                 } else {
                     // Para otros (si los hay)
                     inputBanco.removeAttribute('readonly');
@@ -3228,6 +3242,7 @@
                     inputBanco.placeholder = cfg.placeholderBanco || '';
                     inputBanco.classList.remove('bg-slate-700', 'cursor-not-allowed');
                     inputBanco.style.pointerEvents = 'auto';
+                    labelBanco.innerText = 'Banco / Plataforma';
                 }
             }
 
