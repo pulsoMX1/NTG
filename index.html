@@ -2942,6 +2942,11 @@
         function actualizarTextosInterfaz(monedas) {
             document.getElementById("user-balance").innerText = monedas;
             document.querySelectorAll(".balance-placeholder").forEach(el => el.innerText = monedas);
+            
+            // Actualizar estado de los botones de canje si existen
+            if (typeof window.actualizarBotonesCanjes === 'function') {
+                window.actualizarBotonesCanjes();
+            }
         }
 
         function cambiarMuro(proveedor) {
@@ -3081,19 +3086,65 @@
                 freefire: 'https://1.bp.blogspot.com/-TdUX5b7Caq8/XOwOun9Bq8I/AAAAAAAABvE/SoQnWkyMhHQDAcPmLAUmR7uF4HnsVSMsQCLcBGAs/s1600/DIAMANTES.png'
             };
             
-            grid.innerHTML = cfg.montos.map(m => `
-                <button onclick="seleccionarMonto(${m.nc}, ${m.mxn}, '${m.label}', '${tipo}')"
-                    class="group relative bg-slate-800 border ${c.border} hover:${c.bg} rounded-2xl p-4 sm:p-5 flex flex-col items-center gap-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 w-full">
-                    <div class="w-12 h-12 ${c.bg} rounded-xl flex items-center justify-center mb-1">
+            // Obtener balance actual del usuario
+            const balanceActual = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+            
+            grid.innerHTML = cfg.montos.map(m => {
+                const tieneBalance = balanceActual >= m.nc;
+                const porcentajeProgreso = Math.min((balanceActual / m.nc) * 100, 100);
+                
+                return `
+                <button onclick="seleccionarMontoSeguro(${m.nc}, ${m.mxn}, '${m.label}', '${tipo}', ${tieneBalance})"
+                    class="canje-btn-${tipo}-${m.nc} group relative bg-slate-800 border ${tieneBalance ? c.border : 'border-slate-700'} rounded-2xl p-4 sm:p-5 flex flex-col items-center gap-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 w-full ${tieneBalance ? 'hover:' + c.bg + ' cursor-pointer' : 'cursor-not-allowed opacity-75'}"
+                    ${tieneBalance ? '' : 'style="pointer-events: none;"'}>
+                    <div class="w-12 h-12 ${tieneBalance ? c.bg : 'bg-slate-700'} rounded-xl flex items-center justify-center mb-1 transition-colors duration-300">
                         <img src="${imagenes[tipo]}" alt="${cfg.titulo}" class="w-10 h-10 object-contain">
                     </div>
-                    <p class="${c.text} font-black text-xl">${m.label}</p>
+                    <p class="${tieneBalance ? c.text : 'text-slate-500'} font-black text-xl transition-colors duration-300">${m.label}</p>
                     <p class="text-slate-400 text-xs font-semibold">${m.nc.toLocaleString()} NetCoins</p>
-                    <div class="mt-1 w-full bg-slate-700 rounded-lg py-1.5 text-center text-xs font-bold text-white group-hover:bg-purple-600 transition-colors">
-                        Seleccionar
+                    
+                    <!-- Barra de Progresión -->
+                    <div class="w-full mt-2">
+                        <div class="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                            <div class="bg-gradient-to-r ${tieneBalance ? 'from-' + (cfg.color === 'blue' ? 'blue-500' : cfg.color === 'emerald' ? 'emerald-500' : cfg.color === 'red' ? 'red-500' : 'orange-500') + ' to-' + (cfg.color === 'blue' ? 'blue-400' : cfg.color === 'emerald' ? 'emerald-400' : cfg.color === 'red' ? 'red-400' : 'orange-400') : 'from-slate-600 to-slate-500'} h-full transition-all duration-300"
+                                style="width: ${porcentajeProgreso}%"></div>
+                        </div>
+                        <p class="text-slate-400 text-xs font-semibold mt-1 text-center">
+                            ${tieneBalance ? '✅ Listo para canjear' : `${balanceActual.toLocaleString()} / ${m.nc.toLocaleString()} NC`}
+                        </p>
+                    </div>
+                    
+                    <div class="mt-2 w-full ${tieneBalance ? 'bg-gradient-to-r from-' + (cfg.color === 'blue' ? 'blue-600' : cfg.color === 'emerald' ? 'emerald-600' : cfg.color === 'red' ? 'red-600' : 'orange-600') + ' to-' + (cfg.color === 'blue' ? 'blue-500' : cfg.color === 'emerald' ? 'emerald-500' : cfg.color === 'red' ? 'red-500' : 'orange-500') + ' hover:' + (cfg.color === 'blue' ? 'from-blue-500 to-blue-400' : cfg.color === 'emerald' ? 'from-emerald-500 to-emerald-400' : cfg.color === 'red' ? 'from-red-500 to-red-400' : 'from-orange-500 to-orange-400') : 'bg-slate-700'} rounded-lg py-1.5 text-center text-xs font-bold ${tieneBalance ? 'text-white' : 'text-slate-400'} transition-all duration-300">
+                        ${tieneBalance ? 'Canjear ahora' : 'Insuficientes NetCoins'}
                     </div>
                 </button>
-            `).join('');
+                `;
+            }).join('');
+            
+            // Función para actualizar el estado de los botones cuando cambie el balance
+            window.actualizarBotonesCanjes = function() {
+                const nuevoBalance = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+                cfg.montos.forEach(m => {
+                    const tieneBalance = nuevoBalance >= m.nc;
+                    const btn = document.querySelector('.canje-btn-' + tipo + '-' + m.nc);
+                    if (btn) {
+                        const porcentajeProgreso = Math.min((nuevoBalance / m.nc) * 100, 100);
+                        btn.style.borderColor = tieneBalance ? 'var(--color-border)' : '';
+                        btn.style.pointerEvents = tieneBalance ? 'auto' : 'none';
+                        btn.style.opacity = tieneBalance ? '1' : '0.75';
+                        
+                        // Actualizar barra
+                        const barra = btn.querySelector('div:nth-child(4) div div');
+                        if (barra) barra.style.width = porcentajeProgreso + '%';
+                        
+                        // Actualizar texto de progreso
+                        const textoProgreso = btn.querySelector('p:nth-of-type(3)');
+                        if (textoProgreso) {
+                            textoProgreso.innerText = tieneBalance ? '✅ Listo para canjear' : nuevoBalance.toLocaleString() + ' / ' + m.nc.toLocaleString() + ' NC';
+                        }
+                    }
+                });
+            };
 
             document.getElementById('container-formulario-retiro').classList.add('hidden');
             document.getElementById('form-solicitud-retiro').reset();
@@ -3104,6 +3155,24 @@
             document.getElementById('canje-catalogo').classList.remove('hidden');
             document.getElementById('canje-detalle').classList.add('hidden');
             document.getElementById('container-formulario-retiro').classList.add('hidden');
+        }
+
+        function seleccionarMontoSeguro(nc, mxn, label, tipo, tieneBalance) {
+            // Si no tiene balance suficiente, mostrar notificación
+            if (!tieneBalance) {
+                const balanceActual = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+                const falta = nc - balanceActual;
+                
+                // Mostrar notificación profesional
+                mostrarNotificacion(
+                    `No tienes suficientes NetCoins para canjear esta opción. Te faltan ${falta.toLocaleString()} NC`,
+                    'error'
+                );
+                return;
+            }
+            
+            // Si tiene balance, proceder normalmente
+            seleccionarMonto(nc, mxn, label, tipo);
         }
 
         function seleccionarMonto(nc, mxn, label, tipo) {
