@@ -3735,7 +3735,7 @@
             return _audioCtx;
         }
 
-        function _tono(freq, duracion, tipo = 'sine', volumenInicial = 0.50, delay = 0) {
+        function _tono(freq, duracion, tipo = 'sine', volumenInicial = 0.85, delay = 0) {
             if (!_sonidosActivos) return;
             const ctx = _getAudioCtx();
             if (!ctx) return;
@@ -3753,7 +3753,7 @@
             osc.stop(t0 + duracion + 0.05);
         }
 
-        function _tonoDeslizante(freqInicio, freqFin, duracion, tipo = 'sine', volumen = 0.45, delay = 0) {
+        function _tonoDeslizante(freqInicio, freqFin, duracion, tipo = 'sine', volumen = 0.80, delay = 0) {
             if (!_sonidosActivos) return;
             const ctx = _getAudioCtx();
             if (!ctx) return;
@@ -3772,7 +3772,7 @@
         }
 
         // Arpegio rápido tipo "videojuego casual" — notas en secuencia
-        function _arpegio(freqs, duracion = 0.09, separacion = 0.07, tipo = 'triangle', volumen = 0.42, delayInicial = 0) {
+        function _arpegio(freqs, duracion = 0.09, separacion = 0.07, tipo = 'triangle', volumen = 0.80, delayInicial = 0) {
             freqs.forEach((f, i) => _tono(f, duracion, tipo, volumen, delayInicial + i * separacion));
         }
 
@@ -3781,7 +3781,7 @@
         let _musicaActiva = null;
 
         // Toca una nota de melodía con volumen bajo (para no tapar los efectos de sonido)
-        function _notaMusica(freq, duracion, tipo = 'triangle', volumen = 0.18, delay = 0) {
+        function _notaMusica(freq, duracion, tipo = 'triangle', volumen = 0.35, delay = 0) {
             if (!_sonidosActivos) return;
             const ctx = _getAudioCtx();
             if (!ctx) return;
