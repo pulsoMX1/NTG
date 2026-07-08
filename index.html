@@ -559,15 +559,7 @@
                 cebo2.style.cssText = 'display:block;width:1px;height:1px;position:fixed;left:-9999px;top:-9999px;';
                 document.body.appendChild(cebo2);
 
-                // MÉTODO 3: Fetch a recurso de Adsterra (el que ya usas)
-                let adsterraFail = false;
-                fetch('https://alarmpenguinmelt.com/7378a712ef2e1acc90b8893efa12f6e6/invoke.js', {
-                    method: 'HEAD',
-                    signal: AbortSignal.timeout(3000),
-                    mode: 'no-cors'
-                }).catch(() => { adsterraFail = true; });
 
-                setTimeout(() => {
                     // Verificar cebo1
                     const estilo1 = window.getComputedStyle(cebo);
                     if (
