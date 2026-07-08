@@ -3213,6 +3213,13 @@
                 inputBeneficiario.removeAttribute('required');
                 inputBanco.value = '';
                 inputBeneficiario.value = '';
+            } else if (tipo === 'paypal') {
+                // PAYPAL: Ocultar completamente el div de banco-beneficiario
+                divBancoBen.classList.add('hidden');
+                inputBanco.removeAttribute('required');
+                inputBeneficiario.removeAttribute('required');
+                inputBanco.value = '';
+                inputBeneficiario.value = '';
             } else if (tipo === 'spei') {
                 // SPEI: Mostrar los campos, banco EDITABLE, cambiar placeholders y label
                 divBancoBen.classList.remove('hidden');
@@ -3227,23 +3234,6 @@
                 inputBanco.style.pointerEvents = 'auto';
                 
                 // Beneficiario con ejemplo de nombre
-                inputBeneficiario.setAttribute('required', 'true');
-                inputBeneficiario.removeAttribute('readonly');
-                inputBeneficiario.value = '';
-                inputBeneficiario.placeholder = 'Ej: Juan García López';
-                inputBeneficiario.classList.remove('bg-slate-700', 'cursor-not-allowed');
-                inputBeneficiario.style.pointerEvents = 'auto';
-            } else if (tipo === 'paypal') {
-                // PAYPAL: Campo banco READONLY
-                divBancoBen.classList.remove('hidden');
-                labelBanco.innerText = 'Banco / Plataforma';
-                
-                inputBanco.setAttribute('readonly', 'true');
-                inputBanco.removeAttribute('required');
-                inputBanco.value = cfg.titulo;
-                inputBanco.classList.add('bg-slate-700', 'cursor-not-allowed');
-                inputBanco.style.pointerEvents = 'none';
-                
                 inputBeneficiario.setAttribute('required', 'true');
                 inputBeneficiario.removeAttribute('readonly');
                 inputBeneficiario.value = '';
