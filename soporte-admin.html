@@ -1397,7 +1397,7 @@ async function procesarCanje(canjeId, nuevoStatus) {
     try {
         const { error } = await _supabase
             .from('retiros_pendientes')
-            .update({ estatus: nuevoStatus, updated_at: new Date().toISOString() })
+            .update({ estatus: nuevoStatus })
             .eq('id', canjeId);
 
         if (error) {
