@@ -1327,8 +1327,7 @@ function renderListaCanjes() {
         <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-slate-600 transition">
             <div class="flex items-start justify-between mb-3">
                 <div>
-                    <p class="text-sm font-bold text-white">${canje.tipo_canje}</p>
-                    <p class="text-xs text-slate-500 mt-0.5">${canje.email_usuario}</p>
+                    <p class="text-sm font-bold text-white">${canje.tipo_premio}</p>
                 </div>
                 <div class="text-right">
                     <span class="inline-block text-xs font-bold px-2.5 py-1 rounded-lg ${
@@ -1345,7 +1344,7 @@ function renderListaCanjes() {
             <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
                 <div>
                     <p class="text-slate-500">NetCoins</p>
-                    <p class="font-bold text-amber-400">${canje.monto_nc.toLocaleString()}</p>
+                    <p class="font-bold text-amber-400">${canje.netcoins_deducidos.toLocaleString()}</p>
                 </div>
                 <div>
                     <p class="text-slate-500">Monto MXN</p>
@@ -1353,17 +1352,17 @@ function renderListaCanjes() {
                 </div>
                 <div>
                     <p class="text-slate-500">Banco</p>
-                    <p class="font-bold text-white">${canje.banco}</p>
+                    <p class="font-bold text-white">${canje.banco_plataforma}</p>
                 </div>
                 <div>
                     <p class="text-slate-500">Beneficiario</p>
-                    <p class="font-bold text-white">${canje.beneficiario}</p>
+                    <p class="font-bold text-white">${canje.nombre_beneficiario}</p>
                 </div>
             </div>
 
             <div class="mb-3 text-xs">
                 <p class="text-slate-500">Destino</p>
-                <p class="font-bold text-white break-all">${canje.destino}</p>
+                <p class="font-bold text-white break-all">${canje.cuenta_destino}</p>
             </div>
 
             ${canje.status === 'Pendiente' ? `
