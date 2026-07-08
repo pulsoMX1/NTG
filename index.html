@@ -3278,16 +3278,14 @@
 
         async function procesarSolicitudRetiro() {
             if (!currentUser) return;
-            const montoNC = parseInt(document.getElementById("retiro-monto").value);
-            const montoMXN = parseInt(montoNC / CONVERSION_RATE);
-            const banco = document.getElementById("retiro-banco").value.trim() || "N/A";
-            const beneficiario = document.getElementById("retiro-beneficiario").value.trim() || "N/A";
+            const montoMXN = parseInt(document.getElementById("retiro-monto").value);
+            const banco = document.getElementById("retiro-banco").value.trim();
+            const beneficiario = document.getElementById("retiro-beneficiario").value.trim();
             const destino = document.getElementById("retiro-destino").value.trim();
-            const tipoCanje = document.getElementById("tipo-recompensa-txt").innerText;
+            const tipoPremio = document.getElementById("tipo-recompensa-txt").innerText;
 
-            // Validaciones
-            if (!destino) {
-                mostrarNotificacion("Por favor completa el campo de destino.", "error"); 
+            if (!banco || !beneficiario || !destino) {
+                mostrarNotificacion("Por favor completa todos los campos obligatorios.", "error"); 
                 return;
             }
             
@@ -3295,60 +3293,33 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Procesando...';
 
-            try {
-                // Guardar solicitud en Supabase
-                const { data: solicitud, error: errorInsert } = await _supabase
-                    .from('retiros_pendientes')
-                    .insert([{
-                        user_id: currentUser.id,
-                        email_usuario: currentUser.email,
-                        tipo_canje: tipoCanje,
-                        monto_nc: montoNC,
-                        monto_mxn: montoMXN,
-                        banco: banco,
-                        beneficiario: beneficiario,
-                        destino: destino,
-                        status: 'Pendiente',
-                        created_at: new Date().toISOString()
-                    }])
-                    .select();
+            // Llamada segura a la Edge Function mandando los datos del formulario
+            const { data, error } = await _supabase.functions.invoke('procesar-retiro', {
+                body: { montoMXN, banco, beneficiario, destino, tipoPremio }
+            });
 
-                if (errorInsert) {
-                    throw new Error(errorInsert.message);
-                }
-
-                // Restar NetCoins del usuario
-                const { data: perfil } = await _supabase
-                    .from('perfiles')
-                    .select('netcoins')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                if (perfil && perfil.netcoins >= montoNC) {
-                    const nuevosNetCoins = perfil.netcoins - montoNC;
-                    await _supabase
-                        .from('perfiles')
-                        .update({ netcoins: nuevosNetCoins })
-                        .eq('id', currentUser.id);
-                    
-                    actualizarTextosInterfaz(nuevosNetCoins);
-                }
-
-                // Incrementar pagado a usuarios (solo estadísticas)
-                await incrementarPagadoAUsuarios(montoMXN);
-
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Enviar Solicitud de Canje';
+            if (error || data?.error) {
+                let msg = "Error al registrar la solicitud.";
+                if (data?.error === 'saldo_insuficiente') msg = `Saldo insuficiente. Necesitas ${data.necesitas} NC.`;
+                else if (data?.error === 'campos_incompletos') msg = "Por favor completa todos los campos.";
+                else if (data?.error === 'error_db') msg = "Error del servidor al registrar retiro.";
                 
-                mostrarToastSesion('success', '¡Solicitud enviada!', 'Tu canje está en revisión. En 24–72 hrs hábiles recibirás tu recompensa.');
-                cerrarFormularioRetiro();
-                volverCatalogo();
-            } catch(err) {
-                console.error('Error al procesar solicitud:', err);
-                mostrarNotificacion(`Error: ${err.message}`, "error");
+                mostrarNotificacion(msg, "error");
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Enviar Solicitud de Canje';
+                return;
             }
+
+            // Éxito
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Enviar Solicitud de Canje';
+            
+            // Incrementar pagado a usuarios
+            await incrementarPagadoAUsuarios(montoMXN);
+            
+            mostrarToastSesion('success', '¡Solicitud enviada!', 'Tu canje está en revisión. En 24–72 hrs hábiles recibirás tu recompensa.');
+            cerrarFormularioRetiro();
+            volverCatalogo();
         }
 
         // RULETA DIARIA
