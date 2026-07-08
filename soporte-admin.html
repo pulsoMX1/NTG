@@ -1395,71 +1395,31 @@ async function procesarCanje(canjeId, nuevoStatus) {
     if (!confirm(`¿Estás seguro de que deseas marcar este canje como ${nuevoStatus}?`)) return;
 
     try {
-        // Si se rechaza, obtener los datos para devolver NetCoins
-        let reembolsoRealizado = false;
-        if (nuevoStatus === 'Rechazado') {
-            // Obtener la solicitud para conseguir user_id y netcoins_deducidos
-            const { data: solicitud, error: errorObtener } = await _supabase
-                .from('retiros_pendientes')
-                .select('user_id, netcoins_deducidos')
-                .eq('id', canjeId)
-                .single();
+        // Llamar a la Edge Function segura
+        const response = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/procesar-canje', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${_supabase.auth.session()?.access_token || ''}`
+            },
+            body: JSON.stringify({ canjeId, nuevoStatus })
+        });
 
-            if (errorObtener) {
-                alert('Error al obtener datos de la solicitud: ' + errorObtener.message);
-                return;
-            }
+        const result = await response.json();
 
-            if (solicitud && solicitud.user_id && solicitud.netcoins_deducidos) {
-                // Obtener balance actual del usuario
-                const { data: perfilActual, error: errorPerfil } = await _supabase
-                    .from('perfiles')
-                    .select('netcoins')
-                    .eq('id', solicitud.user_id)
-                    .single();
-
-                if (errorPerfil) {
-                    alert('Error al obtener balance del usuario: ' + errorPerfil.message);
-                    return;
-                }
-
-                // Devolver los NetCoins
-                const nuevoBalance = (perfilActual?.netcoins || 0) + solicitud.netcoins_deducidos;
-                const { error: errorActualizar } = await _supabase
-                    .from('perfiles')
-                    .update({ netcoins: nuevoBalance })
-                    .eq('id', solicitud.user_id);
-
-                if (errorActualizar) {
-                    alert('Error al devolver NetCoins: ' + errorActualizar.message);
-                    return;
-                }
-
-                reembolsoRealizado = true;
-            }
-        }
-
-        // Actualizar el estado de la solicitud
-        const { error } = await _supabase
-            .from('retiros_pendientes')
-            .update({ estatus: nuevoStatus })
-            .eq('id', canjeId);
-
-        if (error) {
-            alert('Error al actualizar el canje: ' + error.message);
+        if (result.error) {
+            alert('Error: ' + result.error);
             return;
         }
 
-        // Mostrar mensaje de éxito
-        if (reembolsoRealizado) {
-            mostrarToast(`Canje rechazado y NetCoins devueltos al usuario`, 'success');
+        if (nuevoStatus === 'Rechazado') {
+            mostrarToast('Canje rechazado y NetCoins devueltos al usuario', 'success');
         } else {
             mostrarToast(`Canje marcado como ${nuevoStatus}`, 'success');
         }
         cargarCanjes();
     } catch(err) {
-        console.error('Error:', err);
-        alert('Error al procesar el canje');
+        alert('Error al procesar el canje: ' + err.message);
     }
 }
 </script>
