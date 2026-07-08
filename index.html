@@ -3284,7 +3284,14 @@
             const destino = document.getElementById("retiro-destino").value.trim();
             const tipoPremio = document.getElementById("tipo-recompensa-txt").innerText;
 
-            if (!banco || !beneficiario || !destino) {
+            // Validación inteligente según el tipo de canje
+            if (!destino) {
+                mostrarNotificacion("Por favor completa el campo de destino.", "error"); 
+                return;
+            }
+
+            // Solo para SPEI, validar banco y beneficiario
+            if (tipoPremio === "Transferencia SPEI" && (!banco || !beneficiario)) {
                 mostrarNotificacion("Por favor completa todos los campos obligatorios.", "error"); 
                 return;
             }
