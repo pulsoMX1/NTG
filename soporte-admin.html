@@ -1352,11 +1352,11 @@ function renderListaCanjes() {
                 </div>
                 <div>
                     <p class="text-slate-500">Banco</p>
-                    <p class="font-bold text-white">${canje.banco_plataforma}</p>
+                    <p class="font-bold text-white">${canje.banco_plataforma || '-'}</p>
                 </div>
                 <div>
                     <p class="text-slate-500">Beneficiario</p>
-                    <p class="font-bold text-white">${canje.nombre_beneficiario}</p>
+                    <p class="font-bold text-white">${canje.nombre_beneficiario || '-'}</p>
                 </div>
             </div>
 
