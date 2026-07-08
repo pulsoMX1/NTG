@@ -85,6 +85,9 @@
                 <button id="modulo-btn-soporte" onclick="cambiarModulo('soporte')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-purple-600 text-white transition">
                     <i class="fa-solid fa-headset mr-1.5"></i>Soporte
                 </button>
+                <button id="modulo-btn-canjes" onclick="cambiarModulo('canjes')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-gift mr-1.5"></i>Canjes
+                </button>
                 <button id="modulo-btn-anuncios" onclick="cambiarModulo('anuncios')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
                 </button>
@@ -106,6 +109,9 @@
     <div class="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-slate-900 border-b border-slate-700/50">
         <button id="modulo-btn-soporte-mobile" onclick="cambiarModulo('soporte')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-purple-600 text-white transition">
             <i class="fa-solid fa-headset mr-1.5"></i>Soporte
+        </button>
+        <button id="modulo-btn-canjes-mobile" onclick="cambiarModulo('canjes')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
+            <i class="fa-solid fa-gift mr-1.5"></i>Canjes
         </button>
         <button id="modulo-btn-anuncios-mobile" onclick="cambiarModulo('anuncios')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
             <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
@@ -214,6 +220,61 @@
                     </div>
                     <p class="text-xs text-slate-600 mt-1.5 text-center">Enter para enviar · Shift+Enter para nueva línea</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--        MÓDULO CANJES Y RETIROS         -->
+    <!-- ══════════════════════════════════════ -->
+    <div id="modulo-canjes" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
+        <div class="max-w-5xl mx-auto space-y-6">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-black text-white">Solicitudes de Canjes</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestiona las solicitudes de retiro de los usuarios</p>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-800 rounded-xl p-2">
+                    <button onclick="filtrarCanjesPor('todos')" class="canjes-filter-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-purple-600 text-white transition">
+                        Todos
+                    </button>
+                    <button onclick="filtrarCanjesPor('pendientes')" class="canjes-filter-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 transition">
+                        Pendientes
+                    </button>
+                    <button onclick="filtrarCanjesPor('procesados')" class="canjes-filter-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 transition">
+                        Procesados
+                    </button>
+                    <button onclick="filtrarCanjesPor('rechazados')" class="canjes-filter-btn text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 transition">
+                        Rechazados
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                    <p class="text-xs text-slate-400 font-semibold">Pendientes</p>
+                    <p id="stat-canjes-pendientes" class="text-2xl font-black text-amber-400 mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                    <p class="text-xs text-slate-400 font-semibold">Procesados</p>
+                    <p id="stat-canjes-procesados" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                    <p class="text-xs text-slate-400 font-semibold">Rechazados</p>
+                    <p id="stat-canjes-rechazados" class="text-2xl font-black text-red-400 mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
+                    <p class="text-xs text-slate-400 font-semibold">Total</p>
+                    <p id="stat-canjes-total" class="text-2xl font-black text-blue-400 mt-1">0</p>
+                </div>
+            </div>
+
+            <!-- Lista de canjes -->
+            <div id="lista-canjes" class="space-y-3">
+                <p class="text-center text-slate-500 py-8">Cargando canjes...</p>
             </div>
         </div>
     </div>
@@ -950,22 +1011,27 @@ let todosLosAnuncios = [];
 function cambiarModulo(modulo) {
     moduloActivo = modulo;
     const esSoporte = modulo === 'soporte';
+    const esCanjes = modulo === 'canjes';
+    const esAnuncios = modulo === 'anuncios';
 
     document.getElementById('main-body').classList.toggle('hidden', !esSoporte);
-    document.getElementById('modulo-anuncios').classList.toggle('hidden', esSoporte);
-    document.getElementById('modulo-anuncios').classList.toggle('flex', !esSoporte);
+    document.getElementById('modulo-canjes').classList.toggle('hidden', !esCanjes);
+    document.getElementById('modulo-canjes').classList.toggle('flex', esCanjes);
+    document.getElementById('modulo-anuncios').classList.toggle('hidden', esAnuncios ? false : true);
+    document.getElementById('modulo-anuncios').classList.toggle('flex', esAnuncios);
 
-    ['modulo-btn-soporte', 'modulo-btn-anuncios', 'modulo-btn-soporte-mobile', 'modulo-btn-anuncios-mobile'].forEach(id => {
+    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const esEsteBtn = id.includes(modulo);
         el.classList.toggle('bg-purple-600', esEsteBtn);
         el.classList.toggle('text-white', esEsteBtn);
-        el.classList.toggle('bg-slate-800', !esEsteBtn && id.includes('mobile'));
+        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios')));
         el.classList.toggle('text-slate-400', !esEsteBtn);
     });
 
     if (modulo === 'anuncios') cargarAnuncios();
+    if (modulo === 'canjes') cargarCanjes();
 }
 
 async function cargarAnuncios() {
@@ -1196,6 +1262,156 @@ async function eliminarAnuncio(id) {
     await _supabase.from('anuncios_personalizados').delete().eq('id', id);
     mostrarToast('Anuncio eliminado', 'success');
     cargarAnuncios();
+}
+
+// ══════════════════════════════════════════════
+//         MÓDULO CANJES Y RETIROS
+// ══════════════════════════════════════════════
+let todosLosCanjes = [];
+let filtroCanjesActual = 'todos';
+
+async function cargarCanjes() {
+    try {
+        const { data, error } = await _supabase
+            .from('retiros_pendientes')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error cargando canjes:', error);
+            document.getElementById('lista-canjes').innerHTML = '<p class="text-center text-red-400 py-8">Error al cargar canjes</p>';
+            return;
+        }
+
+        todosLosCanjes = data || [];
+        renderListaCanjes();
+        actualizarStatsCanjes();
+    } catch(err) {
+        console.error('Error:', err);
+    }
+}
+
+function filtrarCanjesPor(filtro) {
+    filtroCanjesActual = filtro;
+    
+    // Actualizar botones
+    document.querySelectorAll('.canjes-filter-btn').forEach(btn => {
+        const esteBtn = btn.getAttribute('onclick').includes(`'${filtro}'`);
+        btn.classList.toggle('bg-purple-600', esteBtn);
+        btn.classList.toggle('text-white', esteBtn);
+        btn.classList.toggle('bg-slate-700', !esteBtn);
+        btn.classList.toggle('text-slate-300', !esteBtn);
+    });
+
+    renderListaCanjes();
+}
+
+function renderListaCanjes() {
+    const lista = document.getElementById('lista-canjes');
+    
+    let canjesFiltrados = todosLosCanjes;
+    if (filtroCanjesActual === 'pendientes') {
+        canjesFiltrados = todosLosCanjes.filter(c => c.status === 'Pendiente');
+    } else if (filtroCanjesActual === 'procesados') {
+        canjesFiltrados = todosLosCanjes.filter(c => c.status === 'Procesado');
+    } else if (filtroCanjesActual === 'rechazados') {
+        canjesFiltrados = todosLosCanjes.filter(c => c.status === 'Rechazado');
+    }
+
+    if (canjesFiltrados.length === 0) {
+        lista.innerHTML = '<p class="text-center text-slate-500 py-8">No hay canjes para mostrar</p>';
+        return;
+    }
+
+    lista.innerHTML = canjesFiltrados.map(canje => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-slate-600 transition">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <p class="text-sm font-bold text-white">${canje.tipo_canje}</p>
+                    <p class="text-xs text-slate-500 mt-0.5">${canje.email_usuario}</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block text-xs font-bold px-2.5 py-1 rounded-lg ${
+                        canje.status === 'Procesado' ? 'bg-emerald-500/20 text-emerald-400' :
+                        canje.status === 'Rechazado' ? 'bg-red-500/20 text-red-400' :
+                        'bg-amber-500/20 text-amber-400'
+                    }">
+                        ${canje.status}
+                    </span>
+                    <p class="text-xs text-slate-500 mt-2">${new Date(canje.created_at).toLocaleDateString('es-MX')}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+                <div>
+                    <p class="text-slate-500">NetCoins</p>
+                    <p class="font-bold text-amber-400">${canje.monto_nc.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p class="text-slate-500">Monto MXN</p>
+                    <p class="font-bold text-emerald-400">$${canje.monto_mxn.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p class="text-slate-500">Banco</p>
+                    <p class="font-bold text-white">${canje.banco}</p>
+                </div>
+                <div>
+                    <p class="text-slate-500">Beneficiario</p>
+                    <p class="font-bold text-white">${canje.beneficiario}</p>
+                </div>
+            </div>
+
+            <div class="mb-3 text-xs">
+                <p class="text-slate-500">Destino</p>
+                <p class="font-bold text-white break-all">${canje.destino}</p>
+            </div>
+
+            ${canje.status === 'Pendiente' ? `
+                <div class="flex gap-2">
+                    <button onclick="procesarCanje(${canje.id}, 'Procesado')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 rounded-lg transition">
+                        <i class="fa-solid fa-check mr-1"></i>Aprobar
+                    </button>
+                    <button onclick="procesarCanje(${canje.id}, 'Rechazado')" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs py-2 rounded-lg transition">
+                        <i class="fa-solid fa-xmark mr-1"></i>Rechazar
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function actualizarStatsCanjes() {
+    const pendientes = todosLosCanjes.filter(c => c.status === 'Pendiente').length;
+    const procesados = todosLosCanjes.filter(c => c.status === 'Procesado').length;
+    const rechazados = todosLosCanjes.filter(c => c.status === 'Rechazado').length;
+    const total = todosLosCanjes.length;
+
+    document.getElementById('stat-canjes-pendientes').textContent = pendientes;
+    document.getElementById('stat-canjes-procesados').textContent = procesados;
+    document.getElementById('stat-canjes-rechazados').textContent = rechazados;
+    document.getElementById('stat-canjes-total').textContent = total;
+}
+
+async function procesarCanje(canjeId, nuevoStatus) {
+    if (!confirm(`¿Estás seguro de que deseas marcar este canje como ${nuevoStatus}?`)) return;
+
+    try {
+        const { error } = await _supabase
+            .from('retiros_pendientes')
+            .update({ status: nuevoStatus, updated_at: new Date().toISOString() })
+            .eq('id', canjeId);
+
+        if (error) {
+            alert('Error al actualizar el canje: ' + error.message);
+            return;
+        }
+
+        mostrarToast(`Canje marcado como ${nuevoStatus}`, 'success');
+        cargarCanjes();
+    } catch(err) {
+        console.error('Error:', err);
+        alert('Error al procesar el canje');
+    }
 }
 </script>
 </body>
