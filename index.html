@@ -2295,17 +2295,81 @@
         let ipActualUsuario = null;  // Guardar IP del usuario actual
 
         // ══════════════════════════════════════════
-        // OBTENER IP DEL USUARIO
+        // OBTENER IP DEL USUARIO - CON FALLBACK
         // ══════════════════════════════════════════
         async function obtenerIPUsuario() {
             try {
-                const response = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(5000) });
-                const data = await response.json();
-                ipActualUsuario = data.ip;
-                return data.ip;
-            } catch (err) {
-                console.error('Error obteniendo IP:', err);
+                // Intento 1: ipify.org
+                try {
+                    const response = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(5000) });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.ip) {
+                            ipActualUsuario = data.ip;
+                            console.log('[NetGamer] IP obtenida (ipify):', ipActualUsuario);
+                            return data.ip;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[NetGamer] ipify.org falló, intentando fallback...');
+                }
+
+                // Fallback: ip-api.com
+                try {
+                    const response = await fetch('https://ip-api.com/json/', { signal: AbortSignal.timeout(5000) });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.query) {
+                            ipActualUsuario = data.query;
+                            console.log('[NetGamer] IP obtenida (ip-api):', ipActualUsuario);
+                            return data.query;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[NetGamer] ip-api.com también falló');
+                }
+
+                console.warn('[NetGamer] No se pudo obtener IP');
                 return null;
+            } catch (err) {
+                console.error('[NetGamer] Error crítico en obtenerIPUsuario:', err);
+                return null;
+            }
+        }
+
+        // ══════════════════════════════════════════
+        // GUARDAR IP EN SUPABASE
+        // ══════════════════════════════════════════
+        async function guardarIPEnSupabase(userID, ip) {
+            if (!ip || !userID) {
+                console.warn('[NetGamer] IP o userID vacío, no se guarda');
+                return false;
+            }
+
+            try {
+                console.log('[NetGamer] Intentando guardar IP en BD:', ip, 'para usuario:', userID);
+                
+                const { data, error } = await _supabase
+                    .from('perfiles')
+                    .update({ ip_usuario: ip })
+                    .eq('id', userID)
+                    .select();
+
+                if (error) {
+                    console.error('[NetGamer] Error al guardar IP:', error.message);
+                    return false;
+                }
+
+                if (data && data.length > 0) {
+                    console.log('[NetGamer] IP guardada exitosamente:', data[0].ip_usuario);
+                    return true;
+                } else {
+                    console.warn('[NetGamer] Update no retornó datos');
+                    return false;
+                }
+            } catch (err) {
+                console.error('[NetGamer] Error crítico al guardar IP:', err);
+                return false;
             }
         }
 
@@ -2854,12 +2918,16 @@
         }
 
         async function verificarSesionActiva() {
-            // Obtener IP apenas se carga la página
+            // Obtener IP apenas se carga la página (es CRÍTICO)
+            console.log('[NetGamer] Iniciando obtención de IP...');
             await obtenerIPUsuario();
+            console.log('[NetGamer] IP obtenida e importada. Variable global:', ipActualUsuario);
 
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                console.log('[NetGamer] Usuario activo:', currentUser.id);
+                
                 document.getElementById("support-bubble").classList.remove("hidden");
                 const refCode = sessionStorage.getItem('ref_code');
                 if (refCode && refCode !== currentUser.id) {
@@ -2913,13 +2981,17 @@
         async function cargarDatosPerfil(user) {
             // Obtener IP del usuario
             const ip = await obtenerIPUsuario();
+            
+            // Guardar IP en BD si se obtuvo
             if (ip) {
-                // Guardar IP en el perfil si no existe
-                await _supabase.from('perfiles').update({ ip_usuario: ip }).eq('id', user.id);
+                const savedOK = await guardarIPEnSupabase(user.id, ip);
+                console.log('[NetGamer] IP guardada en BD:', savedOK);
             }
 
-            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado').eq('id', user.id).single();
+            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado').eq('id', user.id).single();
             if (!error && data) {
+                console.log('[NetGamer] Datos del perfil cargados:', { ip_usuario: data.ip_usuario, bonus_reclamado: data.bonus_bienvenida_reclamado, ip_bonus_reclamado: data.ip_bonus_reclamado });
+                
                 actualizarTextosInterfaz(data.netcoins || 0);
                 const totalRef = data.total_referidos || 0;
                 document.getElementById("total-referidos-header").innerText = totalRef;
@@ -2931,9 +3003,13 @@
                     setTimeout(async () => {
                         // Verificar si la IP ya recibió el bono
                         const verificacion = await verificarBonoPorIP(user.id);
+                        console.log('[NetGamer] Verificación bono por IP:', verificacion);
+                        
                         if (verificacion.puedeRecibir) {
+                            console.log('[NetGamer] Mostrando modal bono normal');
                             mostrarModalBonus();
                         } else {
+                            console.log('[NetGamer] Mostrando modal rechazo por IP');
                             mostrarModalIPYaReciboBono();
                         }
                     }, 800);
@@ -2966,12 +3042,28 @@
                     : 'Error al procesar el bono. Intenta de nuevo.';
                 mostrarNotificacion(mensajeError, "error");
                 cerrarModalBonus();
+                btn.disabled = false;
+                btn.innerText = 'Reclamar Ahora';
                 return;
             }
 
             // Marcar que esta IP ya recibió el bono
+            console.log('[NetGamer] Marcando IP como ya recibió bono. IP:', ipActualUsuario);
+            
             if (ipActualUsuario) {
-                await _supabase.from('perfiles').update({ ip_bonus_reclamado: true }).eq('id', currentUser.id);
+                const { data: updateData, error: updateError } = await _supabase
+                    .from('perfiles')
+                    .update({ ip_bonus_reclamado: true })
+                    .eq('id', currentUser.id)
+                    .select();
+
+                if (updateError) {
+                    console.error('[NetGamer] Error al marcar IP_bonus_reclamado:', updateError);
+                } else {
+                    console.log('[NetGamer] IP marcada exitosamente como recibió bono:', updateData);
+                }
+            } else {
+                console.warn('[NetGamer] ipActualUsuario está vacío, no se marca el flag');
             }
 
             // Animación de éxito usando la cantidad que devolvió el servidor (1000)
