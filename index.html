@@ -2295,41 +2295,77 @@
         let ipActualUsuario = null;  // Guardar IP del usuario actual
 
         // ══════════════════════════════════════════
-        // OBTENER IP DEL USUARIO - CON FALLBACK
+        // OBTENER IP DEL USUARIO - APIs NO BLOQUEADAS
         // ══════════════════════════════════════════
         async function obtenerIPUsuario() {
             try {
-                // Intento 1: ipify.org
+                // Intento 1: Amazon AWS IP (rara vez bloqueada)
                 try {
-                    const response = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(5000) });
+                    const response = await fetch('https://checkip.amazonaws.com', { signal: AbortSignal.timeout(5000) });
+                    if (response.ok) {
+                        const text = await response.text();
+                        const ip = text.trim();
+                        if (ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
+                            ipActualUsuario = ip;
+                            console.log('[NetGamer] IP obtenida (AWS):', ipActualUsuario);
+                            return ip;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[NetGamer] AWS checkip falló, intentando siguiente...');
+                }
+
+                // Fallback 2: Cloudflare (muy confiable)
+                try {
+                    const response = await fetch('https://1.1.1.1/cdn-cgi/trace', { 
+                        signal: AbortSignal.timeout(5000),
+                        mode: 'no-cors'
+                    });
+                    if (response.ok) {
+                        const text = await response.text();
+                        const match = text.match(/ip=([\d.]+)/);
+                        if (match && match[1]) {
+                            ipActualUsuario = match[1];
+                            console.log('[NetGamer] IP obtenida (Cloudflare):', ipActualUsuario);
+                            return match[1];
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[NetGamer] Cloudflare falló, intentando siguiente...');
+                }
+
+                // Fallback 3: icanhazip (simple y confiable)
+                try {
+                    const response = await fetch('https://icanhazip.com/', { signal: AbortSignal.timeout(5000) });
+                    if (response.ok) {
+                        const ip = await response.text();
+                        const ipLimpio = ip.trim();
+                        if (ipLimpio && /^(\d{1,3}\.){3}\d{1,3}$/.test(ipLimpio)) {
+                            ipActualUsuario = ipLimpio;
+                            console.log('[NetGamer] IP obtenida (icanhazip):', ipActualUsuario);
+                            return ipLimpio;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[NetGamer] icanhazip falló, intentando siguiente...');
+                }
+
+                // Fallback 4: myip.com (alternativa)
+                try {
+                    const response = await fetch('https://api.myip.com', { signal: AbortSignal.timeout(5000) });
                     if (response.ok) {
                         const data = await response.json();
                         if (data.ip) {
                             ipActualUsuario = data.ip;
-                            console.log('[NetGamer] IP obtenida (ipify):', ipActualUsuario);
+                            console.log('[NetGamer] IP obtenida (myip.com):', ipActualUsuario);
                             return data.ip;
                         }
                     }
                 } catch (err) {
-                    console.warn('[NetGamer] ipify.org falló, intentando fallback...');
+                    console.warn('[NetGamer] myip.com falló');
                 }
 
-                // Fallback: ip-api.com
-                try {
-                    const response = await fetch('https://ip-api.com/json/', { signal: AbortSignal.timeout(5000) });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.query) {
-                            ipActualUsuario = data.query;
-                            console.log('[NetGamer] IP obtenida (ip-api):', ipActualUsuario);
-                            return data.query;
-                        }
-                    }
-                } catch (err) {
-                    console.warn('[NetGamer] ip-api.com también falló');
-                }
-
-                console.warn('[NetGamer] No se pudo obtener IP');
+                console.warn('[NetGamer] No se pudo obtener IP de ninguna API');
                 return null;
             } catch (err) {
                 console.error('[NetGamer] Error crítico en obtenerIPUsuario:', err);
@@ -2338,7 +2374,7 @@
         }
 
         // ══════════════════════════════════════════
-        // GUARDAR IP EN SUPABASE
+        // GUARDAR IP EN SUPABASE - EDGE FUNCTION SEGURA
         // ══════════════════════════════════════════
         async function guardarIPEnSupabase(userID, ip) {
             if (!ip || !userID) {
@@ -2347,24 +2383,31 @@
             }
 
             try {
-                console.log('[NetGamer] Intentando guardar IP en BD:', ip, 'para usuario:', userID);
+                console.log('[NetGamer] Llamando Edge Function para guardar IP:', ip);
                 
-                const { data, error } = await _supabase
-                    .from('perfiles')
-                    .update({ ip_usuario: ip })
-                    .eq('id', userID)
-                    .select();
+                // Llamar a Edge Function (se ejecuta en SERVIDOR, no en cliente)
+                const { data: { session } } = await _supabase.auth.getSession();
+                
+                const { data, error } = await _supabase.functions.invoke('procesar-ip', {
+                    body: { ip },
+                    headers: { Authorization: `Bearer ${session?.access_token}` }
+                });
 
                 if (error) {
-                    console.error('[NetGamer] Error al guardar IP:', error.message);
+                    console.error('[NetGamer] Error al guardar IP (Edge Function):', error.message);
                     return false;
                 }
 
-                if (data && data.length > 0) {
-                    console.log('[NetGamer] IP guardada exitosamente:', data[0].ip_usuario);
+                if (data?.error) {
+                    console.error('[NetGamer] Error servidor:', data.error);
+                    return false;
+                }
+
+                if (data?.ok) {
+                    console.log('[NetGamer] IP guardada exitosamente en servidor:', data.ip);
                     return true;
                 } else {
-                    console.warn('[NetGamer] Update no retornó datos');
+                    console.warn('[NetGamer] Respuesta inesperada de Edge Function');
                     return false;
                 }
             } catch (err) {
