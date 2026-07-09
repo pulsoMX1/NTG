@@ -2865,16 +2865,23 @@
             btn.innerText = '⏳ Acreditando...';
 
             try {
-                // Obtener la sesión actual
+                // Obtener la sesión actual CON EL TOKEN
                 const { data: { session } } = await _supabase.auth.getSession();
                 
-                // Llamar a la Edge Function con validación de IP
+                if (!session?.access_token) {
+                    mostrarNotificacion('Error de autenticación. Por favor recarga la página.', 'error');
+                    cerrarModalBonus();
+                    return;
+                }
+
+                // Llamar a la Edge Function CON EL TOKEN
                 const response = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/reclamar-bonus-ip', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session?.access_token || ''}`
-                    }
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({})
                 });
 
                 const data = await response.json();
@@ -2882,17 +2889,18 @@
                 // Manejo de errores
                 if (data?.error === 'ip_ya_reclamo_bono') {
                     cerrarModalBonus();
-                    document.getElementById('modal-bonus-ip-duplicada').classList.add('fixed');
                     document.getElementById('modal-bonus-ip-duplicada').style.display = 'flex';
                     return;
                 }
 
-                if (data?.error) {
-                    const mensajeError = data.error === 'ya_reclamado' 
+                if (!data?.success) {
+                    const mensajeError = data?.error === 'ya_reclamado' 
                         ? 'Ya reclamaste este bono anteriormente.' 
-                        : 'Error al procesar el bono. Intenta de nuevo.';
+                        : data?.error || 'Error al procesar el bono. Intenta de nuevo.';
                     mostrarNotificacion(mensajeError, "error");
                     cerrarModalBonus();
+                    btn.disabled = false;
+                    btn.innerText = '🎉 ¡Reclamar mis NetCoins!';
                     return;
                 }
 
@@ -2908,9 +2916,15 @@
                         ¡Empezar a ganar! 🚀
                     </button>
                 `;
+
+                // Actualizar UI
+                await cargarDatosPerfil(currentUser);
+
             } catch(err) {
                 mostrarNotificacion('Error: ' + err.message, 'error');
                 cerrarModalBonus();
+                btn.disabled = false;
+                btn.innerText = '🎉 ¡Reclamar mis NetCoins!';
             }
         }
 
