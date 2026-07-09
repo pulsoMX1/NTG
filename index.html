@@ -2477,12 +2477,30 @@
                     <strong class="text-amber-400">solo se otorga 1 bono de bienvenida por IP</strong>. 
                     No se te otorgó el bono de bienvenida.
                 </p>
-                <button onclick="cerrarModalBonus()" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-3 rounded-2xl transition active:scale-95">
+                <button onclick="cerrarModalIPYaReciboBono()" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-3 rounded-2xl transition active:scale-95">
                     OK
                 </button>
             `;
             document.getElementById('modal-bonus').classList.add('activo');
             document.body.style.overflow = 'hidden';
+        }
+
+        // Nueva función para cerrar modal y guardar el flag
+        async function cerrarModalIPYaReciboBono() {
+            // Guardar en BD que el usuario ya vio este modal
+            if (currentUser) {
+                try {
+                    await _supabase
+                        .from('perfiles')
+                        .update({ modal_ip_rechazado_visto: true })
+                        .eq('id', currentUser.id);
+                    console.log('[NetGamer] Flag modal_ip_rechazado_visto guardado en BD');
+                } catch (err) {
+                    console.error('[NetGamer] Error al guardar flag:', err);
+                }
+            }
+            // Cerrar modal
+            cerrarModalBonus();
         }
 
         // ══════════════════════════════════════════
@@ -3033,9 +3051,9 @@
                 console.log('[NetGamer] IP guardada en BD:', savedOK);
             }
 
-            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado').eq('id', user.id).single();
+            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado, modal_ip_rechazado_visto').eq('id', user.id).single();
             if (!error && data) {
-                console.log('[NetGamer] Datos del perfil cargados:', { ip_usuario: data.ip_usuario, bonus_reclamado: data.bonus_bienvenida_reclamado, ip_bonus_reclamado: data.ip_bonus_reclamado });
+                console.log('[NetGamer] Datos del perfil cargados:', { ip_usuario: data.ip_usuario, bonus_reclamado: data.bonus_bienvenida_reclamado, modal_visto: data.modal_ip_rechazado_visto });
                 
                 actualizarTextosInterfaz(data.netcoins || 0);
                 const totalRef = data.total_referidos || 0;
@@ -3045,27 +3063,24 @@
 
                 // Mostrar modal bonus si nunca lo ha reclamado
                 if (!data.bonus_bienvenida_reclamado) {
-                    // Verificar si ya mostramos el modal en esta sesión
-                    const modalYaMostrado = sessionStorage.getItem('modal_bono_ip_mostrado');
-                    
-                    if (!modalYaMostrado) {
-                        setTimeout(async () => {
-                            // Marcar que ya mostraremos el modal
-                            sessionStorage.setItem('modal_bono_ip_mostrado', 'true');
-                            
-                            // Verificar si la IP ya recibió el bono
-                            const verificacion = await verificarBonoPorIP(user.id);
-                            console.log('[NetGamer] Verificación bono por IP:', verificacion);
-                            
-                            if (verificacion.puedeRecibir) {
-                                console.log('[NetGamer] Mostrando modal bono normal');
-                                mostrarModalBonus();
-                            } else {
-                                console.log('[NetGamer] Mostrando modal rechazo por IP');
+                    setTimeout(async () => {
+                        // Verificar si la IP ya recibió el bono
+                        const verificacion = await verificarBonoPorIP(user.id);
+                        console.log('[NetGamer] Verificación bono por IP:', verificacion);
+                        
+                        if (verificacion.puedeRecibir) {
+                            console.log('[NetGamer] Mostrando modal bono normal');
+                            mostrarModalBonus();
+                        } else {
+                            // Solo mostrar modal de rechazo si el usuario NO lo ha visto antes (verificar BD)
+                            if (!data.modal_ip_rechazado_visto) {
+                                console.log('[NetGamer] Mostrando modal rechazo por IP (primera vez para esta cuenta)');
                                 mostrarModalIPYaReciboBono();
+                            } else {
+                                console.log('[NetGamer] Esta cuenta ya vio el modal de rechazo por IP, no mostrar de nuevo');
                             }
-                        }, 800);
-                    }
+                        }
+                    }, 800);
                 }
             }
         }
