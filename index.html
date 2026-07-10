@@ -3097,10 +3097,14 @@
             btn.disabled = true;
             btn.innerText = '⏳ Acreditando...';
 
-            // Llamada segura a la Edge Function con token explícito
+            // Llamada segura a la Edge Function con token explícito.
+            // La Edge Function ahora se encarga de marcar ip_bonus_reclamado
+            // e ip_usuario server-side (con service_role), por eso le mandamos
+            // la IP en el body en vez de actualizarla nosotros desde el cliente.
             const { data: { session } } = await _supabase.auth.getSession();
             const { data, error } = await _supabase.functions.invoke('reclamar-bonus', {
-                headers: { Authorization: `Bearer ${session?.access_token}` }
+                headers: { Authorization: `Bearer ${session?.access_token}` },
+                body: { ip: ipActualUsuario }
             });
 
             // Manejo de errores desde el servidor
@@ -3113,25 +3117,6 @@
                 btn.disabled = false;
                 btn.innerText = 'Reclamar Ahora';
                 return;
-            }
-
-            // Marcar que esta IP ya recibió el bono
-            console.log('[NetGamer] Marcando IP como ya recibió bono. IP:', ipActualUsuario);
-            
-            if (ipActualUsuario) {
-                const { data: updateData, error: updateError } = await _supabase
-                    .from('perfiles')
-                    .update({ ip_bonus_reclamado: true })
-                    .eq('id', currentUser.id)
-                    .select();
-
-                if (updateError) {
-                    console.error('[NetGamer] Error al marcar IP_bonus_reclamado:', updateError);
-                } else {
-                    console.log('[NetGamer] IP marcada exitosamente como recibió bono:', updateData);
-                }
-            } else {
-                console.warn('[NetGamer] ipActualUsuario está vacío, no se marca el flag');
             }
 
             // Animación de éxito usando la cantidad que devolvió el servidor (1000)
@@ -3849,29 +3834,9 @@
             requestAnimationFrame(animar);
         }
 
-        async function finalizarGiro(idx, perfil) {
-            ruletaGirando = false;
-            const premio = RULETA_PREMIOS[idx];
-            const hoy = new Date().toISOString().split('T')[0];
-
-            // Acreditar NC y guardar fecha
-            await _supabase.from('perfiles').update({
-                netcoins: (perfil.netcoins || 0) + premio.nc,
-                ultimo_giro_ruleta: hoy
-            }).eq('id', currentUser.id);
-
-            document.getElementById('ruleta-resultado').innerHTML =
-                `🎉 <span class="text-amber-400 font-extrabold">+${premio.nc} NetCoins</span> acreditados`;
-            
-            // También mostramos una notificación tipo Toast
-            mostrarNotificacion(`¡Ganaste ${premio.nc} NetCoins en la ruleta!`, "success");
-
-            const btn = document.getElementById('btn-girar');
-            btn.innerText = '✅ Ya giraste hoy';
-            btn.disabled = true;
-            btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
-            iniciarCuentaRegresiva();
-        }
+        // NOTA: finalizarGiro() fue eliminada — era código muerto de la versión
+        // anterior a la migración a la Edge Function 'girar-ruleta'. El flujo
+        // real de acreditación de NC ahora vive 100% en girarRuleta() + la Edge Function.
 
         function mostrarToastSesion(tipo, titulo, mensaje) {
             const toast = document.getElementById('toast-sesion');
