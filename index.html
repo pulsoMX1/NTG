@@ -3849,29 +3849,9 @@
             requestAnimationFrame(animar);
         }
 
-        async function finalizarGiro(idx, perfil) {
-            ruletaGirando = false;
-            const premio = RULETA_PREMIOS[idx];
-            const hoy = new Date().toISOString().split('T')[0];
-
-            // Acreditar NC y guardar fecha
-            await _supabase.from('perfiles').update({
-                netcoins: (perfil.netcoins || 0) + premio.nc,
-                ultimo_giro_ruleta: hoy
-            }).eq('id', currentUser.id);
-
-            document.getElementById('ruleta-resultado').innerHTML =
-                `🎉 <span class="text-amber-400 font-extrabold">+${premio.nc} NetCoins</span> acreditados`;
-            
-            // También mostramos una notificación tipo Toast
-            mostrarNotificacion(`¡Ganaste ${premio.nc} NetCoins en la ruleta!`, "success");
-
-            const btn = document.getElementById('btn-girar');
-            btn.innerText = '✅ Ya giraste hoy';
-            btn.disabled = true;
-            btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
-            iniciarCuentaRegresiva();
-        }
+        // NOTA: finalizarGiro() fue eliminada — era código muerto de la versión
+        // anterior a la migración a la Edge Function 'girar-ruleta'. El flujo
+        // real de acreditación de NC ahora vive 100% en girarRuleta() + la Edge Function.
 
         function mostrarToastSesion(tipo, titulo, mensaje) {
             const toast = document.getElementById('toast-sesion');
