@@ -2799,13 +2799,18 @@
                     
                 if (error) throw error;
                 
-                // Contar usuarios registrados - método simple
-                const { data: perfiles, error: errorPerfiles } = await _supabase
-                    .from('perfiles')
-                    .select('id');
-                
-                
-                const totalPerfiles = perfiles ? perfiles.length : 0;
+                // Contar usuarios registrados vía Edge Function (usa service_role,
+                // así funciona también para visitantes no logueados, que no tienen
+                // permiso RLS para leer la tabla perfiles directamente).
+                let totalPerfiles = 0;
+                try {
+                    const { data: dataUsuarios, error: errorUsuarios } = await _supabase.functions.invoke('contar-usuarios');
+                    if (!errorUsuarios && dataUsuarios?.usuarios_registrados !== undefined) {
+                        totalPerfiles = dataUsuarios.usuarios_registrados;
+                    }
+                } catch (errCont) {
+                    console.error('[NetGamer] Error al contar usuarios:', errCont);
+                }
                 
                 // Actualizar contadores
                 if (data) {
