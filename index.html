@@ -234,6 +234,275 @@
             #sidebar nav button i { margin: 0; }
         }
 
+        /* ════════════════════════════════════════════════════════════ */
+        /* MEJORAS RESPONSIVAS AVANZADAS - TODOS LOS DISPOSITIVOS */
+        /* ════════════════════════════════════════════════════════════ */
+
+        /* Extra Small Devices (< 360px) */
+        @media (max-width: 359px) {
+            html { font-size: 13px; }
+            body { font-size: 13px; }
+            #landing-container h2 { font-size: clamp(1.5rem, 8vw, 2.25rem); }
+            .space-y-8 { margin-top: 1rem; margin-bottom: 1rem; }
+            button { min-height: 40px; font-size: 13px; }
+        }
+
+        /* Small Mobile (360px - 480px) */
+        @media (min-width: 360px) and (max-width: 480px) {
+            #landing-container { 
+                padding: clamp(1rem, 4vw, 1.5rem);
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            /* Text scaling */
+            .text-3xl { font-size: clamp(1.5rem, 5vw, 2rem); }
+            .text-2xl { font-size: clamp(1.25rem, 4vw, 1.5rem); }
+            .text-xl { font-size: clamp(1rem, 3vw, 1.25rem); }
+            .text-lg { font-size: clamp(0.95rem, 2.5vw, 1.125rem); }
+            
+            /* Spacing */
+            .space-y-6 > * + * { margin-top: 1rem; }
+            .space-y-8 > * + * { margin-top: 1.25rem; }
+            
+            /* Buttons */
+            button { 
+                min-height: 44px;
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+            
+            /* Cards */
+            .rounded-2xl { border-radius: clamp(12px, 3vw, 16px); }
+            .p-6 { padding: clamp(1rem, 3vw, 1.5rem); }
+        }
+
+        /* Medium Mobile (481px - 640px) */
+        @media (min-width: 481px) and (max-width: 640px) {
+            #landing-container { 
+                padding: clamp(1.25rem, 5vw, 1.75rem);
+                margin: 0 auto;
+                max-width: 100%;
+            }
+            
+            /* Layout fluido */
+            .flex-col { flex-direction: column; }
+            .flex-row { flex-direction: row; }
+            
+            /* Grids responsivos */
+            .grid-cols-2 { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .grid-cols-3 { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; }
+            
+            /* Images y media */
+            img { max-width: 100%; height: auto; }
+            video { max-width: 100%; height: auto; }
+        }
+
+        /* Tablet Small (641px - 768px) */
+        @media (min-width: 641px) and (max-width: 768px) {
+            #app-container { flex-direction: column; }
+            #main-content { width: 100%; padding: 1rem; }
+            
+            .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+            
+            /* Sidebar oculto */
+            #sidebar { display: none !important; }
+            #bottom-nav { display: flex; }
+        }
+
+        /* Tablet Large (769px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #sidebar { 
+                width: 72px;
+                transition: width 0.3s ease;
+            }
+            
+            #main-content { 
+                width: calc(100% - 72px);
+                padding: clamp(1rem, 2vw, 1.5rem);
+            }
+            
+            .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Desktop Small (1025px - 1280px) */
+        @media (min-width: 1025px) and (max-width: 1280px) {
+            #sidebar { width: 256px; }
+            #main-content { 
+                width: calc(100% - 256px);
+                padding: 1.5rem;
+            }
+            
+            .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Desktop Large (1281px - 1920px) */
+        @media (min-width: 1281px) and (max-width: 1920px) {
+            #sidebar { width: 280px; }
+            #main-content { 
+                width: calc(100% - 280px);
+                padding: 2rem;
+            }
+            
+            .grid-cols-3 { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+            .grid-cols-4 { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+        }
+
+        /* Desktop Ultra (> 1920px) */
+        @media (min-width: 1921px) {
+            #main-content { 
+                max-width: 2560px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+            
+            .grid-cols-3 { grid-template-columns: repeat(4, 1fr); gap: 2.5rem; }
+            .grid-cols-4 { grid-template-columns: repeat(5, 1fr); gap: 2.5rem; }
+        }
+
+        /* ════════════════════════════════════════════════════════════ */
+        /* ORIENTACIÓN (Landscape vs Portrait) */
+        /* ════════════════════════════════════════════════════════════ */
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            #landing-container { 
+                min-height: auto; 
+                padding: 0.75rem 1rem;
+            }
+            #auth-container .bg-slate-800 { 
+                max-height: 90vh; 
+                padding: 1rem;
+            }
+            #bottom-nav { 
+                padding: 0.5rem 0; 
+                height: auto;
+            }
+            
+            h1, h2, h3 { margin: 0.25rem 0; }
+        }
+
+        @media (orientation: portrait) and (max-width: 640px) {
+            #app-container { flex-direction: column; }
+            #main-content { width: 100%; }
+        }
+
+        /* ════════════════════════════════════════════════════════════ */
+        /* ELEMENTOS ESPECÍFICOS RESPONSIVOS */
+        /* ════════════════════════════════════════════════════════════ */
+
+        /* Ruleta - Escalado proporcionalmente */
+        #ruleta {
+            width: clamp(180px, 60vw, 500px);
+            height: clamp(180px, 60vw, 500px);
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Modales responsivos */
+        #modal-bonus { 
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+        #modal-bonus-card {
+            width: clamp(280px, 90vw, 500px);
+            max-height: 90vh;
+            padding: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        /* Inputs responsivos (16px previene zoom en iOS) */
+        input, textarea, select {
+            font-size: 16px;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border-radius: clamp(8px, 2vw, 12px);
+            box-sizing: border-box;
+        }
+
+        /* Sliders responsivos */
+        .swiper {
+            width: 100%;
+            padding: clamp(1rem, 3vw, 2rem) 0;
+        }
+        .swiper-slide {
+            min-width: clamp(150px, 75vw, 320px);
+        }
+
+        /* Cards responsivas */
+        .stat-card, .canje-card {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            border-radius: clamp(12px, 3vw, 16px);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Tablas responsivas */
+        @media (max-width: 767px) {
+            table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            th, td {
+                padding: clamp(0.5rem, 2vw, 0.75rem);
+                font-size: clamp(12px, 3vw, 14px);
+            }
+        }
+
+        /* Navbar responsive */
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Images responsivas */
+        img, video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Lists responsivas */
+        ul, ol {
+            padding-left: clamp(1rem, 3vw, 2rem);
+            margin: clamp(0.5rem, 2vw, 1rem) 0;
+        }
+
+        /* ════════════════════════════════════════════════════════════ */
+        /* ACCESIBILIDAD Y USABILIDAD */
+        /* ════════════════════════════════════════════════════════════ */
+
+        /* Focus visible para navegación por teclado */
+        *:focus-visible {
+            outline: 2px solid #7c3aed;
+            outline-offset: 2px;
+        }
+
+        /* Touch targets mínimos (44x44px) */
+        button, a, .clickable {
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        /* Animaciones suaves en todos los dispositivos */
+        @media (prefers-reduced-motion: no-preference) {
+            * {
+                scroll-behavior: smooth;
+            }
+        }
+
+        /* Respetar preferencia de movimiento reducido */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
         /* Animación balance */
         .balance-bump { animation: bump 0.4s ease; }
         @keyframes bump {
