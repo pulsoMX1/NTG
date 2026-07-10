@@ -2946,10 +2946,12 @@
             try {
                 if (nuevoUserId === referidorId) { sessionStorage.removeItem('ref_code'); return; }
 
+                const ipParaReferido = ipActualUsuario || await obtenerIPUsuario();
+
                 const { data: { session } } = await _supabase.auth.getSession();
                 const { data, error } = await _supabase.functions.invoke('procesar-referido', {
                     headers: { Authorization: `Bearer ${session?.access_token}` },
-                    body: { referidorId }
+                    body: { referidorId, ip: ipParaReferido }
                 });
 
                 if (error || data?.error) {
