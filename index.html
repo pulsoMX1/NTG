@@ -1460,97 +1460,25 @@
                         <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Juegos disponibles</p>
                     </div>
 
-                    <!-- ══ JUEGO: PIEDRA PAPEL TIJERAS ══ -->
-                    <div class="rounded-2xl border border-slate-700 bg-slate-800/80 overflow-hidden">
-                        <div class="flex items-center gap-3 px-4 py-3.5 border-b border-slate-700/70 bg-slate-800">
-                            <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-xl shadow-lg shadow-purple-900/40">✊</div>
+                    <!-- ══ JUEGO: PIEDRA PAPEL TIJERAS (botón que abre modal de apuesta) ══ -->
+                    <button onclick="abrirModalSeleccionJuego('ppt')" class="w-full text-left rounded-2xl border border-slate-700 bg-slate-800/80 overflow-hidden hover:border-purple-500/50 transition active:scale-[.98] group">
+                        <div class="relative aspect-[21/9] sm:aspect-[3/1] bg-gradient-to-br from-violet-600 via-purple-700 to-slate-900 flex items-center justify-center overflow-hidden">
+                            <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full bg-purple-400/20 blur-3xl"></div>
+                            <div class="pointer-events-none absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-indigo-500/20 blur-3xl"></div>
+                            <span class="text-6xl sm:text-7xl drop-shadow-lg group-hover:scale-110 transition-transform duration-300">✊</span>
+                            <span class="absolute top-3 right-3 text-[10px] font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-full px-2 py-0.5 backdrop-blur-sm">EN VIVO</span>
+                        </div>
+                        <div class="flex items-center gap-3 px-4 py-3.5">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
                                     <h3 class="font-extrabold text-white text-sm leading-tight">Piedra Papel Tijeras</h3>
                                     <span class="text-[10px] bg-violet-500/20 border border-violet-500/30 text-violet-300 rounded-full px-2 py-0.5 font-bold">1v1</span>
                                 </div>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Emparejamiento en vivo · Mejor de 5 rondas · 15s por jugada</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Mejor de 5 rondas · Apuestas desde 100 NC</p>
                             </div>
-                            <span class="shrink-0 text-[10px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-full px-2 py-0.5">EN VIVO</span>
+                            <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-purple-400 group-hover:translate-x-0.5 transition"></i>
                         </div>
-
-                        <div class="px-4 pt-3 pb-2">
-                            <div class="grid grid-cols-3 gap-2 text-center mb-1">
-                                <div class="bg-slate-900/60 rounded-lg py-2 px-1">
-                                    <p class="text-base">✊</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Piedra<br><span class="text-purple-400 font-bold">vence</span> Tijeras</p>
-                                </div>
-                                <div class="bg-slate-900/60 rounded-lg py-2 px-1">
-                                    <p class="text-base">✋</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Papel<br><span class="text-purple-400 font-bold">vence</span> Piedra</p>
-                                </div>
-                                <div class="bg-slate-900/60 rounded-lg py-2 px-1">
-                                    <p class="text-base">✌️</p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Tijeras<br><span class="text-purple-400 font-bold">vence</span> Papel</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="px-4 pb-2 space-y-2">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">⚡ Selecciona tu apuesta para jugar</p>
-
-                            <button onclick="buscarPartida('ppt', 100)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-emerald-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-base">🌱</div>
-                                    <div class="text-left">
-                                        <p class="text-sm font-extrabold text-white">100 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
-                                        
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs font-black text-emerald-400">+100 NC</p>
-                                    <p class="text-[10px] text-slate-500">si ganas</p>
-                                </div>
-                            </button>
-
-                            <button onclick="buscarPartida('ppt', 200)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-blue-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-base">⚡</div>
-                                    <div class="text-left">
-                                        <p class="text-sm font-extrabold text-white">200 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
-                                        
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs font-black text-blue-400">+200 NC</p>
-                                    <p class="text-[10px] text-slate-500">si ganas</p>
-                                </div>
-                            </button>
-
-                            <button onclick="buscarPartida('ppt', 300)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-700/50 hover:bg-slate-700 border border-slate-600/60 hover:border-amber-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">🔥</div>
-                                    <div class="text-left">
-                                        <p class="text-sm font-extrabold text-white">300 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
-                                        
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-xs font-black text-amber-400">+300 NC</p>
-                                    <p class="text-[10px] text-slate-500">si ganas</p>
-                                </div>
-                            </button>
-                        </div>
-
-                        <div class="px-4 py-3">
-                            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
-                                <div class="bg-emerald-500/8 border border-emerald-500/15 rounded-lg py-1.5 px-1 text-emerald-400 font-semibold">
-                                    <i class="fa-solid fa-rotate-left mr-1"></i>Empate devuelve NC
-                                </div>
-                                <div class="bg-rose-500/8 border border-rose-500/15 rounded-lg py-1.5 px-1 text-rose-400 font-semibold">
-                                    <i class="fa-solid fa-heart-crack mr-1"></i>Derrota −1 vida
-                                </div>
-                                <div class="bg-purple-500/8 border border-purple-500/15 rounded-lg py-1.5 px-1 text-purple-400 font-semibold">
-                                    <i class="fa-solid fa-clock mr-1"></i>15s por jugada
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </button>
 
                     <!-- ══ PRÓXIMAMENTE ══ -->
                     <div class="rounded-2xl border border-dashed border-slate-700 bg-slate-800/20 p-5">
@@ -1564,6 +1492,103 @@
 
                     </div>
 
+                </div>
+
+                <!-- ══ MODAL SELECCIÓN DE APUESTA POR JUEGO ══ -->
+                <div id="modal-juego" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[5900] p-0 sm:p-4">
+                    <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-sm max-h-[92vh] overflow-y-auto shadow-2xl">
+
+                        <!-- Header -->
+                        <div class="relative px-4 pt-4 pb-3 border-b border-slate-700/70">
+                            <button onclick="cerrarModalSeleccionJuego()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition">
+                                <i class="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                            <div class="flex items-center gap-3 pr-8">
+                                <div id="modal-juego-icono" class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-xl shadow-lg shadow-purple-900/40">✊</div>
+                                <div class="min-w-0">
+                                    <h3 id="modal-juego-titulo" class="font-extrabold text-white text-base leading-tight">Piedra Papel Tijeras</h3>
+                                    <p id="modal-juego-subtitulo" class="text-[11px] text-slate-400 mt-0.5">Emparejamiento en vivo · Mejor de 5 rondas · 15s por jugada</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reglas rápidas (solo aplica a Piedra Papel Tijeras) -->
+                        <div id="modal-juego-reglas-ppt" class="px-4 pt-3">
+                            <div class="grid grid-cols-3 gap-2 text-center mb-1">
+                                <div class="bg-slate-800/60 rounded-lg py-2 px-1">
+                                    <p class="text-base">✊</p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Piedra<br><span class="text-purple-400 font-bold">vence</span> Tijeras</p>
+                                </div>
+                                <div class="bg-slate-800/60 rounded-lg py-2 px-1">
+                                    <p class="text-base">✋</p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Papel<br><span class="text-purple-400 font-bold">vence</span> Piedra</p>
+                                </div>
+                                <div class="bg-slate-800/60 rounded-lg py-2 px-1">
+                                    <p class="text-base">✌️</p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5 leading-tight">Tijeras<br><span class="text-purple-400 font-bold">vence</span> Papel</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selección de apuesta -->
+                        <div class="px-4 pt-3 pb-2 space-y-2">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">⚡ Selecciona tu apuesta para jugar</p>
+
+                            <button onclick="buscarPartida('ppt', 100)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-emerald-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-base">🌱</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">100 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-black text-emerald-400">+100 NC</p>
+                                    <p class="text-[10px] text-slate-500">si ganas</p>
+                                </div>
+                            </button>
+
+                            <button onclick="buscarPartida('ppt', 200)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-blue-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-base">⚡</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">200 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-black text-blue-400">+200 NC</p>
+                                    <p class="text-[10px] text-slate-500">si ganas</p>
+                                </div>
+                            </button>
+
+                            <button onclick="buscarPartida('ppt', 300)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-amber-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">🔥</div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-extrabold text-white">300 NC <span class="text-[10px] font-semibold text-slate-500">apuesta</span></p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-black text-amber-400">+300 NC</p>
+                                    <p class="text-[10px] text-slate-500">si ganas</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Resumen de reglas de resultado -->
+                        <div class="px-4 pb-4">
+                            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                                <div class="bg-emerald-500/8 border border-emerald-500/15 rounded-lg py-1.5 px-1 text-emerald-400 font-semibold">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i>Empate devuelve NC
+                                </div>
+                                <div class="bg-rose-500/8 border border-rose-500/15 rounded-lg py-1.5 px-1 text-rose-400 font-semibold">
+                                    <i class="fa-solid fa-heart-crack mr-1"></i>Derrota −1 vida
+                                </div>
+                                <div class="bg-purple-500/8 border border-purple-500/15 rounded-lg py-1.5 px-1 text-purple-400 font-semibold">
+                                    <i class="fa-solid fa-clock mr-1"></i>15s por jugada
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ══ MODAL BUSCANDO PARTIDA ══ -->
@@ -4389,11 +4414,40 @@
             if (btnRecargar) { if (vidas <= 0) { btnRecargar.classList.remove('hidden'); btnRecargar.style.display='flex'; } else { btnRecargar.classList.add('hidden'); btnRecargar.style.display=''; } }
         }
 
+        // Catálogo de juegos disponibles: agrega aquí cada juego nuevo que se sume
+        // a la arena, y abrirModalSeleccionJuego() rellenará el modal automáticamente.
+        const CATALOGO_JUEGOS = {
+            ppt: {
+                titulo: 'Piedra Papel Tijeras',
+                subtitulo: 'Emparejamiento en vivo · Mejor de 5 rondas · 15s por jugada',
+                icono: '✊',
+                mostrarReglasPPT: true
+            }
+        };
+
+        function abrirModalSeleccionJuego(juego) {
+            const info = CATALOGO_JUEGOS[juego];
+            if (!info) return;
+            Sonidos.click();
+            document.getElementById('modal-juego-icono').textContent = info.icono;
+            document.getElementById('modal-juego-titulo').textContent = info.titulo;
+            document.getElementById('modal-juego-subtitulo').textContent = info.subtitulo;
+            document.getElementById('modal-juego-reglas-ppt').classList.toggle('hidden', !info.mostrarReglasPPT);
+            document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
+            document.getElementById('modal-juego').classList.remove('hidden');
+        }
+
+        function cerrarModalSeleccionJuego() {
+            document.getElementById('modal-juego').classList.add('hidden');
+        }
+
+
         let _buscandoPartida = false;
         async function buscarPartida(juego, apuesta) {
             if (!currentUser) { mostrarNotificacion('Inicia sesión primero', 'error'); return; }
             if (_buscandoPartida) return;
             Sonidos.click();
+            cerrarModalSeleccionJuego();
             _buscandoPartida = true;
             document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = true);
             _apuestaActual = apuesta;
