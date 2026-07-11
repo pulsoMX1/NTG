@@ -379,7 +379,11 @@
 <script>
 const SUPABASE_URL = "https://meiwuluwrdjszxeyoqtt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4";
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        storageKey: 'sb-admin-auth-token'
+    }
+});
 
 let adminUser = null;
 let todosLosTickets = [];
