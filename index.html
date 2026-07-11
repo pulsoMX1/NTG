@@ -4780,13 +4780,6 @@
         let _timerPoll     = null;
         let _resultadoProcesado = false;  // evita doble procesamiento (respuesta HTTP + Realtime)
 
-        // ══════════════════════════════════════════
-        // SISTEMA DE DETECCIÓN DE ABANDONO DE PARTIDA
-        // ══════════════════════════════════════════
-        let _watchdogPartida    = null;   // intervalo que vigila si el rival sigue conectado
-        let _cachedAccessToken  = null;   // token cacheado para poder avisar al servidor incluso al cerrar la pestaña
-        const SEGUNDOS_TIMEOUT_ABANDONO = 12; // si el rival no manda señal de vida en este tiempo, se considera abandono
-
         // Genera un color de fondo de avatar basado en el string ID
         function _avatarColor(id) {
             const paleta = ['#7c3aed','#2563eb','#0891b2','#059669','#d97706','#dc2626','#db2777'];
@@ -4868,7 +4861,6 @@
             _puntosRival   = 0;
 
             const { data: { session } } = await _supabase.auth.getSession();
-            _cachedAccessToken = session?.access_token || _cachedAccessToken;
             const { data, error } = await _supabase.functions.invoke('buscar-partida', {
                 body: { juego, apuesta },
                 headers: { Authorization: `Bearer ${session?.access_token}` }
@@ -5186,91 +5178,7 @@
                     }
                 })
                 .subscribe();
-
-            // Iniciar el watchdog de abandono en cuanto se empareja la partida
-            iniciarWatchdogPartida(partida_id);
         }
-
-        // ══════════════════════════════════════════
-        // WATCHDOG: detecta si el rival se desconectó/cerró la web
-        // y en ese caso otorga la victoria automáticamente al jugador que sigue conectado.
-        // ══════════════════════════════════════════
-        function iniciarWatchdogPartida(partida_id) {
-            if (_watchdogPartida) clearInterval(_watchdogPartida);
-
-            _watchdogPartida = setInterval(async () => {
-                if (_resultadoProcesado || !_partidaActual) {
-                    clearInterval(_watchdogPartida);
-                    return;
-                }
-                try {
-                    const { data: { session } } = await _supabase.auth.getSession();
-                    _cachedAccessToken = session?.access_token || _cachedAccessToken;
-
-                    // 1. Mandar mi propia señal de "sigo conectado"
-                    _supabase.functions.invoke('ping-partida', {
-                        body: { partida_id },
-                        headers: { Authorization: `Bearer ${_cachedAccessToken}` }
-                    }).catch(() => {});
-
-                    // 2. Revisar si el rival dejó de mandar señales de vida
-                    const { data } = await _supabase
-                        .from('partidas')
-                        .select('estatus, ultimo_ping_j1, ultimo_ping_j2')
-                        .eq('id', partida_id)
-                        .single();
-
-                    if (!data || data.estatus === 'terminada') return;
-
-                    const pingRival = _jugadorNum === 1 ? data.ultimo_ping_j2 : data.ultimo_ping_j1;
-                    if (!pingRival) return; // el rival aún no ha mandado su primer ping, esperar
-
-                    const segundosSinPing = (Date.now() - new Date(pingRival).getTime()) / 1000;
-
-                    if (segundosSinPing > SEGUNDOS_TIMEOUT_ABANDONO) {
-                        clearInterval(_watchdogPartida);
-                        await _reclamarVictoriaPorAbandono(partida_id, _cachedAccessToken);
-                    }
-                } catch (e) {}
-            }, 4000);
-        }
-
-        async function _reclamarVictoriaPorAbandono(partida_id, token) {
-            if (_resultadoProcesado) return;
-            try {
-                const { data, error } = await _supabase.functions.invoke('reclamar-abandono', {
-                    body: { partida_id },
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!error && data?.ok && data.partida) {
-                    mostrarNotificacion('🏆 Tu rival abandonó la partida. ¡Ganaste automáticamente!', 'success');
-                    procesarResultadoRonda(data.partida, null);
-                }
-            } catch (e) {}
-        }
-
-        function detenerWatchdogPartida() {
-            if (_watchdogPartida) { clearInterval(_watchdogPartida); _watchdogPartida = null; }
-        }
-
-        // Avisar al servidor de inmediato si el usuario cierra la pestaña, recarga
-        // o navega fuera de la web mientras tiene una partida activa en curso.
-        function _notificarAbandonoPartida() {
-            if (!_partidaActual || _resultadoProcesado || !_cachedAccessToken) return;
-            try {
-                fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/abandonar-partida', {
-                    method: 'POST',
-                    keepalive: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${_cachedAccessToken}`
-                    },
-                    body: JSON.stringify({ partida_id: _partidaActual })
-                });
-            } catch (e) {}
-        }
-        window.addEventListener('pagehide', _notificarAbandonoPartida);
-        window.addEventListener('beforeunload', _notificarAbandonoPartida);
 
         async function procesarResultadoRonda(data, miJugada) {
             if (_resultadoProcesado) return;
@@ -5460,7 +5368,6 @@
             clearInterval(_timerRival);
             clearInterval(_timerRonda);
             clearInterval(_timerPoll);
-            detenerWatchdogPartida();
             _partidaActual = null;
             _jugadorNum    = null;
             _jugadaHecha   = false;
