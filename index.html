@@ -2966,6 +2966,28 @@
             btn.disabled = true;
             btn.innerText = "Enviando...";
 
+            // 1. Verificar en el servidor si el correo existe realmente en la base de datos
+            //    (resetPasswordForEmail de Supabase NUNCA revela si un correo existe o no,
+            //    por eso necesitamos preguntarle primero a nuestra Edge Function).
+            try {
+                const { data: verifData, error: verifError } = await _supabase.functions.invoke('verificar-email-existe', {
+                    body: { email }
+                });
+
+                if (verifError || !verifData?.existe) {
+                    mostrarNotificacion("No existe ninguna cuenta registrada con ese correo electrónico.", "error");
+                    btn.disabled = false;
+                    btn.innerText = "Continuar";
+                    return;
+                }
+            } catch (err) {
+                mostrarNotificacion("Error al verificar el correo. Intenta de nuevo.", "error");
+                btn.disabled = false;
+                btn.innerText = "Continuar";
+                return;
+            }
+
+            // 2. Si el correo sí existe, entonces sí enviamos el código de recuperación
             const { error } = await _supabase.auth.resetPasswordForEmail(email);
 
             btn.disabled = false;
@@ -3249,6 +3271,14 @@
                 if (error) { 
                     mostrarNotificacion(`Error: ${error.message}`, "error"); 
                     return; 
+                }
+
+                // Supabase no lanza error cuando el correo ya existe (por seguridad,
+                // para no revelar qué correos están registrados). En su lugar,
+                // devuelve un usuario con "identities" vacío. Detectamos ese caso aquí.
+                if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                    mostrarNotificacion("Este correo ya está registrado. Intenta iniciar sesión.", "error");
+                    return;
                 }
                 
                 if (refCodeGuardado) sessionStorage.setItem('ref_pending_user', data.user?.id || '');
