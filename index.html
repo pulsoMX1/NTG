@@ -808,12 +808,11 @@
                         <i class="fa-solid fa-user-plus text-purple-400 shrink-0"></i>
                         <span>¡Invitado! Ambos reciben <strong>500 NC</strong></span>
                     </div>
-                    <div class="flex items-start gap-2 pt-1">
-                        <input type="checkbox" id="acepta-terminos" required
-                            class="mt-0.5 w-4 h-4 rounded border-slate-600 bg-slate-900 text-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer shrink-0">
-                        <label for="acepta-terminos" class="text-xs text-slate-400 leading-snug cursor-pointer">
-                            Acepto los <button type="button" onclick="abrirModalTerminos()" class="text-purple-400 hover:underline font-semibold">Términos y Condiciones</button>
-                            y la <button type="button" onclick="abrirModalPrivacidad()" class="text-purple-400 hover:underline font-semibold">Política de Privacidad</button> de NetGamer.
+                    <div class="flex items-start gap-2 px-0.5">
+                        <input type="checkbox" id="register-aceptar-terminos" required
+                            class="mt-0.5 w-4 h-4 shrink-0 rounded border-slate-600 bg-slate-900 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-800 cursor-pointer">
+                        <label for="register-aceptar-terminos" class="text-xs text-slate-400 leading-snug cursor-pointer select-none">
+                            He leído y acepto los <button type="button" onclick="abrirTerminos()" class="text-purple-400 hover:underline font-semibold">Términos y Condiciones</button> y la <button type="button" onclick="abrirPrivacidad()" class="text-purple-400 hover:underline font-semibold">Política de Privacidad</button> de NetGamer MX.
                         </label>
                     </div>
                     <button type="submit" id="btn-registrarse"
@@ -1686,171 +1685,6 @@
                                 <div class="bg-purple-500/8 border border-purple-500/15 rounded-lg py-1.5 px-1 text-purple-400 font-semibold">
                                     <i class="fa-solid fa-clock mr-1"></i>15s por jugada
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ══ MODAL TÉRMINOS Y CONDICIONES ══ -->
-                <div id="modal-terminos" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[6100] p-0 sm:p-4">
-                    <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-                        <div class="relative px-5 pt-4 pb-3 border-b border-slate-700/70 shrink-0">
-                            <button onclick="cerrarModalTerminos()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition">
-                                <i class="fa-solid fa-xmark text-sm"></i>
-                            </button>
-                            <h3 class="font-extrabold text-white text-base pr-8">📜 Términos y Condiciones de Uso</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Última actualización: Julio 2026 · NetGamer</p>
-                        </div>
-                        <div class="overflow-y-auto px-5 py-4 text-sm text-slate-300 leading-relaxed space-y-4">
-                            <p>Bienvenido a <strong class="text-amber-400">NetGamer</strong>. Al crear una cuenta o utilizar cualquier parte de esta plataforma, aceptas en su totalidad los términos y condiciones descritos en este documento. Si no estás de acuerdo con alguno de ellos, no debes registrarte ni utilizar el servicio.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">1. Descripción del Servicio</h4>
-                            <p>NetGamer es una plataforma de entretenimiento en línea donde los usuarios registrados pueden:</p>
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>Participar en juegos en línea contra otros usuarios (actualmente, Piedra Papel Tijeras) apostando <strong class="text-amber-400">NetCoins (NC)</strong>, la moneda virtual interna de la plataforma.</li>
-                                <li>Girar una ruleta de premios diaria gratuita para ganar NetCoins.</li>
-                                <li>Ganar NetCoins leyendo noticias en nuestro portal informativo asociado, PulsoMX.</li>
-                                <li>Invitar a otras personas mediante un sistema de referidos y ganar NetCoins por cada referido válido.</li>
-                                <li>Canjear sus NetCoins acumulados por dinero real mediante transferencia bancaria (SPEI) u otros métodos de pago disponibles.</li>
-                                <li>Adquirir una membresía Premium con beneficios adicionales dentro de la plataforma.</li>
-                            </ul>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">2. Elegibilidad y Registro</h4>
-                            <p><strong class="text-white">2.1 Edad mínima.</strong> Debes tener al menos <strong class="text-amber-400">18 años cumplidos</strong> para crear una cuenta en NetGamer, dado que la plataforma involucra la posibilidad de obtener recompensas económicas reales. Nos reservamos el derecho de solicitar verificación de edad y de suspender cualquier cuenta que se determine pertenece a un menor de edad.</p>
-                            <p><strong class="text-white">2.2 Proceso de registro.</strong> Para crear una cuenta debes proporcionar un nombre de usuario, un correo electrónico válido y una contraseña. Tu correo debe verificarse mediante un código de un solo uso (OTP) de 6 dígitos enviado a tu bandeja de entrada antes de poder utilizar la plataforma.</p>
-                            <p><strong class="text-white">2.3 Una cuenta por persona.</strong> Cada persona puede crear <strong class="text-amber-400">únicamente una cuenta</strong>. La creación de cuentas múltiples con el fin de reclamar bonos, referidos o promociones repetidamente está estrictamente prohibida y constituye una violación grave de estos términos (ver sección 7).</p>
-                            <p><strong class="text-white">2.4 Veracidad de la información.</strong> Te comprometes a proporcionar información verdadera y actualizada al registrarte y, en su caso, al solicitar un retiro (nombre del beneficiario, datos bancarios). NetGamer no se hace responsable por retiros enviados a cuentas bancarias incorrectas proporcionadas por el propio usuario.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">3. NetCoins (NC) — Moneda Virtual</h4>
-                            <p>Los NetCoins son una moneda virtual interna sin valor monetario intrínseco fuera de la plataforma, hasta el momento en que se solicita su canje conforme a la sección 6. NetGamer se reserva el derecho de ajustar en cualquier momento las tasas de conversión, los montos de recompensa y las condiciones de obtención de NetCoins, notificando dichos cambios a través de la plataforma.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">4. Bono de Bienvenida y Sistema de Referidos</h4>
-                            <p><strong class="text-white">4.1 Bono de bienvenida.</strong> Los nuevos usuarios pueden reclamar, <strong class="text-amber-400">una sola vez por cuenta</strong>, un bono de bienvenida de NetCoins tras verificar su correo electrónico.</p>
-                            <p><strong class="text-white">4.2 Sistema de referidos.</strong> Al invitar a otra persona mediante tu enlace de referido, tanto tú como la persona invitada reciben una recompensa en NetCoins una vez que la cuenta nueva completa su registro y verificación.</p>
-                            <p><strong class="text-white">4.3 Medidas antifraude por dirección IP.</strong> Con el fin de prevenir el abuso del bono de bienvenida y del sistema de referidos (por ejemplo, mediante la creación de múltiples cuentas desde el mismo dispositivo o red para reclamar recompensas repetidamente), NetGamer registra y verifica la <strong class="text-amber-400">dirección IP</strong> asociada a cada cuenta. Si se detecta que una misma dirección IP ya recibió el bono de bienvenida o ya fue utilizada para un referido previamente válido, las cuentas adicionales desde esa misma IP no podrán reclamar dichas recompensas nuevamente. Esta verificación es una medida de seguridad, no una garantía absoluta, y NetGamer se reserva el derecho de invalidar recompensas obtenidas de forma fraudulenta detectadas por cualquier otro medio.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">5. Juegos, Apuestas y Ruleta</h4>
-                            <p><strong class="text-white">5.1 Piedra Papel Tijeras.</strong> Es un juego de emparejamiento en vivo contra otro usuario, jugado a mejor de varias rondas, con un límite de tiempo por jugada. Antes de cada partida, el usuario elige un monto de apuesta en NetCoins entre las opciones disponibles. El ganador recibe una recompensa en NetCoins conforme al monto apostado; en caso de empate, la apuesta se devuelve; en caso de derrota, el usuario pierde una "vida" además de la apuesta correspondiente.</p>
-                            <p><strong class="text-white">5.2 Sistema de vidas.</strong> Los usuarios cuentan con un número limitado de vidas diarias para participar en partidas, salvo que cuenten con vidas ilimitadas otorgadas por una membresía Premium u otra promoción vigente. Las vidas se restablecen de forma periódica conforme a las reglas vigentes de la plataforma.</p>
-                            <p><strong class="text-white">5.3 Ruleta diaria.</strong> Los usuarios pueden girar una ruleta de premios <strong class="text-amber-400">una vez cada 24 horas</strong> de forma gratuita, obteniendo una cantidad variable de NetCoins determinada al azar entre los premios disponibles.</p>
-                            <p><strong class="text-white">5.4 Naturaleza de las apuestas.</strong> Las apuestas dentro de los juegos de NetGamer se realizan utilizando NetCoins previamente obtenidos o adquiridos por el usuario, y su resultado depende de la habilidad del jugador frente a otro usuario real, no de un generador de resultados predeterminado en favor de la plataforma.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">6. Canje de NetCoins por Dinero Real</h4>
-                            <p><strong class="text-white">6.1 Solicitud de retiro.</strong> Los usuarios pueden solicitar el canje de sus NetCoins acumulados por dinero real (pesos mexicanos), indicando el monto deseado y el método de retiro disponible (por ejemplo, transferencia SPEI), proporcionando los datos bancarios correspondientes.</p>
-                            <p><strong class="text-white">6.2 Tasa de conversión.</strong> La tasa de conversión vigente entre NetCoins y moneda real se muestra al momento de realizar la solicitud de retiro dentro de la plataforma, y puede ser modificada por NetGamer en cualquier momento hacia el futuro, sin afectar retiros ya solicitados y en proceso.</p>
-                            <p><strong class="text-white">6.3 Revisión y aprobación manual.</strong> Toda solicitud de retiro queda en estado <strong class="text-amber-400">"Pendiente"</strong> y es revisada manualmente por el equipo de soporte de NetGamer antes de ser aprobada o rechazada. Al enviar la solicitud, el monto en NetCoins correspondiente se descuenta inmediatamente de tu saldo. Si la solicitud es <strong class="text-amber-400">rechazada</strong> (por ejemplo, por datos bancarios incorrectos o sospecha de actividad fraudulenta), los NetCoins descontados se reintegran automáticamente a tu cuenta.</p>
-                            <p><strong class="text-white">6.4 Tiempos de procesamiento.</strong> NetGamer procesará las solicitudes de retiro aprobadas dentro de un plazo razonable, el cual puede variar según el volumen de solicitudes y los procesos de verificación antifraude aplicables.</p>
-                            <p><strong class="text-white">6.5 Facultad de rechazo.</strong> NetGamer se reserva el derecho de rechazar cualquier solicitud de retiro si existe sospecha razonable de fraude, uso de múltiples cuentas, explotación de errores de la plataforma, o incumplimiento de estos términos.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">7. Conductas Prohibidas</h4>
-                            <p>Queda estrictamente prohibido:</p>
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>Crear o utilizar más de una cuenta por persona.</li>
-                                <li>Utilizar herramientas automatizadas, scripts, bots o cualquier método técnico para interactuar con la plataforma de forma no prevista por la interfaz normal de usuario, incluyendo intentos de manipular directamente las peticiones a nuestros servidores para alterar saldos, estadísticas o resultados de juegos.</li>
-                                <li>Intentar explotar errores, vulnerabilidades o fallos de la plataforma para obtener NetCoins, beneficios Premium o cualquier otra ventaja no prevista.</li>
-                                <li>Coludirse con otro(s) usuario(s) para manipular el resultado de las partidas con fines de obtener NetCoins de forma artificial.</li>
-                                <li>Proporcionar información falsa durante el registro o al solicitar un retiro.</li>
-                                <li>Acosar, amenazar o comportarse de forma abusiva hacia otros usuarios o hacia el equipo de soporte.</li>
-                            </ul>
-                            <p>NetGamer se reserva el derecho de <strong class="text-amber-400">suspender o cancelar permanentemente</strong> cualquier cuenta que incurra en las conductas anteriores, así como de retener o cancelar NetCoins, recompensas o solicitudes de retiro obtenidos mediante dichas conductas, sin necesidad de compensación alguna al usuario.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">8. Membresía Premium</h4>
-                            <p>NetGamer ofrece una membresía Premium opcional de pago que otorga beneficios adicionales dentro de la plataforma, los cuales pueden incluir, entre otros, la eliminación de publicidad, vidas ilimitadas para los juegos, y otros beneficios que se detallan en la sección correspondiente de la plataforma al momento de la contratación. Los beneficios y su vigencia pueden modificarse hacia el futuro, respetando siempre las condiciones vigentes al momento en que el usuario contrató su membresía activa.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">9. Publicidad y Portal de Noticias Asociado</h4>
-                            <p>NetGamer puede mostrar publicidad de terceros dentro de la plataforma como parte de su modelo de sostenibilidad económica. Los usuarios con membresía Premium activa no verán dicha publicidad. Asimismo, NetGamer está asociado directamente con el portal de noticias <strong class="text-amber-400">PulsoMX</strong>, donde los usuarios pueden ganar NetCoins adicionales por leer noticias; dicha recompensa se acredita de forma automática y directa a la cuenta de NetGamer del usuario que accedió desde la plataforma.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">10. Propiedad y Suspensión de Cuentas</h4>
-                            <p>NetGamer se reserva el derecho de suspender, limitar o cancelar el acceso de cualquier usuario a la plataforma, de forma temporal o permanente, en caso de incumplimiento de estos términos, por motivos de seguridad, o por requerimiento de alguna autoridad competente.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">11. Modificaciones a estos Términos</h4>
-                            <p>NetGamer podrá actualizar estos Términos y Condiciones en cualquier momento. Los cambios serán efectivos a partir de su publicación dentro de la plataforma. El uso continuado de la plataforma después de dichos cambios constituye tu aceptación de los términos actualizados.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">12. Contacto y Soporte</h4>
-                            <p>Para cualquier duda, aclaración o reporte relacionado con tu cuenta, retiros, o el funcionamiento de la plataforma, puedes comunicarte con nosotros a través del <strong class="text-amber-400">sistema de tickets de soporte disponible dentro de la plataforma</strong>, en la sección correspondiente de tu cuenta.</p>
-
-                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-xl px-4 py-3 mt-4">
-                                <p class="text-xs">Al marcar la casilla de aceptación durante el registro, confirmas que has leído, entendido y aceptado la totalidad de estos Términos y Condiciones, así como nuestra <button type="button" onclick="cerrarModalTerminos(); abrirModalPrivacidad();" class="text-purple-400 hover:underline font-semibold">Política de Privacidad</button>.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ══ MODAL POLÍTICA DE PRIVACIDAD ══ -->
-                <div id="modal-privacidad" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center z-[6100] p-0 sm:p-4">
-                    <div class="bg-slate-900 border border-slate-700/80 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-                        <div class="relative px-5 pt-4 pb-3 border-b border-slate-700/70 shrink-0">
-                            <button onclick="cerrarModalPrivacidad()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition">
-                                <i class="fa-solid fa-xmark text-sm"></i>
-                            </button>
-                            <h3 class="font-extrabold text-white text-base pr-8">🔒 Política de Privacidad</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Última actualización: Julio 2026 · NetGamer</p>
-                        </div>
-                        <div class="overflow-y-auto px-5 py-4 text-sm text-slate-300 leading-relaxed space-y-4">
-                            <p>En <strong class="text-amber-400">NetGamer</strong> nos tomamos en serio la privacidad de nuestros usuarios. Esta Política de Privacidad explica de forma detallada qué información recopilamos, con qué propósito la utilizamos, y cómo la protegemos.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">1. Información que Recopilamos</h4>
-                            <div class="space-y-2">
-                                <div class="bg-slate-800/50 rounded-lg px-3 py-2">
-                                    <p class="text-white font-semibold text-xs">Nombre de usuario y correo electrónico</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Recopilados al registrarte. Se usan para identificarte, iniciar sesión, verificar tu cuenta y enviarte códigos de verificación (OTP) y recuperación de contraseña.</p>
-                                </div>
-                                <div class="bg-slate-800/50 rounded-lg px-3 py-2">
-                                    <p class="text-white font-semibold text-xs">Contraseña</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Se almacena de forma cifrada mediante nuestro proveedor de autenticación (Supabase Auth). NetGamer nunca almacena ni puede visualizar tu contraseña en texto plano.</p>
-                                </div>
-                                <div class="bg-slate-800/50 rounded-lg px-3 py-2">
-                                    <p class="text-white font-semibold text-xs">Dirección IP</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Recopilada al usar la plataforma, para prevención de fraude en el bono de bienvenida y el sistema de referidos (evitar múltiples cuentas desde el mismo origen).</p>
-                                </div>
-                                <div class="bg-slate-800/50 rounded-lg px-3 py-2">
-                                    <p class="text-white font-semibold text-xs">Datos bancarios</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Banco, beneficiario y cuenta destino, recopilados únicamente al solicitar un retiro, para procesar el envío de tu dinero mediante transferencia SPEI u otro método disponible.</p>
-                                </div>
-                                <div class="bg-slate-800/50 rounded-lg px-3 py-2">
-                                    <p class="text-white font-semibold text-xs">Historial de juego y transacciones</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Registrado al jugar, apostar, girar la ruleta, referir usuarios, etc. Se usa para calcular tu saldo de NetCoins, mostrar tu historial, y detectar actividad fraudulenta.</p>
-                                </div>
-                            </div>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">2. Cómo Protegemos tu Información</h4>
-                            <p>Implementamos múltiples capas de seguridad técnica para proteger tu cuenta y tu saldo de NetCoins, incluyendo:</p>
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>Autenticación segura mediante verificación de correo con código de un solo uso (OTP).</li>
-                                <li>Reglas de seguridad a nivel de base de datos que impiden que cualquier usuario, incluso mediante herramientas técnicas avanzadas, modifique directamente su saldo de NetCoins, su estatus Premium, o cualquier otro dato sensible de su cuenta sin pasar por los procesos oficiales de la plataforma.</li>
-                                <li>Toda operación que involucre movimiento de NetCoins (bonos, apuestas, premios, retiros) se procesa y valida exclusivamente en nuestros servidores, nunca confiando en información enviada directamente desde el dispositivo del usuario.</li>
-                                <li>Las contraseñas se almacenan cifradas y nunca son visibles, ni siquiera para el equipo de NetGamer.</li>
-                            </ul>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">3. Con Quién Compartimos tu Información</h4>
-                            <p><strong class="text-amber-400">NetGamer no vende tu información personal a terceros.</strong> Tu información puede compartirse únicamente en los siguientes casos:</p>
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li><strong class="text-white">Proveedores de infraestructura:</strong> Supabase (base de datos y autenticación) y proveedores de envío de correo electrónico para los códigos de verificación.</li>
-                                <li><strong class="text-white">Portal de noticias asociado (PulsoMX):</strong> cuando accedes desde tu cuenta de NetGamer, identificamos tu sesión únicamente para acreditar las recompensas en NetCoins que ganas por leer noticias directamente a tu cuenta.</li>
-                                <li><strong class="text-white">Redes de publicidad de terceros:</strong> si no cuentas con membresía Premium, es posible que veas anuncios de nuestros socios publicitarios, quienes pueden utilizar cookies conforme a sus propias políticas.</li>
-                                <li><strong class="text-white">Requerimientos legales:</strong> podemos divulgar información si así lo exige la ley o una autoridad competente.</li>
-                            </ul>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">4. Uso de la IP para Prevención de Fraude</h4>
-                            <p>Registramos la dirección IP asociada a tu cuenta específicamente para prevenir el abuso de promociones (bono de bienvenida y sistema de referidos) mediante la creación de cuentas múltiples. Esta información se utiliza únicamente con fines de seguridad interna y no se comparte con fines comerciales.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">5. Retención de Datos</h4>
-                            <p>Conservamos tu información mientras tu cuenta permanezca activa. Si decides eliminar tu cuenta o la misma es cancelada por incumplimiento de nuestros Términos y Condiciones, conservaremos cierta información (como historial de transacciones) durante el tiempo razonablemente necesario para cumplir con obligaciones legales, fiscales o de prevención de fraude.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">6. Menores de Edad</h4>
-                            <p>NetGamer no está dirigido a menores de 18 años y no recopilamos intencionalmente información de menores de edad. Si detectamos que una cuenta pertenece a un menor de edad, procederemos a suspenderla.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">7. Tus Derechos</h4>
-                            <p>Puedes solicitar acceso, corrección o eliminación de tu información personal, así como la eliminación de tu cuenta, comunicándote con nosotros a través del sistema de soporte de la plataforma.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">8. Cambios a esta Política</h4>
-                            <p>Podemos actualizar esta Política de Privacidad periódicamente. Cualquier cambio será publicado dentro de la plataforma con su fecha de actualización correspondiente.</p>
-
-                            <h4 class="text-purple-400 font-bold text-sm pt-2 border-t border-slate-800">9. Contacto</h4>
-                            <p>Para cualquier duda relacionada con el manejo de tu información personal, puedes comunicarte con nosotros a través del <strong class="text-amber-400">sistema de tickets de soporte disponible dentro de la plataforma</strong>, en la sección correspondiente de tu cuenta.</p>
-
-                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-xl px-4 py-3 mt-4">
-                                <p class="text-xs">Al marcar la casilla de aceptación durante el registro, confirmas que has leído, entendido y aceptado esta Política de Privacidad, así como nuestros <button type="button" onclick="cerrarModalPrivacidad(); abrirModalTerminos();" class="text-purple-400 hover:underline font-semibold">Términos y Condiciones</button>.</p>
                             </div>
                         </div>
                     </div>
@@ -3103,19 +2937,6 @@
 
         let _recoverEmailActual = '';
 
-        function abrirModalTerminos() {
-            document.getElementById('modal-terminos').classList.remove('hidden');
-        }
-        function cerrarModalTerminos() {
-            document.getElementById('modal-terminos').classList.add('hidden');
-        }
-        function abrirModalPrivacidad() {
-            document.getElementById('modal-privacidad').classList.remove('hidden');
-        }
-        function cerrarModalPrivacidad() {
-            document.getElementById('modal-privacidad').classList.add('hidden');
-        }
-
         function toggleVerContrasena(inputId, btnEl) {
             const input = document.getElementById(inputId);
             const icon = btnEl.querySelector('i');
@@ -3405,7 +3226,8 @@
             document.getElementById("register-form").addEventListener("submit", async (e) => {
                 e.preventDefault();
 
-                if (!document.getElementById("acepta-terminos").checked) {
+                const aceptaTerminos = document.getElementById("register-aceptar-terminos").checked;
+                if (!aceptaTerminos) {
                     mostrarNotificacion("Debes aceptar los Términos y Condiciones y la Política de Privacidad para registrarte.", "error");
                     return;
                 }
@@ -4547,21 +4369,101 @@
 
         /* ==================== LÓGICA MODAL LEGAL ==================== */
         const textoPrivacidad = `
-            <h3 class="font-bold text-white mb-2">1. Información que recopilamos</h3>
-            <p>Recopilamos de forma segura tu dirección de correo electrónico, nombre de usuario y datos analíticos de interacción dentro de la plataforma (como tareas iniciadas o completadas en nuestros muros asociados).</p>
-            <h3 class="font-bold text-white mb-2 mt-4">2. Uso de la información</h3>
-            <p>Usamos tu información exclusivamente para gestionar tu cuenta, procesar la entrega de tus recompensas y otorgar soporte técnico. Además, compartimos identificadores anónimos de usuario (UUID) con nuestros proveedores de ofertas (ej. AdGem) estrictamente para verificar y otorgar créditos de manera automática.</p>
-            <h3 class="font-bold text-white mb-2 mt-4">3. Retención y Seguridad de Datos</h3>
-            <p>Empleamos estándares de seguridad de la industria a través de nuestra arquitectura en la nube (Supabase) para encriptar contraseñas y proteger el acceso a tus datos personales. Puedes solicitar la eliminación completa de tu cuenta en cualquier momento contactando a nuestro soporte.</p>
+            <p class="text-slate-400 text-xs mb-4">Última actualización: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+
+            <h3 class="font-bold text-white mb-2">1. Introducción</h3>
+            <p>Esta Política de Privacidad describe cómo NetGamer MX ("la Plataforma", "nosotros") recopila, utiliza, almacena y protege la información de los usuarios ("tú", "el usuario") que se registran y utilizan nuestros servicios disponibles en netgamermx.com. Al crear una cuenta y utilizar la Plataforma, aceptas las prácticas descritas en este documento.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">2. Información que recopilamos</h3>
+            <p>Recopilamos las siguientes categorías de datos:</p>
+            <p><strong>a) Datos de registro:</strong> correo electrónico, nombre de usuario y contraseña (almacenada de forma encriptada mediante hash, nunca en texto plano).</p>
+            <p><strong>b) Dirección IP:</strong> registramos tu dirección IP al momento del registro y la utilizamos para nuestro sistema antifraude, con el fin de detectar múltiples cuentas creadas desde el mismo dispositivo/red, y para validar la elegibilidad del bono de bienvenida y del sistema de referidos.</p>
+            <p><strong>c) Datos de actividad dentro de la Plataforma:</strong> saldo de NetCoins, historial de ganancias, historial de canjes/retiros solicitados, ofertas y tareas completadas en los muros de ofertas asociados (offerwalls), partidas jugadas en el modo 1v1, uso de la ruleta diaria, estado de vidas y suscripción premium.</p>
+            <p><strong>d) Datos de soporte:</strong> mensajes, archivos adjuntos e imágenes que envíes a través del chat de soporte integrado, para poder atender tus solicitudes.</p>
+            <p><strong>e) Datos de pago:</strong> cuando compras vidas ilimitadas o la suscripción premium, el procesamiento del pago es gestionado íntegramente por MercadoPago; NetGamer MX no almacena números de tarjeta ni datos financieros sensibles, únicamente recibe la confirmación del estado del pago.</p>
+            <p><strong>f) Datos de retiro:</strong> si solicitas un canje/retiro (por ejemplo vía SPEI, PayPal, Robux o Free Fire), recopilamos los datos necesarios para procesarlo: banco, nombre del beneficiario, CLABE/correo/ID de jugador según corresponda.</p>
+            <p><strong>g) Datos técnicos y analíticos:</strong> información de interacción con la interfaz, estadísticas agregadas de uso (usuarios en línea, montos pagados a la comunidad) y datos generados por anuncios publicitarios mostrados dentro de la Plataforma.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">3. Uso de la información</h3>
+            <p>Utilizamos tu información para: (i) crear, verificar y administrar tu cuenta; (ii) acreditar el bono de bienvenida, las recompensas de referidos y las ganancias obtenidas por tareas u ofertas completadas; (iii) procesar solicitudes de canje y pagos; (iv) prevenir fraude, abuso del sistema de bonos/referidos y el uso de múltiples cuentas, mediante la verificación cruzada de direcciones IP; (v) brindarte soporte técnico a través del chat integrado; (vi) mostrar publicidad y gestionar el sistema de anuncios personalizados y de red (por ejemplo, EffectiveCPM y HighPerformanceFormat) a usuarios no premium; y (vii) mejorar la Plataforma mediante estadísticas de uso agregadas y anónimas.</p>
+            <p>Compartimos identificadores anónimos de usuario (UUID) con nuestros proveedores de ofertas (offerwalls) exclusivamente para verificar la finalización de tareas/ofertas y otorgar automáticamente los créditos correspondientes en NetCoins.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">4. Sistema antifraude basado en IP</h3>
+            <p>Con el fin de proteger la integridad económica de la Plataforma, NetGamer MX registra y verifica la dirección IP de cada usuario en el momento del registro. Si se detecta que otra cuenta ha recibido previamente el bono de bienvenida o el bono de referido desde la misma dirección IP, la nueva cuenta no será elegible para recibir dichos bonos. Esta verificación se procesa de forma segura a través de funciones de servidor (Edge Functions) y nunca se realiza directamente desde el navegador del usuario.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">5. Cookies y almacenamiento local</h3>
+            <p>La Plataforma puede utilizar almacenamiento de sesión (sessionStorage) del navegador para recordar temporalmente información como códigos de referido durante el proceso de registro. Los anuncios mostrados por nuestras redes publicitarias asociadas pueden utilizar sus propias cookies o tecnologías similares conforme a sus propias políticas.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">6. Con quién compartimos tu información</h3>
+            <p>No vendemos tu información personal a terceros. Compartimos datos únicamente con: (a) Supabase, nuestro proveedor de infraestructura en la nube (base de datos, autenticación y funciones de servidor); (b) MercadoPago, para el procesamiento de pagos de vidas ilimitadas y premium; (c) proveedores de muros de ofertas (offerwalls) como AdGem y similares, únicamente mediante identificador anónimo (UUID); y (d) redes de publicidad asociadas, para la entrega de anuncios a usuarios no premium.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">7. Retención y seguridad de datos</h3>
+            <p>Empleamos estándares de seguridad de la industria a través de nuestra arquitectura en la nube (Supabase/PostgreSQL) para encriptar contraseñas, aplicar políticas de seguridad a nivel de fila (RLS) sobre la información de tu perfil, y procesar las modificaciones sensibles de cuenta (saldo, IP, estado premium, etc.) exclusivamente mediante funciones de servidor protegidas, nunca directamente desde el cliente. Conservamos tus datos mientras tu cuenta permanezca activa o mientras sea necesario para cumplir obligaciones legales, resolver disputas o hacer cumplir estos acuerdos.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">8. Tus derechos (ARCO)</h3>
+            <p>Puedes solicitar en cualquier momento el acceso, rectificación, cancelación u oposición (derechos ARCO) respecto de tus datos personales, así como la eliminación completa de tu cuenta, contactando a nuestro equipo de soporte a través del chat integrado en la Plataforma.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">9. Menores de edad</h3>
+            <p>La Plataforma está destinada a personas de 13 años de edad o mayores. Si eres menor de 18 años, debes contar con la autorización y supervisión de tu padre, madre o tutor legal, especialmente respecto de cualquier proceso de canje o retiro de recompensas.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">10. Cambios a esta política</h3>
+            <p>Podemos actualizar esta Política de Privacidad periódicamente. Los cambios relevantes serán reflejados en esta misma sección, indicando la fecha de la última actualización.</p>
         `;
 
         const textoTerminos = `
+            <p class="text-slate-400 text-xs mb-4">Última actualización: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+
             <h3 class="font-bold text-white mb-2">1. Aceptación de los Términos</h3>
-            <p>Al acceder y utilizar NetGamer MX, aceptas cumplir en su totalidad con estos términos y condiciones. Esta plataforma está destinada a un público de 13 años o mayor.</p>
-            <h3 class="font-bold text-white mb-2 mt-4">2. Políticas Antifraude</h3>
-            <p>Queda <strong>estrictamente prohibido</strong> el uso de Redes Privadas Virtuales (VPNs), servidores Proxy, emuladores, la creación de múltiples cuentas por un mismo usuario, y el uso de software de automatización (bots). Cualquier infracción detectada resultará en el baneo permanente de la cuenta y el decomiso de los fondos ("NetCoins") almacenados.</p>
-            <h3 class="font-bold text-white mb-2 mt-4">3. Proceso de Retiro de Fondos</h3>
-            <p>NetGamer MX y sus administradores se reservan el derecho de realizar auditorías manuales o automáticas a las ofertas completadas antes de liberar fondos mediante transferencias bancarias (SPEI) u otros métodos. Las equivalencias de NetCoins a moneda real pueden estar sujetas a cambios anunciados previamente.</p>
+            <p>Al crear una cuenta y/o utilizar NetGamer MX (netgamermx.com), aceptas cumplir en su totalidad con estos Términos y Condiciones y con nuestra Política de Privacidad. Si no estás de acuerdo con alguno de estos términos, no debes registrarte ni utilizar la Plataforma. Esta plataforma está destinada a un público de 13 años o mayor; los menores de 18 años deben contar con supervisión de un padre, madre o tutor legal.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">2. Descripción del Servicio</h3>
+            <p>NetGamer MX es una plataforma de recompensas y entretenimiento competitivo en la que los usuarios pueden ganar una moneda virtual interna llamada <strong>NetCoins (NC)</strong> mediante distintas actividades, incluyendo:</p>
+            <p>a) Completar ofertas, encuestas y tareas en los muros de ofertas (offerwalls) integrados de proveedores asociados (por ejemplo AdGem).</p>
+            <p>b) Leer noticias dentro de la sección correspondiente de la Plataforma.</p>
+            <p>c) Participar en la Ruleta Diaria, que otorga una cantidad aleatoria de NetCoins una vez cada 24 horas.</p>
+            <p>d) Jugar partidas competitivas 1v1 en tiempo real contra otros usuarios, apostando y ganando NetCoins según el resultado de la partida.</p>
+            <p>e) Invitar a otros usuarios mediante el sistema de referidos.</p>
+            <p>f) Reclamar el bono de bienvenida al registrarse por primera vez.</p>
+            <p>Las NetCoins acumuladas pueden canjearse posteriormente por recompensas reales, sujeto a las condiciones descritas en la sección 6 de este documento.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">3. Registro de Cuenta</h3>
+            <p>Para utilizar la Plataforma debes registrarte proporcionando un correo electrónico válido, un nombre de usuario y una contraseña, y verificar tu correo mediante un código de un solo uso (OTP). Cada persona puede mantener <strong>únicamente una cuenta</strong>. Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de toda actividad realizada desde tu cuenta.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">4. Bono de Bienvenida y Sistema de Referidos</h3>
+            <p>Al registrarte y verificar tu cuenta por primera vez, puedes reclamar un bono de bienvenida de <strong>1,000 NetCoins</strong>. Este bono se otorga <strong>una sola vez por persona</strong>. Adicionalmente, al invitar a otros usuarios mediante tu enlace de referido, tanto tú como la persona invitada pueden recibir <strong>500 NetCoins</strong> cada uno cuando el referido complete el proceso correspondiente.</p>
+            <p>Para prevenir el abuso de estos beneficios, NetGamer MX verifica la dirección IP asociada a cada cuenta. <strong>Solo se otorga un bono de bienvenida y un bono de referido por dirección IP.</strong> Si el sistema detecta que ya existe una cuenta que recibió el bono de bienvenida o que fue registrada como referido desde la misma IP, la nueva cuenta no recibirá dicho beneficio, sin perjuicio de las demás funciones de la Plataforma.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">5. Vidas, Modo 1v1 y Suscripción Premium</h3>
+            <p>El modo de juego competitivo 1v1 utiliza un sistema de "vidas" que se consumen al participar en partidas. Los usuarios pueden recargar vidas mediante compras individuales o adquirir <strong>vidas ilimitadas</strong> a través de una suscripción premium, procesada mediante MercadoPago. Los usuarios con suscripción premium activa dejan de visualizar publicidad dentro de la Plataforma mientras dicha suscripción permanezca vigente. Todas las compras dentro de la Plataforma (vidas, premium) son procesadas de forma segura mediante funciones de servidor y la pasarela de pago MercadoPago; NetGamer MX no almacena información financiera sensible.</p>
+            <p>Las apuestas realizadas en las partidas 1v1 se descuentan y acreditan exclusivamente en NetCoins, moneda virtual interna sin valor monetario directo hasta el momento de un canje aprobado conforme a la sección 6.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">6. Proceso de Canje y Retiro de Recompensas</h3>
+            <p>Los usuarios pueden solicitar el canje de sus NetCoins por recompensas reales a través de distintos métodos disponibles en la Plataforma, incluyendo transferencia bancaria (SPEI), PayPal, Robux, tarjetas o créditos de Free Fire, u otros métodos que se habiliten en el futuro. Cada solicitud de canje requiere saldo suficiente de NetCoins y la información de destino correspondiente (por ejemplo, CLABE y beneficiario para SPEI, correo para PayPal, o ID de jugador para recompensas de videojuegos).</p>
+            <p>NetGamer MX y sus administradores se reservan el derecho de realizar auditorías manuales o automáticas sobre las ofertas completadas, partidas jugadas y el origen de las NetCoins antes de aprobar y liberar cualquier solicitud de canje. El tiempo estimado de procesamiento de una solicitud aprobada es de <strong>24 a 72 horas hábiles</strong>, aunque este plazo puede variar. Las equivalencias entre NetCoins y moneda real o recompensas en especie pueden estar sujetas a cambios, los cuales serán anunciados previamente dentro de la Plataforma.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">7. Políticas Antifraude y Conducta Prohibida</h3>
+            <p>Queda <strong>estrictamente prohibido</strong>:</p>
+            <p>a) El uso de Redes Privadas Virtuales (VPNs), servidores Proxy, emuladores u otras herramientas destinadas a ocultar o falsificar la dirección IP real o la ubicación del dispositivo.</p>
+            <p>b) La creación de múltiples cuentas por una misma persona, dispositivo o red, incluyendo con el fin de reclamar más de un bono de bienvenida o de referido.</p>
+            <p>c) El uso de software de automatización, bots, scripts o cualquier mecanismo que manipule el resultado de las ofertas, la ruleta diaria, las partidas 1v1 o cualquier otra función de la Plataforma.</p>
+            <p>d) La manipulación, falsificación o alteración de comprobantes de pago, capturas de pantalla u otra evidencia enviada como parte de una solicitud de canje o de soporte.</p>
+            <p>e) Cualquier intento de acceder, modificar o interferir sin autorización con los sistemas, bases de datos o funciones de servidor de la Plataforma.</p>
+            <p>Cualquier infracción detectada, ya sea mediante revisión manual o mecanismos automáticos, resultará en el <strong>baneo permanente de la cuenta</strong> y el decomiso de los fondos ("NetCoins") almacenados, sin derecho a compensación.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">8. Publicidad</h3>
+            <p>Los usuarios que no cuenten con una suscripción premium activa verán publicidad dentro de la Plataforma, incluyendo banners, anuncios de video/imagen personalizados y anuncios provenientes de redes publicitarias asociadas. Estos anuncios ayudan a financiar el pago de recompensas a la comunidad. La interacción con dichos anuncios (por ejemplo, clics) puede ser registrada con fines estadísticos y de facturación con los anunciantes.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">9. Soporte al Cliente</h3>
+            <p>NetGamer MX ofrece un canal de soporte mediante chat integrado en la Plataforma, a través del cual los usuarios pueden enviar mensajes y archivos adjuntos para resolver dudas, incidencias o problemas relacionados con su cuenta, canjes o partidas.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">10. Limitación de Responsabilidad</h3>
+            <p>NetGamer MX pone su mejor esfuerzo para mantener la Plataforma disponible y funcionando correctamente, pero no garantiza un servicio ininterrumpido o libre de errores. La Plataforma no se hace responsable por pérdidas derivadas de fallos de conexión a internet del usuario, información incorrecta proporcionada por el usuario en sus solicitudes de canje, o interrupciones de terceros proveedores (offerwalls, pasarela de pago, redes publicitarias).</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">11. Modificaciones a la Plataforma y a estos Términos</h3>
+            <p>NetGamer MX se reserva el derecho de modificar, suspender o discontinuar cualquier función de la Plataforma, así como de actualizar estos Términos y Condiciones en cualquier momento. El uso continuado de la Plataforma después de dichos cambios constituye la aceptación de los términos actualizados.</p>
+
+            <h3 class="font-bold text-white mb-2 mt-4">12. Terminación de Cuenta</h3>
+            <p>NetGamer MX puede suspender o cancelar una cuenta, con o sin previo aviso, en caso de incumplimiento de estos Términos y Condiciones, incluyendo las conductas descritas en la sección 7. El usuario también puede solicitar la eliminación de su cuenta en cualquier momento a través de nuestro soporte.</p>
         `;
 
         function abrirPrivacidad() {
