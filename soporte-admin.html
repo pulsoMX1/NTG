@@ -379,11 +379,7 @@
 <script>
 const SUPABASE_URL = "https://meiwuluwrdjszxeyoqtt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4";
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-    auth: {
-        storageKey: 'sb-admin-auth-token'
-    }
-});
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let adminUser = null;
 let todosLosTickets = [];
@@ -435,6 +431,16 @@ async function iniciarSesionAdmin() {
 
     await cargarTickets();
     suscribirTicketsRealtime();
+    suscribirAnunciosRealtime();
+}
+
+function suscribirAnunciosRealtime() {
+    _supabase
+        .channel('admin-anuncios-stats')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'anuncios_personalizados' }, async () => {
+            await cargarAnuncios();
+        })
+        .subscribe();
 }
 
 function showLoginError(msg) {
