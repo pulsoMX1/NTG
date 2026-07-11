@@ -768,6 +768,9 @@
                         <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Contraseña</label>
                         <input type="password" id="login-password" autocomplete="current-password"
                             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                        <div class="text-right mt-1">
+                            <button type="button" onclick="abrirRecuperarContrasena()" class="text-xs text-purple-400 hover:underline font-semibold">¿Olvidaste la contraseña?</button>
+                        </div>
                     </div>
                     <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-2.5 rounded-xl shadow-lg shadow-purple-600/30 transition duration-200 text-sm sm:text-base">
                         Ingresar
@@ -843,6 +846,95 @@
                     <button onclick="reenviarCodigo()" class="text-purple-400 hover:underline font-semibold">reenviar</button>
                 </p>
                 <button onclick="toggleAuthViews(false)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver</button>
+            </div>
+
+            <!-- ══ RECUPERAR CONTRASEÑA: paso 1, pedir correo ══ -->
+            <div id="recover-email-view" class="hidden text-center space-y-3">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-key text-purple-400 text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold">Recuperar contraseña</h2>
+                    <p class="text-slate-400 text-xs mt-1">Ingresa el correo de tu cuenta y te enviaremos un código para restablecerla.</p>
+                </div>
+                <form id="recover-email-form" class="space-y-2.5 text-left">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Correo Electrónico</label>
+                        <input type="email" id="recover-email" autocomplete="email"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <button type="submit" id="btn-recover-email"
+                        class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-2.5 rounded-xl transition text-sm sm:text-base">
+                        Continuar
+                    </button>
+                </form>
+                <button onclick="toggleAuthViews(true)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver a iniciar sesión</button>
+            </div>
+
+            <!-- ══ RECUPERAR CONTRASEÑA: paso 2, verificar código OTP ══ -->
+            <div id="recover-otp-view" class="hidden text-center space-y-3">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-shield-halved text-purple-400 text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold">Verifica tu correo</h2>
+                    <p class="text-slate-400 text-xs mt-1">Código de 6 dígitos enviado a:</p>
+                    <p id="recover-email-address" class="text-purple-400 font-bold text-xs mt-0.5 break-all"></p>
+                </div>
+                <div class="flex justify-center gap-1 sm:gap-1.5" id="recover-otp-inputs">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                    <input type="text" maxlength="1" class="recover-otp-input text-center text-lg font-black bg-slate-900 border-2 border-slate-600 rounded-lg focus:outline-none focus:border-purple-500 transition w-10 h-10 sm:w-12 sm:h-12" inputmode="numeric">
+                </div>
+                <div id="recover-otp-error" class="hidden bg-rose-900/30 border border-rose-500/40 rounded-xl px-4 py-2 text-xs text-rose-400">
+                    <i class="fa-solid fa-circle-xmark mr-1"></i> Código incorrecto o expirado.
+                </div>
+                <button onclick="verificarOTPRecuperacion()" id="btn-verificar-recover-otp"
+                    class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 font-bold py-2.5 rounded-xl transition text-sm sm:text-base">
+                    Verificar Código
+                </button>
+                <p class="text-xs text-slate-400">¿No llegó? Revisa spam o
+                    <button onclick="reenviarCodigoRecuperacion()" class="text-purple-400 hover:underline font-semibold">reenviar</button>
+                </p>
+                <button onclick="toggleAuthViews(true)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver</button>
+            </div>
+
+            <!-- ══ RECUPERAR CONTRASEÑA: paso 3, nueva contraseña ══ -->
+            <div id="recover-newpass-view" class="hidden text-center space-y-3">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-lock text-emerald-400 text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold">Nueva contraseña</h2>
+                    <p class="text-slate-400 text-xs mt-1">Crea una nueva contraseña para tu cuenta.</p>
+                </div>
+                <form id="recover-newpass-form" class="space-y-2.5 text-left">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Nueva contraseña</label>
+                        <div class="relative">
+                            <input type="password" id="recover-new-password" autocomplete="new-password" minlength="6"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                            <button type="button" onclick="toggleVerContrasena('recover-new-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition">
+                                <i class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Confirmar nueva contraseña</label>
+                        <input type="password" id="recover-confirm-password" autocomplete="new-password" minlength="6"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition" required>
+                    </div>
+                    <div id="recover-newpass-error" class="hidden bg-rose-900/30 border border-rose-500/40 rounded-xl px-4 py-2 text-xs text-rose-400">
+                        <i class="fa-solid fa-circle-xmark mr-1"></i> <span id="recover-newpass-error-texto">Las contraseñas no coinciden.</span>
+                    </div>
+                    <button type="submit" id="btn-recover-newpass"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 font-bold py-2.5 rounded-xl transition text-sm sm:text-base">
+                        Cambiar contraseña
+                    </button>
+                </form>
             </div>
 
             <div class="mt-5 pt-3 border-t border-slate-700/50 flex justify-center gap-3 text-xs text-slate-500">
@@ -2731,6 +2823,9 @@
             document.getElementById("login-view").classList.toggle("hidden", !showLogin);
             document.getElementById("register-view").classList.toggle("hidden", showLogin);
             document.getElementById("verify-email-view").classList.add("hidden");
+            document.getElementById("recover-email-view").classList.add("hidden");
+            document.getElementById("recover-otp-view").classList.add("hidden");
+            document.getElementById("recover-newpass-view").classList.add("hidden");
         }
 
         function mostrarPantallaVerificacion(email) {
@@ -2806,6 +2901,167 @@
             if (error) mostrarNotificacion("Error al reenviar el código. Intenta de nuevo.", "error");
             else mostrarNotificacion("¡Código reenviado! Revisa tu correo o bandeja de spam.", "success");
         }
+
+        // ════════════════════════════════════════════════════════════
+        // RECUPERACIÓN DE CONTRASEÑA
+        // ════════════════════════════════════════════════════════════
+
+        let _recoverEmailActual = '';
+
+        function toggleVerContrasena(inputId, btnEl) {
+            const input = document.getElementById(inputId);
+            const icon = btnEl.querySelector('i');
+            const vaAMostrarse = input.type === 'password';
+            input.type = vaAMostrarse ? 'text' : 'password';
+            icon.classList.toggle('fa-eye', !vaAMostrarse);
+            icon.classList.toggle('fa-eye-slash', vaAMostrarse);
+        }
+
+        function abrirRecuperarContrasena() {
+            document.getElementById("login-view").classList.add("hidden");
+            document.getElementById("register-view").classList.add("hidden");
+            document.getElementById("verify-email-view").classList.add("hidden");
+            document.getElementById("recover-otp-view").classList.add("hidden");
+            document.getElementById("recover-newpass-view").classList.add("hidden");
+            document.getElementById("recover-email-view").classList.remove("hidden");
+            document.getElementById("recover-email").value = '';
+            setTimeout(() => document.getElementById("recover-email").focus(), 100);
+        }
+
+        document.getElementById("recover-email-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const email = document.getElementById("recover-email").value.trim();
+            if (!email) return;
+
+            const btn = document.getElementById("btn-recover-email");
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
+
+            const { error } = await _supabase.auth.resetPasswordForEmail(email);
+
+            btn.disabled = false;
+            btn.innerText = "Continuar";
+
+            if (error) {
+                mostrarNotificacion("No pudimos enviar el código. Verifica el correo e intenta de nuevo.", "error");
+                return;
+            }
+
+            _recoverEmailActual = email;
+            mostrarPantallaOTPRecuperacion(email);
+        });
+
+        function mostrarPantallaOTPRecuperacion(email) {
+            document.getElementById("recover-email-view").classList.add("hidden");
+            document.getElementById("recover-otp-view").classList.remove("hidden");
+            document.getElementById("recover-email-address").innerText = email;
+            document.getElementById("recover-otp-error").classList.add("hidden");
+            document.querySelectorAll('.recover-otp-input').forEach(i => i.value = '');
+            setTimeout(() => document.querySelectorAll('.recover-otp-input')[0].focus(), 100);
+            configurarRecoverOTPInputs();
+        }
+
+        function configurarRecoverOTPInputs() {
+            const inputs = document.querySelectorAll('.recover-otp-input');
+            inputs.forEach((input, index) => {
+                input.oninput = () => {
+                    input.value = input.value.replace(/\D/g, '');
+                    if (input.value && index < inputs.length - 1) inputs[index + 1].focus();
+                    const codigo = Array.from(inputs).map(i => i.value).join('');
+                    if (codigo.length === 6) verificarOTPRecuperacion();
+                };
+                input.onkeydown = (e) => {
+                    if (e.key === 'Backspace' && !input.value && index > 0) inputs[index - 1].focus();
+                };
+                input.onpaste = (e) => {
+                    e.preventDefault();
+                    const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                    inputs.forEach((inp, i) => inp.value = paste[i] || '');
+                    if (paste.length === 6) verificarOTPRecuperacion();
+                };
+            });
+        }
+
+        async function verificarOTPRecuperacion() {
+            const inputs = document.querySelectorAll('.recover-otp-input');
+            const codigo = Array.from(inputs).map(i => i.value).join('');
+            if (codigo.length < 6) return;
+
+            const btn = document.getElementById("btn-verificar-recover-otp");
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+
+            const { data, error } = await _supabase.auth.verifyOtp({ email: _recoverEmailActual, token: codigo, type: 'recovery' });
+
+            btn.disabled = false;
+            btn.innerText = "Verificar Código";
+
+            if (error) {
+                document.getElementById("recover-otp-error").classList.remove("hidden");
+                inputs.forEach(i => { i.value = ''; i.classList.add('border-rose-500'); setTimeout(() => i.classList.remove('border-rose-500'), 2000); });
+                inputs[0].focus();
+                return;
+            }
+
+            document.getElementById("recover-otp-view").classList.add("hidden");
+            document.getElementById("recover-newpass-view").classList.remove("hidden");
+            document.getElementById("recover-new-password").value = '';
+            document.getElementById("recover-confirm-password").value = '';
+            document.getElementById("recover-newpass-error").classList.add("hidden");
+        }
+
+        async function reenviarCodigoRecuperacion() {
+            if (!_recoverEmailActual) return;
+            const { error } = await _supabase.auth.resetPasswordForEmail(_recoverEmailActual);
+            if (error) mostrarNotificacion("Error al reenviar el código. Intenta de nuevo.", "error");
+            else mostrarNotificacion("¡Código reenviado! Revisa tu correo o bandeja de spam.", "success");
+        }
+
+        document.getElementById("recover-newpass-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const nueva = document.getElementById("recover-new-password").value;
+            const confirmar = document.getElementById("recover-confirm-password").value;
+            const errorEl = document.getElementById("recover-newpass-error");
+            const errorTexto = document.getElementById("recover-newpass-error-texto");
+
+            if (nueva.length < 6) {
+                errorTexto.innerText = "La contraseña debe tener al menos 6 caracteres.";
+                errorEl.classList.remove("hidden");
+                return;
+            }
+
+            if (nueva !== confirmar) {
+                errorTexto.innerText = "Las contraseñas no coinciden.";
+                errorEl.classList.remove("hidden");
+                return;
+            }
+
+            errorEl.classList.add("hidden");
+
+            const btn = document.getElementById("btn-recover-newpass");
+            btn.disabled = true;
+            btn.innerText = "Cambiando...";
+
+            const { error } = await _supabase.auth.updateUser({ password: nueva });
+
+            btn.disabled = false;
+            btn.innerText = "Cambiar contraseña";
+
+            if (error) {
+                errorTexto.innerText = "No se pudo cambiar la contraseña. Intenta de nuevo.";
+                errorEl.classList.remove("hidden");
+                return;
+            }
+
+            // Cerramos la sesión temporal creada por la verificación del OTP de
+            // recuperación: el usuario debe volver a iniciar sesión manualmente
+            // con su nueva contraseña, tal como se pide.
+            await _supabase.auth.signOut();
+
+            _recoverEmailActual = '';
+            toggleAuthViews(true);
+            mostrarNotificacion("✅ Cambiaste tu contraseña con éxito. Ya puedes iniciar sesión con tu nueva contraseña.", "success");
+        });
 
         // ════════════════════════════════════════════════════════════
         // ESTADÍSTICAS GLOBALES EN TIEMPO REAL
@@ -4138,7 +4394,7 @@
                 return;
             }
             // Cambia esta URL por la verdadera URL de tu página de noticias en GitHub
-            const urlNoticias = "https://pulsomx1.github.io"; 
+            const urlNoticias = "https://pulsomx1.github.io/PulsoMX/"; 
             
             // Abrimos el blog en una pestaña nueva, mandando el ID oculto en la URL
             window.open(`${urlNoticias}?uid=${currentUser.id}`, '_blank');
@@ -5638,14 +5894,14 @@ function suscribirSoporteRealtime() {
                 renderMensajeSoporte(payload.new);
                 scrollSoporteAbajo();
                 if (payload.new.sender === 'admin') {
-                    mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
-                    // Mostrar badge en burbuja
-                    document.getElementById('support-badge').classList.remove('hidden');
                     // Si el chat está abierto, marcar leído inmediatamente
                     const modalAbierto = !document.getElementById('support-modal').classList.contains('hidden');
                     if (modalAbierto) {
                         await _supabase.from('support_tickets').update({ unread_user: 0 }).eq('id', supportTicketId);
                     } else {
+                        // Mostrar notificación y badge SOLO si el chat está cerrado
+                        mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
+                        document.getElementById('support-badge').classList.remove('hidden');
                         // Incrementar contador no leídos
                         await _supabase.from('support_tickets').update({ 
                             unread_user: _supabase.rpc ? undefined : 0
@@ -5954,20 +6210,10 @@ function mostrarAnuncioPersonalizado(anuncio) {
     document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
-    // Registrar impresión (vía Edge Function, incremento atómico y seguro)
-    registrarEventoAnuncio(anuncio.id, 'impresion');
-}
-
-async function registrarEventoAnuncio(anuncioId, tipo) {
-    try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        await _supabase.functions.invoke('registrar-evento-anuncio', {
-            headers: { Authorization: `Bearer ${session?.access_token}` },
-            body: { anuncioId, tipo }
-        });
-    } catch (e) {
-        console.error('[NetGamer] Error al registrar evento de anuncio:', e);
-    }
+    // Registrar impresión
+    _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
+        if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
+    });
 }
 
 function cerrarAnuncioPersonalizado() {
@@ -5989,7 +6235,10 @@ function cerrarAnuncioPersonalizado() {
 
 function registrarClicAnuncio() {
     if (!_anuncioIdActual) return;
-    registrarEventoAnuncio(_anuncioIdActual, 'clic');
+    const idAnuncio = _anuncioIdActual;
+    _supabase.from('anuncios_personalizados').select('clics').eq('id', idAnuncio).single().then(({ data }) => {
+        if (data) _supabase.from('anuncios_personalizados').update({ clics: (data.clics || 0) + 1 }).eq('id', idAnuncio);
+    });
 }
 
 // Iniciar el ciclo de anuncios personalizados cuando el usuario se autentica
