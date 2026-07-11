@@ -843,7 +843,7 @@
                     Verificar Código
                 </button>
                 <p class="text-xs text-slate-400">¿No llegó? Revisa spam o
-                    <button onclick="reenviarCodigo()" class="text-purple-400 hover:underline font-semibold">reenviar</button>
+                    <button onclick="reenviarCodigo()" id="btn-reenviar-codigo" class="text-purple-400 hover:underline font-semibold">reenviar</button>
                 </p>
                 <button onclick="toggleAuthViews(false)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver</button>
             </div>
@@ -897,7 +897,7 @@
                     Verificar Código
                 </button>
                 <p class="text-xs text-slate-400">¿No llegó? Revisa spam o
-                    <button onclick="reenviarCodigoRecuperacion()" class="text-purple-400 hover:underline font-semibold">reenviar</button>
+                    <button onclick="reenviarCodigoRecuperacion()" id="btn-reenviar-codigo-recover" class="text-purple-400 hover:underline font-semibold">reenviar</button>
                 </p>
                 <button onclick="toggleAuthViews(true)" class="text-xs text-slate-500 hover:text-slate-300 transition">← Volver</button>
             </div>
@@ -2895,8 +2895,30 @@
             });
         }
 
+        function iniciarCooldownReenvio(idBoton, segundos = 60) {
+            const btn = document.getElementById(idBoton);
+            if (!btn) return;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'pointer-events-none');
+            let restante = segundos;
+            const textoOriginal = 'reenviar';
+            btn.innerText = `reenviar (${restante}s)`;
+            const intervalo = setInterval(() => {
+                restante--;
+                if (restante <= 0) {
+                    clearInterval(intervalo);
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'pointer-events-none');
+                    btn.innerText = textoOriginal;
+                } else {
+                    btn.innerText = `reenviar (${restante}s)`;
+                }
+            }, 1000);
+        }
+
         async function reenviarCodigo() {
             const email = document.getElementById("verify-email-address").innerText;
+            iniciarCooldownReenvio('btn-reenviar-codigo');
             const { error } = await _supabase.auth.resend({ type: 'signup', email });
             if (error) mostrarNotificacion("Error al reenviar el código. Intenta de nuevo.", "error");
             else mostrarNotificacion("¡Código reenviado! Revisa tu correo o bandeja de spam.", "success");
@@ -3012,10 +3034,12 @@
 
         async function reenviarCodigoRecuperacion() {
             if (!_recoverEmailActual) return;
+            iniciarCooldownReenvio('btn-reenviar-codigo-recover');
             const { error } = await _supabase.auth.resetPasswordForEmail(_recoverEmailActual);
             if (error) mostrarNotificacion("Error al reenviar el código. Intenta de nuevo.", "error");
             else mostrarNotificacion("¡Código reenviado! Revisa tu correo o bandeja de spam.", "success");
         }
+
 
         document.getElementById("recover-newpass-form").addEventListener("submit", async function (e) {
             e.preventDefault();
