@@ -4138,7 +4138,7 @@
                 return;
             }
             // Cambia esta URL por la verdadera URL de tu página de noticias en GitHub
-            const urlNoticias = "https://pulsomx1.github.io/PulsoMX/"; 
+            const urlNoticias = "https://pulsomx1.github.io"; 
             
             // Abrimos el blog en una pestaña nueva, mandando el ID oculto en la URL
             window.open(`${urlNoticias}?uid=${currentUser.id}`, '_blank');
@@ -5638,14 +5638,14 @@ function suscribirSoporteRealtime() {
                 renderMensajeSoporte(payload.new);
                 scrollSoporteAbajo();
                 if (payload.new.sender === 'admin') {
+                    mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
+                    // Mostrar badge en burbuja
+                    document.getElementById('support-badge').classList.remove('hidden');
                     // Si el chat está abierto, marcar leído inmediatamente
                     const modalAbierto = !document.getElementById('support-modal').classList.contains('hidden');
                     if (modalAbierto) {
                         await _supabase.from('support_tickets').update({ unread_user: 0 }).eq('id', supportTicketId);
                     } else {
-                        // Mostrar notificación y badge SOLO si el chat está cerrado
-                        mostrarNotificacion("💬 Nueva respuesta de soporte", "info");
-                        document.getElementById('support-badge').classList.remove('hidden');
                         // Incrementar contador no leídos
                         await _supabase.from('support_tickets').update({ 
                             unread_user: _supabase.rpc ? undefined : 0
@@ -5954,10 +5954,20 @@ function mostrarAnuncioPersonalizado(anuncio) {
     document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
-    // Registrar impresión
-    _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
-        if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
-    });
+    // Registrar impresión (vía Edge Function, incremento atómico y seguro)
+    registrarEventoAnuncio(anuncio.id, 'impresion');
+}
+
+async function registrarEventoAnuncio(anuncioId, tipo) {
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        await _supabase.functions.invoke('registrar-evento-anuncio', {
+            headers: { Authorization: `Bearer ${session?.access_token}` },
+            body: { anuncioId, tipo }
+        });
+    } catch (e) {
+        console.error('[NetGamer] Error al registrar evento de anuncio:', e);
+    }
 }
 
 function cerrarAnuncioPersonalizado() {
@@ -5979,10 +5989,7 @@ function cerrarAnuncioPersonalizado() {
 
 function registrarClicAnuncio() {
     if (!_anuncioIdActual) return;
-    const idAnuncio = _anuncioIdActual;
-    _supabase.from('anuncios_personalizados').select('clics').eq('id', idAnuncio).single().then(({ data }) => {
-        if (data) _supabase.from('anuncios_personalizados').update({ clics: (data.clics || 0) + 1 }).eq('id', idAnuncio);
-    });
+    registrarEventoAnuncio(_anuncioIdActual, 'clic');
 }
 
 // Iniciar el ciclo de anuncios personalizados cuando el usuario se autentica
