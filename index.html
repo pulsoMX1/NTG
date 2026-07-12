@@ -425,6 +425,18 @@
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
 
+    <!-- ══ PANTALLA DE SITIO SUSPENDIDO (cubre absolutamente todo) ══ -->
+    <div id="pantalla-sitio-suspendido" class="hidden fixed inset-0 bg-slate-950 flex items-center justify-center z-[2147483647] p-6">
+        <div class="max-w-md w-full text-center space-y-5">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-3xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-black text-white">Hemos suspendido temporalmente el sitio para todas las personas</h1>
+            <p id="motivo-sitio-suspendido" class="text-sm text-slate-400 leading-relaxed whitespace-pre-line"></p>
+            <p class="text-xs text-slate-600 pt-2">NetGamer</p>
+        </div>
+    </div>
+
     <div id="toast-sesion">
         <div id="toast-sesion-inner" class="flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold">
             <span id="toast-sesion-icon" class="text-xl shrink-0"></span>
@@ -2416,6 +2428,48 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentUser = null;
+        const ADMIN_EMAIL_SITIO = 'ed8108868@gmail.com';
+
+        function mostrarPantallaSuspendido(motivo) {
+            document.getElementById('motivo-sitio-suspendido').innerText = motivo || '';
+            document.getElementById('pantalla-sitio-suspendido').classList.remove('hidden');
+        }
+
+        function ocultarPantallaSuspendido() {
+            document.getElementById('pantalla-sitio-suspendido').classList.add('hidden');
+        }
+
+        async function verificarEstadoSitio() {
+            try {
+                const { data, error } = await _supabase.from('estado_sitio').select('suspendido, motivo').eq('id', 1).single();
+                if (error || !data) return;
+
+                const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
+                if (data.suspendido && !esAdmin) {
+                    mostrarPantallaSuspendido(data.motivo);
+                } else {
+                    ocultarPantallaSuspendido();
+                }
+            } catch (e) { /* si falla la verificación, no bloqueamos el sitio por error de red */ }
+        }
+
+        let _suscritoEstadoSitio = false;
+        function suscribirseEstadoSitio() {
+            if (_suscritoEstadoSitio) return;
+            _suscritoEstadoSitio = true;
+            _supabase
+                .channel('estado-sitio-global')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estado_sitio' }, (payload) => {
+                    const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
+                    if (payload.new.suspendido && !esAdmin) {
+                        mostrarPantallaSuspendido(payload.new.motivo);
+                    } else {
+                        ocultarPantallaSuspendido();
+                    }
+                })
+                .subscribe();
+        }
+
         let ipActualUsuario = null;  // Guardar IP del usuario actual
 
         // ══════════════════════════════════════════
@@ -3360,6 +3414,11 @@
                     setTimeout(() => splash.style.display = "none", 400);
                 }
             }
+
+            // Chequeo del estado del sitio (activo/suspendido) — corre sin importar
+            // si hay sesión o no, para bloquear también a visitantes no logueados.
+            await verificarEstadoSitio();
+            suscribirseEstadoSitio();
         }
 
         async function cargarDatosPerfil(user) {
