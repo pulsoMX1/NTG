@@ -3569,8 +3569,9 @@
         })();
 
         function actualizarTextosInterfaz(monedas) {
-            document.getElementById("user-balance").innerText = monedas;
-            document.querySelectorAll(".balance-placeholder").forEach(el => el.innerText = monedas);
+            const monedasFormateadas = Number(monedas).toLocaleString('en-US');
+            document.getElementById("user-balance").innerText = monedasFormateadas;
+            document.querySelectorAll(".balance-placeholder").forEach(el => el.innerText = monedasFormateadas);
             
             // Actualizar estado de los botones de canje si existen
             if (typeof window.actualizarBotonesCanjes === 'function') {
@@ -4246,7 +4247,7 @@
                             <p class="text-xs text-slate-500">${fechaStr} · ${horaStr}</p>
                         </div>
                     </div>
-                    <span class="text-amber-400 font-extrabold text-sm shrink-0 ml-3">+${g.netcoins} NC</span>
+                    <span class="text-amber-400 font-extrabold text-sm shrink-0 ml-3">+${Number(g.netcoins).toLocaleString('en-US')} NC</span>
                 </div>`;
             }).join('');
         }
