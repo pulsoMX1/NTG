@@ -5161,8 +5161,12 @@
             }, 1000);
         }
 
+        let _pollPresenciaRival = null;
+
         function suscribirsePartida(partida_id) {
             if (_canalPartida) { _canalPartida.unsubscribe(); _canalPartida = null; }
+            console.log('[NetGamer][Abandono] Uniéndome al canal de presence:', 'partida-rt-' + partida_id, '| mi userId:', currentUser.id);
+
             _canalPartida = _supabase.channel('partida-rt-' + partida_id, {
                     config: { presence: { key: currentUser.id } }
                 })
@@ -5180,34 +5184,59 @@
                     }
                 })
                 // ─── DETECCIÓN DE ABANDONO EN TIEMPO REAL ───
-                // Supabase Realtime marca automáticamente a un usuario como "leave"
-                // en cuanto su navegador cierra la conexión (cerrar pestaña, recargar,
-                // perder internet, etc.) — normalmente en cuestión de segundos.
+                .on('presence', { event: 'sync' }, () => {
+                    console.log('[NetGamer][Abandono] presence sync. Estado actual:', _canalPartida.presenceState());
+                })
+                .on('presence', { event: 'join' }, ({ key }) => {
+                    console.log('[NetGamer][Abandono] presence JOIN detectado:', key);
+                })
                 .on('presence', { event: 'leave' }, ({ key }) => {
-                    // Ignorar mi propia salida; solo nos interesa si el que se fue es el rival
+                    console.log('[NetGamer][Abandono] presence LEAVE detectado:', key, '(mi id es', currentUser.id + ')');
                     if (key === currentUser.id) return;
                     _manejarPosibleAbandonoRival(partida_id);
                 })
                 .subscribe(async (status) => {
+                    console.log('[NetGamer][Abandono] Estado del canal:', status);
                     if (status === 'SUBSCRIBED') {
-                        await _canalPartida.track({ online_at: new Date().toISOString() });
+                        const trackResult = await _canalPartida.track({ online_at: new Date().toISOString() });
+                        console.log('[NetGamer][Abandono] track() resultado:', trackResult);
+
+                        // Respaldo: además del evento 'leave' (que a veces tarda o no llega
+                        // por congestión del servidor de Realtime), revisamos cada 5s de forma
+                        // directa si el rival sigue en la lista de presence.
+                        if (_pollPresenciaRival) clearInterval(_pollPresenciaRival);
+                        _pollPresenciaRival = setInterval(() => {
+                            if (_resultadoProcesado || !_canalPartida || partida_id !== _partidaActual) {
+                                clearInterval(_pollPresenciaRival);
+                                return;
+                            }
+                            const presentes = _canalPartida.presenceState();
+                            const rivalPresente = Object.keys(presentes).some(key => key !== currentUser.id);
+                            console.log('[NetGamer][Abandono] Poll de respaldo — rival presente:', rivalPresente, presentes);
+                            if (!rivalPresente) {
+                                _manejarPosibleAbandonoRival(partida_id);
+                            }
+                        }, 5000);
                     }
                 });
         }
 
-        // Cuando Realtime detecta que el rival se desconectó, esperamos un pequeño
-        // margen (por si fue solo un parpadeo de red que se reconecta solo) y luego,
-        // si sigue sin estar presente, le avisamos al servidor para cerrar la partida
-        // y darnos la victoria automáticamente.
+        // Cuando detectamos que el rival se desconectó (por evento 'leave' o por el poll
+        // de respaldo), esperamos un pequeño margen por si fue solo un parpadeo de red
+        // que se reconecta solo, y luego, si sigue sin estar presente, le avisamos al
+        // servidor para cerrar la partida y darnos la victoria automáticamente.
         let _timeoutConfirmarAbandono = null;
         function _manejarPosibleAbandonoRival(partida_id) {
             if (_resultadoProcesado || partida_id !== _partidaActual) return;
-            if (_timeoutConfirmarAbandono) clearTimeout(_timeoutConfirmarAbandono);
+            if (_timeoutConfirmarAbandono) return; // ya hay una confirmación en curso, no duplicar
+            console.log('[NetGamer][Abandono] Posible abandono detectado. Esperando 4s para confirmar...');
 
             _timeoutConfirmarAbandono = setTimeout(async () => {
+                _timeoutConfirmarAbandono = null;
                 if (_resultadoProcesado || !_canalPartida) return;
                 const presentes = _canalPartida.presenceState();
                 const rivalSigueConectado = Object.keys(presentes).some(key => key !== currentUser.id);
+                console.log('[NetGamer][Abandono] Confirmando tras 4s. ¿Rival sigue conectado?', rivalSigueConectado);
                 if (rivalSigueConectado) return; // era solo un parpadeo de red, se reconectó a tiempo
 
                 await _reclamarVictoriaPorAbandono(partida_id);
@@ -5216,21 +5245,31 @@
 
         async function _reclamarVictoriaPorAbandono(partida_id) {
             if (_resultadoProcesado) return;
+            console.log('[NetGamer][Abandono] Llamando a la Edge Function reclamar-abandono...');
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
                 const { data, error } = await _supabase.functions.invoke('reclamar-abandono', {
                     body: { partida_id },
                     headers: { Authorization: `Bearer ${session?.access_token}` }
                 });
-                if (!error && data?.ok && data.partida) {
+                console.log('[NetGamer][Abandono] Respuesta de reclamar-abandono → data:', data, '| error:', error);
+                if (error || data?.error) {
+                    mostrarNotificacion('⚠️ No se pudo confirmar el abandono del rival (revisa la consola / despliegue de la Edge Function).', 'error');
+                    return;
+                }
+                if (data?.ok && data.partida) {
                     mostrarNotificacion('🏆 Tu rival abandonó la partida. ¡Ganaste automáticamente!', 'success');
                     procesarResultadoRonda(data.partida, null);
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error('[NetGamer][Abandono] Excepción al llamar reclamar-abandono:', e);
+                mostrarNotificacion('⚠️ Error de red al confirmar el abandono del rival.', 'error');
+            }
         }
 
         function detenerWatchdogPartida() {
             if (_timeoutConfirmarAbandono) { clearTimeout(_timeoutConfirmarAbandono); _timeoutConfirmarAbandono = null; }
+            if (_pollPresenciaRival) { clearInterval(_pollPresenciaRival); _pollPresenciaRival = null; }
         }
 
         async function procesarResultadoRonda(data, miJugada) {
