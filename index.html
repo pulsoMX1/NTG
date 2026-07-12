@@ -3717,7 +3717,7 @@
             };
             
             // Obtener balance actual del usuario
-            const balanceActual = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+            const balanceActual = parseInt((document.getElementById('user-balance')?.innerText || '0').replace(/[^0-9]/g, '')) || 0;
             
             grid.innerHTML = cfg.montos.map(m => {
                 const tieneBalance = balanceActual >= m.nc;
@@ -3753,7 +3753,7 @@
             
             // Función para actualizar el estado de los botones cuando cambie el balance
             window.actualizarBotonesCanjes = function() {
-                const nuevoBalance = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+                const nuevoBalance = parseInt((document.getElementById('user-balance')?.innerText || '0').replace(/[^0-9]/g, '')) || 0;
                 cfg.montos.forEach(m => {
                     const tieneBalance = nuevoBalance >= m.nc;
                     const btn = document.querySelector('.canje-btn-' + tipo + '-' + m.nc);
@@ -3790,7 +3790,7 @@
         function seleccionarMontoSeguro(nc, mxn, label, tipo, tieneBalance) {
             // Si no tiene balance suficiente, mostrar notificación
             if (!tieneBalance) {
-                const balanceActual = parseInt(document.getElementById('user-balance')?.innerText || '0') || 0;
+                const balanceActual = parseInt((document.getElementById('user-balance')?.innerText || '0').replace(/[^0-9]/g, '')) || 0;
                 const falta = nc - balanceActual;
                 
                 // Mostrar notificación profesional
