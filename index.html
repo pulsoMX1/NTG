@@ -5060,13 +5060,16 @@
 
             // Calcular segundos restantes sincronizados con tsInicio (timestamp BD)
             const DURACION_JUGADA = 15;
-            const transcurridoSeg = tsInicio ? Math.floor((Date.now() - tsInicio) / 1000) : 0;
-            let seg = Math.max(1, DURACION_JUGADA - transcurridoSeg);
+            const tsReferencia = tsInicio || Date.now();
+            let seg = Math.max(1, DURACION_JUGADA - Math.floor((Date.now() - tsReferencia) / 1000));
             document.getElementById('countdown-jugada').textContent = seg;
             const barraJugada = document.getElementById('barra-jugada');
             if (barraJugada) barraJugada.style.width = (seg / DURACION_JUGADA * 100) + '%';
             _timerJugada = setInterval(async () => {
-                seg--;
+                // Recalculado desde el tiempo real transcurrido en cada tick (no un simple seg--),
+                // así se autocorrige aunque el navegador haya frenado el setInterval por estar
+                // la pestaña en segundo plano (el típico "throttling" de pestañas inactivas).
+                seg = Math.max(0, DURACION_JUGADA - Math.floor((Date.now() - tsReferencia) / 1000));
                 document.getElementById('countdown-jugada').textContent = seg;
                 if (barraJugada) barraJugada.style.width = (seg / DURACION_JUGADA * 100) + '%';
                 if (seg > 0 && seg <= 3) Sonidos.tickUrgente();
