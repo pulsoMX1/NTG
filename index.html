@@ -5323,11 +5323,18 @@
             const miEmoji    = emojisJugada[miJugadaFinal]    || '❓';
             const rivalEmoji = emojisJugada[rivalJugadaFinal] || '❓';
 
-            // ¿Alguien ganó ya 3 rondas?
-            if (_puntosYo >= 3 || _puntosRival >= 3) {
-                const ganeElPartido = ganeRonda || (_puntosYo > _puntosRival);
+            // ¿Alguien ganó ya 3 rondas, O la partida se cerró de golpe (ej. abandono del rival)?
+            const partidaTerminadaDeGolpe = data.estatus === 'terminada';
+            if (_puntosYo >= 3 || _puntosRival >= 3 || partidaTerminadaDeGolpe) {
+                const esAbandono = data.resultado === 'abandono';
+                // Si tenemos ganador_id explícito (ej. viene de reclamar-abandono), confiar en eso
+                // por encima del cálculo de puntos, ya que en un abandono el marcador puede no
+                // haber llegado a 3.
+                const ganeElPartido = data.ganador_id
+                    ? (data.ganador_id === currentUser.id)
+                    : (ganeRonda || (_puntosYo > _puntosRival));
                 if (ganeElPartido) Sonidos.victoriaFinal(); else Sonidos.derrotaFinal();
-                mostrarResultadoFinal(ganeElPartido, miEmoji, rivalEmoji);
+                mostrarResultadoFinal(ganeElPartido, miEmoji, rivalEmoji, esAbandono);
                 return;
             }
 
@@ -5402,7 +5409,7 @@
             }, esperaAnuncio);
         }
 
-        function mostrarResultadoFinal(ganeYo, miEmoji, rivalEmoji) {
+        function mostrarResultadoFinal(ganeYo, miEmoji, rivalEmoji, esAbandono = false) {
             // Marcador final
             const ptsYoEl    = document.getElementById('resultado-pts-yo');
             const ptsRivalEl = document.getElementById('resultado-pts-rival');
@@ -5412,21 +5419,41 @@
             document.getElementById('fase-resultado').classList.remove('hidden');
 
             const emoji   = ganeYo ? '🏆' : '💀';
-            const titulo  = ganeYo ? '¡Ganaste!' : '¡Perdiste!';
+            const titulo  = esAbandono
+                ? (ganeYo ? '¡Ganaste por abandono!' : '¡Perdiste por abandono!')
+                : (ganeYo ? '¡Ganaste!' : '¡Perdiste!');
             const color   = ganeYo ? 'text-emerald-400' : 'text-rose-400';
             const barra   = ganeYo ? 'bg-gradient-to-r from-emerald-500 to-cyan-400' : 'bg-gradient-to-r from-rose-500 to-pink-600';
-            const detalle = ganeYo
-                ? `+${_apuestaActual} NC agregados a tu balance 🎉`
-                : `-${_apuestaActual} NC y perdiste 1 vida 💔`;
+            let detalle;
+            if (esAbandono) {
+                detalle = ganeYo
+                    ? `Tu rival abandonó la partida. +${_apuestaActual} NC agregados a tu balance 🎉`
+                    : `Abandonaste la partida. -${_apuestaActual} NC y perdiste 1 vida 💔`;
+            } else {
+                detalle = ganeYo
+                    ? `+${_apuestaActual} NC agregados a tu balance 🎉`
+                    : `-${_apuestaActual} NC y perdiste 1 vida 💔`;
+            }
 
             document.getElementById('resultado-barra-top').className = `h-1 w-full ${barra}`;
             document.getElementById('resultado-emoji').textContent    = emoji;
             document.getElementById('resultado-titulo').className     = `text-2xl font-black mb-1 ${color}`;
             document.getElementById('resultado-titulo').textContent   = titulo;
             document.getElementById('resultado-detalle').textContent  = detalle;
-            document.getElementById('resultado-mi-jugada').textContent    = miEmoji;
-            document.getElementById('resultado-rival-jugada').textContent = rivalEmoji;
 
+            // En caso de abandono no hubo una jugada real de piedra/papel/tijeras
+            // que mostrar, así que ocultamos esa sección en vez de mostrar signos de interrogación.
+            const jugadasFinalesEl = document.getElementById('resultado-mi-jugada')?.closest('div')?.parentElement;
+            if (esAbandono) {
+                document.getElementById('resultado-mi-jugada').textContent    = '🚪';
+                document.getElementById('resultado-rival-jugada').textContent = '👋';
+            } else {
+                document.getElementById('resultado-mi-jugada').textContent    = miEmoji;
+                document.getElementById('resultado-rival-jugada').textContent = rivalEmoji;
+            }
+
+            // Refrescar vidas y balance de NetCoins (las NetCoins ya se acreditaron
+            // en el servidor — aquí solo actualizamos lo que se ve en pantalla)
             cargarVidas();
             cargarDatosPerfil(currentUser);
         }
