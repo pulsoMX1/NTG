@@ -2431,12 +2431,10 @@
                         const ip = text.trim();
                         if (ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
                             ipActualUsuario = ip;
-                            console.log('[NetGamer] IP obtenida (AWS):', ipActualUsuario);
                             return ip;
                         }
                     }
                 } catch (err) {
-                    console.warn('[NetGamer] AWS checkip falló, intentando siguiente...');
                 }
 
                 // Fallback 2: Cloudflare (muy confiable)
@@ -2450,12 +2448,10 @@
                         const match = text.match(/ip=([\d.]+)/);
                         if (match && match[1]) {
                             ipActualUsuario = match[1];
-                            console.log('[NetGamer] IP obtenida (Cloudflare):', ipActualUsuario);
                             return match[1];
                         }
                     }
                 } catch (err) {
-                    console.warn('[NetGamer] Cloudflare falló, intentando siguiente...');
                 }
 
                 // Fallback 3: icanhazip (simple y confiable)
@@ -2466,12 +2462,10 @@
                         const ipLimpio = ip.trim();
                         if (ipLimpio && /^(\d{1,3}\.){3}\d{1,3}$/.test(ipLimpio)) {
                             ipActualUsuario = ipLimpio;
-                            console.log('[NetGamer] IP obtenida (icanhazip):', ipActualUsuario);
                             return ipLimpio;
                         }
                     }
                 } catch (err) {
-                    console.warn('[NetGamer] icanhazip falló, intentando siguiente...');
                 }
 
                 // Fallback 4: myip.com (alternativa)
@@ -2481,18 +2475,14 @@
                         const data = await response.json();
                         if (data.ip) {
                             ipActualUsuario = data.ip;
-                            console.log('[NetGamer] IP obtenida (myip.com):', ipActualUsuario);
                             return data.ip;
                         }
                     }
                 } catch (err) {
-                    console.warn('[NetGamer] myip.com falló');
                 }
 
-                console.warn('[NetGamer] No se pudo obtener IP de ninguna API');
                 return null;
             } catch (err) {
-                console.error('[NetGamer] Error crítico en obtenerIPUsuario:', err);
                 return null;
             }
         }
@@ -2502,12 +2492,10 @@
         // ══════════════════════════════════════════
         async function guardarIPEnSupabase(userID, ip) {
             if (!ip || !userID) {
-                console.warn('[NetGamer] IP o userID vacío, no se guarda');
                 return false;
             }
 
             try {
-                console.log('[NetGamer] Llamando Edge Function para guardar IP:', ip);
                 
                 // Llamar a Edge Function (se ejecuta en SERVIDOR, no en cliente)
                 const { data: { session } } = await _supabase.auth.getSession();
@@ -2518,24 +2506,19 @@
                 });
 
                 if (error) {
-                    console.error('[NetGamer] Error al guardar IP (Edge Function):', error.message);
                     return false;
                 }
 
                 if (data?.error) {
-                    console.error('[NetGamer] Error servidor:', data.error);
                     return false;
                 }
 
                 if (data?.ok) {
-                    console.log('[NetGamer] IP guardada exitosamente en servidor:', data.ip);
                     return true;
                 } else {
-                    console.warn('[NetGamer] Respuesta inesperada de Edge Function');
                     return false;
                 }
             } catch (err) {
-                console.error('[NetGamer] Error crítico al guardar IP:', err);
                 return false;
             }
         }
@@ -2559,7 +2542,6 @@
 
                 return { puedeRecibir: true, razon: null };
             } catch (err) {
-                console.error('Error verificando bono:', err);
                 return { puedeRecibir: true, razon: null };  // En caso de error, permitir
             }
         }
@@ -2583,7 +2565,6 @@
 
                 return { puedeSerReferido: true, razon: null };
             } catch (err) {
-                console.error('Error verificando referido:', err);
                 return { puedeSerReferido: true, razon: null };  // En caso de error, permitir
             }
         }
@@ -2618,9 +2599,7 @@
                         .from('perfiles')
                         .update({ modal_ip_rechazado_visto: true })
                         .eq('id', currentUser.id);
-                    console.log('[NetGamer] Flag modal_ip_rechazado_visto guardado en BD');
                 } catch (err) {
-                    console.error('[NetGamer] Error al guardar flag:', err);
                 }
             }
             // Cerrar modal
@@ -3143,7 +3122,6 @@
                         totalPerfiles = dataUsuarios.usuarios_registrados;
                     }
                 } catch (errCont) {
-                    console.error('[NetGamer] Error al contar usuarios:', errCont);
                 }
                 
                 // Actualizar contadores
@@ -3304,7 +3282,6 @@
                 });
 
                 if (error || data?.error) {
-                    console.warn('[NetGamer] Referido no procesado:', data?.error || error);
                     if (data?.error === 'ip_ya_fue_referida') {
                         sessionStorage.setItem('modal_referido_rechazado_mostrado', 'true');
                         mostrarModalIPYaFueReferida();
@@ -3317,7 +3294,6 @@
                 sessionStorage.removeItem('ref_code');
                 sessionStorage.removeItem('ref_pending_user');
             } catch(err) {
-                console.error('[NetGamer] Error al procesar referido:', err);
                 sessionStorage.removeItem('ref_code');
                 sessionStorage.removeItem('ref_pending_user');
             }
@@ -3325,14 +3301,11 @@
 
         async function verificarSesionActiva() {
             // Obtener IP apenas se carga la página (es CRÍTICO)
-            console.log('[NetGamer] Iniciando obtención de IP...');
             await obtenerIPUsuario();
-            console.log('[NetGamer] IP obtenida e importada. Variable global:', ipActualUsuario);
 
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
-                console.log('[NetGamer] Usuario activo:', currentUser.id);
                 
                 document.getElementById("support-bubble").classList.remove("hidden");
                 const refCode = sessionStorage.getItem('ref_code');
@@ -3391,12 +3364,10 @@
             // Guardar IP en BD si se obtuvo
             if (ip) {
                 const savedOK = await guardarIPEnSupabase(user.id, ip);
-                console.log('[NetGamer] IP guardada en BD:', savedOK);
             }
 
             const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado, modal_ip_rechazado_visto').eq('id', user.id).single();
             if (!error && data) {
-                console.log('[NetGamer] Datos del perfil cargados:', { ip_usuario: data.ip_usuario, bonus_reclamado: data.bonus_bienvenida_reclamado, modal_visto: data.modal_ip_rechazado_visto });
                 
                 actualizarTextosInterfaz(data.netcoins || 0);
                 const totalRef = data.total_referidos || 0;
@@ -3409,18 +3380,14 @@
                     setTimeout(async () => {
                         // Verificar si la IP ya recibió el bono
                         const verificacion = await verificarBonoPorIP(user.id);
-                        console.log('[NetGamer] Verificación bono por IP:', verificacion);
                         
                         if (verificacion.puedeRecibir) {
-                            console.log('[NetGamer] Mostrando modal bono normal');
                             mostrarModalBonus();
                         } else {
                             // Solo mostrar modal de rechazo si el usuario NO lo ha visto antes (verificar BD)
                             if (!data.modal_ip_rechazado_visto) {
-                                console.log('[NetGamer] Mostrando modal rechazo por IP (primera vez para esta cuenta)');
                                 mostrarModalIPYaReciboBono();
                             } else {
-                                console.log('[NetGamer] Esta cuenta ya vio el modal de rechazo por IP, no mostrar de nuevo');
                             }
                         }
                     }, 800);
@@ -5167,7 +5134,6 @@
 
         function suscribirsePartida(partida_id) {
             if (_canalPartida) { _canalPartida.unsubscribe(); _canalPartida = null; }
-            console.log('[NetGamer][Abandono] Uniéndome al canal de presence:', 'partida-rt-' + partida_id, '| mi userId:', currentUser.id);
 
             _canalPartida = _supabase.channel('partida-rt-' + partida_id, {
                     config: { presence: { key: currentUser.id } }
@@ -5187,21 +5153,16 @@
                 })
                 // ─── DETECCIÓN DE ABANDONO EN TIEMPO REAL ───
                 .on('presence', { event: 'sync' }, () => {
-                    console.log('[NetGamer][Abandono] presence sync. Estado actual:', _canalPartida.presenceState());
                 })
                 .on('presence', { event: 'join' }, ({ key }) => {
-                    console.log('[NetGamer][Abandono] presence JOIN detectado:', key);
                 })
                 .on('presence', { event: 'leave' }, ({ key }) => {
-                    console.log('[NetGamer][Abandono] presence LEAVE detectado:', key, '(mi id es', currentUser.id + ')');
                     if (key === currentUser.id) return;
                     _manejarPosibleAbandonoRival(partida_id);
                 })
                 .subscribe(async (status) => {
-                    console.log('[NetGamer][Abandono] Estado del canal:', status);
                     if (status === 'SUBSCRIBED') {
                         const trackResult = await _canalPartida.track({ online_at: new Date().toISOString() });
-                        console.log('[NetGamer][Abandono] track() resultado:', trackResult);
 
                         // Respaldo: además del evento 'leave' (que a veces tarda o no llega
                         // por congestión del servidor de Realtime), revisamos cada 5s de forma
@@ -5219,7 +5180,6 @@
                             if (_resultadoProcesado) return; // pausa entre rondas: saltar este ciclo, reintentar en 5s
                             const presentes = _canalPartida.presenceState();
                             const rivalPresente = Object.keys(presentes).some(key => key !== currentUser.id);
-                            console.log('[NetGamer][Abandono] Poll de respaldo — rival presente:', rivalPresente, presentes);
                             if (!rivalPresente) {
                                 _manejarPosibleAbandonoRival(partida_id);
                             }
@@ -5236,14 +5196,12 @@
         function _manejarPosibleAbandonoRival(partida_id) {
             if (_partidaFinalizada || partida_id !== _partidaActual) return;
             if (_timeoutConfirmarAbandono) return; // ya hay una confirmación en curso, no duplicar
-            console.log('[NetGamer][Abandono] Posible abandono detectado. Esperando 4s para confirmar...');
 
             _timeoutConfirmarAbandono = setTimeout(async () => {
                 _timeoutConfirmarAbandono = null;
                 if (_partidaFinalizada || !_canalPartida) return;
                 const presentes = _canalPartida.presenceState();
                 const rivalSigueConectado = Object.keys(presentes).some(key => key !== currentUser.id);
-                console.log('[NetGamer][Abandono] Confirmando tras 4s. ¿Rival sigue conectado?', rivalSigueConectado);
                 if (rivalSigueConectado) return; // era solo un parpadeo de red, se reconectó a tiempo
 
                 await _reclamarVictoriaPorAbandono(partida_id);
@@ -5252,14 +5210,12 @@
 
         async function _reclamarVictoriaPorAbandono(partida_id) {
             if (_resultadoProcesado) return;
-            console.log('[NetGamer][Abandono] Llamando a la Edge Function reclamar-abandono...');
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
                 const { data, error } = await _supabase.functions.invoke('reclamar-abandono', {
                     body: { partida_id },
                     headers: { Authorization: `Bearer ${session?.access_token}` }
                 });
-                console.log('[NetGamer][Abandono] Respuesta de reclamar-abandono → data:', data, '| error:', error);
                 if (error || data?.error) {
                     mostrarNotificacion('⚠️ No se pudo confirmar el abandono del rival (revisa la consola / despliegue de la Edge Function).', 'error');
                     return;
@@ -5269,7 +5225,6 @@
                     procesarResultadoRonda(data.partida, null);
                 }
             } catch (e) {
-                console.error('[NetGamer][Abandono] Excepción al llamar reclamar-abandono:', e);
                 mostrarNotificacion('⚠️ Error de red al confirmar el abandono del rival.', 'error');
             }
         }
