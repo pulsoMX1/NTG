@@ -91,6 +91,9 @@
                 <button id="modulo-btn-anuncios" onclick="cambiarModulo('anuncios')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
                 </button>
+                <button id="modulo-btn-sitio" onclick="cambiarModulo('sitio')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
+                </button>
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -115,6 +118,9 @@
         </button>
         <button id="modulo-btn-anuncios-mobile" onclick="cambiarModulo('anuncios')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
             <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
+        </button>
+        <button id="modulo-btn-sitio-mobile" onclick="cambiarModulo('sitio')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
+            <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
         </button>
     </div>
 
@@ -372,6 +378,58 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--      MÓDULO ESTADO DEL SITIO           -->
+<!-- ══════════════════════════════════════ -->
+<div id="modulo-sitio" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
+    <div class="max-w-lg mx-auto">
+        <h2 class="text-lg font-black text-white mb-1">Estado del sitio</h2>
+        <p class="text-sm text-slate-400 mb-6">Suspende NetGamer temporalmente para todos los usuarios (menos tú).</p>
+
+        <div class="rounded-2xl border border-slate-700 bg-slate-800/60 p-5 mb-5">
+            <div class="flex items-center gap-3">
+                <div id="icono-estado-sitio" class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shrink-0">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="min-w-0">
+                    <p id="texto-estado-sitio" class="font-bold text-white text-sm">Cargando estado...</p>
+                    <p id="submotivo-estado-sitio" class="text-xs text-slate-500 mt-0.5"></p>
+                </div>
+            </div>
+        </div>
+
+        <button id="btn-abrir-suspender" onclick="abrirModalSuspender()" class="hidden w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition items-center justify-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Suspender NetGamer
+        </button>
+        <button id="btn-reactivar-sitio" onclick="reactivarSitio()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Reactivar Sitio
+        </button>
+    </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR SUSPENSIÓN ══ -->
+<div id="modal-suspender" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+    <div class="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md shadow-2xl">
+        <div class="px-5 pt-5 pb-3 border-b border-slate-700/70">
+            <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+                <span>¿Estás seguro de suspender el sitio web de NetGamer?</span>
+            </h3>
+        </div>
+        <div class="px-5 py-4 space-y-3">
+            <p class="text-xs text-slate-400">Todos los usuarios conectados verán un aviso de pantalla completa con el motivo que escribas abajo. Solo tú (administrador) podrás seguir usando el sitio con normalidad.</p>
+            <div>
+                <label class="text-xs font-semibold text-slate-400 block mb-1.5">Motivo (se mostrará a todos los usuarios)</label>
+                <textarea id="input-motivo-suspension" rows="4" placeholder="Ej. Estamos realizando mantenimiento para mejorar la plataforma. Volveremos en unos minutos." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition resize-none"></textarea>
+            </div>
+        </div>
+        <div class="px-5 pb-5 flex gap-2">
+            <button onclick="cerrarModalSuspender()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl transition">Cancelar</button>
+            <button id="btn-confirmar-suspender" onclick="confirmarSuspenderSitio()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl transition">Cerrar NetGamer</button>
         </div>
     </div>
 </div>
@@ -1023,25 +1081,136 @@ function cambiarModulo(modulo) {
     const esSoporte = modulo === 'soporte';
     const esCanjes = modulo === 'canjes';
     const esAnuncios = modulo === 'anuncios';
+    const esSitio = modulo === 'sitio';
 
     document.getElementById('main-body').classList.toggle('hidden', !esSoporte);
     document.getElementById('modulo-canjes').classList.toggle('hidden', !esCanjes);
     document.getElementById('modulo-canjes').classList.toggle('flex', esCanjes);
     document.getElementById('modulo-anuncios').classList.toggle('hidden', esAnuncios ? false : true);
     document.getElementById('modulo-anuncios').classList.toggle('flex', esAnuncios);
+    document.getElementById('modulo-sitio').classList.toggle('hidden', !esSitio);
+    document.getElementById('modulo-sitio').classList.toggle('flex', esSitio);
 
-    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile'].forEach(id => {
+    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-sitio', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-sitio-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const esEsteBtn = id.includes(modulo);
         el.classList.toggle('bg-purple-600', esEsteBtn);
         el.classList.toggle('text-white', esEsteBtn);
-        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios')));
+        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('sitio')));
         el.classList.toggle('text-slate-400', !esEsteBtn);
     });
 
     if (modulo === 'anuncios') cargarAnuncios();
     if (modulo === 'canjes') cargarCanjes();
+    if (modulo === 'sitio') cargarEstadoSitio();
+}
+
+// ══════════════════════════════════════════════════════════
+// ESTADO DEL SITIO — suspender / reactivar NetGamer para todos
+// ══════════════════════════════════════════════════════════
+
+function actualizarTarjetaEstadoSitio(suspendido, motivo) {
+    const icono = document.getElementById('icono-estado-sitio');
+    const texto = document.getElementById('texto-estado-sitio');
+    const submotivo = document.getElementById('submotivo-estado-sitio');
+    const btnSuspender = document.getElementById('btn-abrir-suspender');
+    const btnReactivar = document.getElementById('btn-reactivar-sitio');
+
+    if (suspendido) {
+        icono.className = 'w-11 h-11 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-lg shrink-0';
+        icono.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+        texto.innerText = 'El sitio está SUSPENDIDO';
+        submotivo.innerText = motivo || '';
+        btnSuspender.classList.add('hidden');
+        btnSuspender.classList.remove('flex');
+        btnReactivar.classList.remove('hidden');
+        btnReactivar.classList.add('flex');
+    } else {
+        icono.className = 'w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shrink-0';
+        icono.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        texto.innerText = 'El sitio está activo';
+        submotivo.innerText = 'Todos los usuarios pueden usar NetGamer normalmente.';
+        btnReactivar.classList.add('hidden');
+        btnReactivar.classList.remove('flex');
+        btnSuspender.classList.remove('hidden');
+        btnSuspender.classList.add('flex');
+    }
+}
+
+async function cargarEstadoSitio() {
+    const { data, error } = await _supabase.from('estado_sitio').select('suspendido, motivo').eq('id', 1).single();
+    if (!error && data) actualizarTarjetaEstadoSitio(data.suspendido, data.motivo);
+}
+
+function abrirModalSuspender() {
+    document.getElementById('input-motivo-suspension').value = '';
+    document.getElementById('modal-suspender').classList.remove('hidden');
+}
+
+function cerrarModalSuspender() {
+    document.getElementById('modal-suspender').classList.add('hidden');
+}
+
+async function confirmarSuspenderSitio() {
+    const motivo = document.getElementById('input-motivo-suspension').value.trim();
+    if (!motivo) {
+        alert('Escribe un motivo para mostrar a los usuarios.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirmar-suspender');
+    btn.disabled = true;
+    btn.innerText = 'Cerrando...';
+
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/actualizar-estado-sitio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ suspendido: true, motivo })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data?.error) {
+            alert('No se pudo suspender el sitio: ' + (data?.error || 'error desconocido'));
+            return;
+        }
+
+        cerrarModalSuspender();
+        actualizarTarjetaEstadoSitio(true, motivo);
+    } catch (e) {
+        alert('Error de red al suspender el sitio.');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Cerrar NetGamer';
+    }
+}
+
+async function reactivarSitio() {
+    const btn = document.getElementById('btn-reactivar-sitio');
+    btn.disabled = true;
+
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/actualizar-estado-sitio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ suspendido: false })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data?.error) {
+            alert('No se pudo reactivar el sitio: ' + (data?.error || 'error desconocido'));
+            return;
+        }
+
+        actualizarTarjetaEstadoSitio(false, null);
+    } catch (e) {
+        alert('Error de red al reactivar el sitio.');
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 async function cargarAnuncios() {
