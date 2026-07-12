@@ -4779,6 +4779,7 @@
         let _timerRonda    = null;
         let _timerPoll     = null;
         let _resultadoProcesado = false;  // evita doble procesamiento (respuesta HTTP + Realtime)
+        let _partidaFinalizada = false;   // true SOLO cuando la partida ya terminó de verdad (no en cada pausa entre rondas)
 
         // Genera un color de fondo de avatar basado en el string ID
         function _avatarColor(id) {
@@ -5075,6 +5076,7 @@
             // Reset botones
             _jugadaHecha = false;
             _resultadoProcesado = false;
+            _partidaFinalizada = false;
             if (_timerPoll) clearInterval(_timerPoll);
             // Guardar puntos actuales para detectar cambio de ronda por polling
             _puntosAntes = { j1: _jugadorNum === 1 ? _puntosYo : _puntosRival, j2: _jugadorNum === 1 ? _puntosRival : _puntosYo };
@@ -5206,10 +5208,15 @@
                         // directa si el rival sigue en la lista de presence.
                         if (_pollPresenciaRival) clearInterval(_pollPresenciaRival);
                         _pollPresenciaRival = setInterval(() => {
-                            if (_resultadoProcesado || !_canalPartida || partida_id !== _partidaActual) {
+                            if (!_canalPartida || partida_id !== _partidaActual) {
                                 clearInterval(_pollPresenciaRival);
                                 return;
                             }
+                            if (_partidaFinalizada) {
+                                clearInterval(_pollPresenciaRival);
+                                return;
+                            }
+                            if (_resultadoProcesado) return; // pausa entre rondas: saltar este ciclo, reintentar en 5s
                             const presentes = _canalPartida.presenceState();
                             const rivalPresente = Object.keys(presentes).some(key => key !== currentUser.id);
                             console.log('[NetGamer][Abandono] Poll de respaldo — rival presente:', rivalPresente, presentes);
@@ -5227,13 +5234,13 @@
         // servidor para cerrar la partida y darnos la victoria automáticamente.
         let _timeoutConfirmarAbandono = null;
         function _manejarPosibleAbandonoRival(partida_id) {
-            if (_resultadoProcesado || partida_id !== _partidaActual) return;
+            if (_partidaFinalizada || partida_id !== _partidaActual) return;
             if (_timeoutConfirmarAbandono) return; // ya hay una confirmación en curso, no duplicar
             console.log('[NetGamer][Abandono] Posible abandono detectado. Esperando 4s para confirmar...');
 
             _timeoutConfirmarAbandono = setTimeout(async () => {
                 _timeoutConfirmarAbandono = null;
-                if (_resultadoProcesado || !_canalPartida) return;
+                if (_partidaFinalizada || !_canalPartida) return;
                 const presentes = _canalPartida.presenceState();
                 const rivalSigueConectado = Object.keys(presentes).some(key => key !== currentUser.id);
                 console.log('[NetGamer][Abandono] Confirmando tras 4s. ¿Rival sigue conectado?', rivalSigueConectado);
@@ -5334,6 +5341,7 @@
                     ? (data.ganador_id === currentUser.id)
                     : (ganeRonda || (_puntosYo > _puntosRival));
                 if (ganeElPartido) Sonidos.victoriaFinal(); else Sonidos.derrotaFinal();
+                _partidaFinalizada = true;
                 mostrarResultadoFinal(ganeElPartido, miEmoji, rivalEmoji, esAbandono);
                 return;
             }
