@@ -5285,6 +5285,13 @@
             _resultadoProcesado = true;
             clearInterval(_timerJugada);
             if (_timerPoll) clearInterval(_timerPoll);
+            // Importante: si el abandono se detecta mientras aún se está en la pantalla
+            // de "rival encontrado" (o en el anuncio de ronda), esos timers de countdown
+            // siguen corriendo en segundo plano y, si no se detienen aquí, unos segundos
+            // después terminan tapando la pantalla de resultado final con la del
+            // siguiente anuncio de ronda, dejando todo trabado.
+            clearInterval(_timerRival);
+            clearInterval(_timerRonda);
             document.getElementById('estado-espera-rival').classList.add('hidden');
 
             const esJ1       = _jugadorNum === 1;
