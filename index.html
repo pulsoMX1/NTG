@@ -464,7 +464,7 @@
                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Lee noticias y gana más NetCoins
                 </p>
                 <p class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Invita amigos y ambos ganan 500 NC
+                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Invita amigos y ambos ganan 6,000 NC
                 </p>
                 <p class="text-[11px] sm:text-xs text-slate-300 flex items-center gap-2">
                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Canjea por PayPal, SPEI o Diamantes
@@ -777,14 +777,14 @@
                     </button>
                 </form>
                 <p class="text-center text-xs text-slate-400 mt-2">
-                    ¿No tienes cuenta? <button type="button" onclick="toggleAuthViews(false)" class="text-amber-400 hover:underline font-semibold">¡Regístrate y recibe 1,000 NC gratis!</button>
+                    ¿No tienes cuenta? <button type="button" onclick="toggleAuthViews(false)" class="text-amber-400 hover:underline font-semibold">¡Regístrate y recibe 20,000 NC gratis!</button>
                 </p>
             </div>
 
             <div id="register-view" class="hidden">
                 <div class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/40 rounded-2xl px-3 py-2 mb-3 text-center">
                     <p class="text-amber-400 font-extrabold text-xs sm:text-sm">🎁 ¡Regístrate y recibe</p>
-                    <p class="text-2xl sm:text-3xl font-black text-amber-300">1,000 NC</p>
+                    <p class="text-2xl sm:text-3xl font-black text-amber-300">20,000 NC</p>
                     <p class="text-amber-400/70 text-xs mt-0">de regalo al verificar</p>
                 </div>
                 <h2 class="text-base sm:text-lg font-bold mb-2.5 text-center">Crear Cuenta</h2>
@@ -806,7 +806,7 @@
                     </div>
                     <div id="referido-detectado" class="hidden bg-purple-900/30 border border-purple-500/40 rounded-xl px-3 py-2 text-xs text-purple-300 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-purple-400 shrink-0"></i>
-                        <span>¡Invitado! Ambos reciben <strong>500 NC</strong></span>
+                        <span>¡Invitado! Ambos reciben <strong>6,000 NC</strong></span>
                     </div>
                     <div class="flex items-center gap-2 px-0.5 -mt-4">
                         <input type="checkbox" id="register-aceptar-terminos" required
@@ -1106,7 +1106,7 @@
                     <div class="bg-gradient-to-r from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mt-4">
                         <div>
                             <h3 class="text-base sm:text-lg font-extrabold text-emerald-400 mb-1"><i class="fa-solid fa-user-plus mr-2"></i>¡Invita amigos y gana!</h3>
-                            <p class="text-slate-300 text-xs sm:text-sm">Por cada amigo que se registre, <strong class="text-white">tú y tu amigo ganan 500 NC</strong>.</p>
+                            <p class="text-slate-300 text-xs sm:text-sm">Por cada amigo que se registre, <strong class="text-white">tú y tu amigo ganan 6,000 NC</strong>.</p>
                         </div>
                         <button onclick="switchTab('tab-referidos', event)"
                             class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition w-full sm:w-auto text-center">
@@ -1212,7 +1212,7 @@
                                 <i class="fa-solid fa-coins text-amber-400 text-base sm:text-xl"></i>
                             </div>
                             <h4 class="font-bold text-xs sm:text-sm mb-1">3. Ganen juntos</h4>
-                            <p class="text-slate-400 text-xs hidden sm:block">500 NC para cada uno</p>
+                            <p class="text-slate-400 text-xs hidden sm:block">6,000 NC para cada uno</p>
                         </div>
                     </div>
 
@@ -2404,8 +2404,8 @@
         const SUPABASE_URL = "https://meiwuluwrdjszxeyoqtt.supabase.co";
         const SUPABASE_KEY = "sb_publishable_gZgGIamNJqf8ir8vvt1OTw_bJ-rosi4";
         const CONVERSION_RATE = 100;
-        const NC_POR_REFERIDO = 500;
-        const NC_BONUS_BIENVENIDA = 1000;
+        const NC_POR_REFERIDO = 6000;
+        const NC_BONUS_BIENVENIDA = 20000;
         const BASE_URL = "https://netgamermx.com";
 
         const adgemAppId = "32755";
@@ -3434,7 +3434,7 @@
                 return;
             }
 
-            // Animación de éxito usando la cantidad que devolvió el servidor (1000)
+            // Animación de éxito usando la cantidad que devolvió el servidor (20,000)
             const ncAcreditadas = data.nc || NC_BONUS_BIENVENIDA;
             const card = document.getElementById('modal-bonus-card');
             card.innerHTML = `
@@ -3495,7 +3495,7 @@
 
         function obtenerMensajeCompartir() {
             const enlace = document.getElementById("referral-link-input").value;
-            return `¡Únete a NetGamer MX y gana dinero real completando tareas! Usa mi enlace y ambos recibimos 500 NetCoins de regalo 🎮💰 ${enlace}`;
+            return `¡Únete a NetGamer MX y gana dinero real completando tareas! Usa mi enlace y ambos recibimos 6,000 NetCoins de regalo 🎮💰 ${enlace}`;
         }
 
         function compartirWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(obtenerMensajeCompartir())}`, '_blank'); }
@@ -4433,7 +4433,7 @@
             <p>Para utilizar la Plataforma debes registrarte proporcionando un correo electrónico válido, un nombre de usuario y una contraseña, y verificar tu correo mediante un código de un solo uso (OTP). Cada persona puede mantener <strong>únicamente una cuenta</strong>. Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de toda actividad realizada desde tu cuenta.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">4. Bono de Bienvenida y Sistema de Referidos</h3>
-            <p>Al registrarte y verificar tu cuenta por primera vez, puedes reclamar un bono de bienvenida de <strong>1,000 NetCoins</strong>. Este bono se otorga <strong>una sola vez por persona</strong>. Adicionalmente, al invitar a otros usuarios mediante tu enlace de referido, tanto tú como la persona invitada pueden recibir <strong>500 NetCoins</strong> cada uno cuando el referido complete el proceso correspondiente.</p>
+            <p>Al registrarte y verificar tu cuenta por primera vez, puedes reclamar un bono de bienvenida de <strong>20,000 NetCoins</strong>. Este bono se otorga <strong>una sola vez por persona</strong>. Adicionalmente, al invitar a otros usuarios mediante tu enlace de referido, tanto tú como la persona invitada pueden recibir <strong>6,000 NetCoins</strong> cada uno cuando el referido complete el proceso correspondiente.</p>
             <p>Para prevenir el abuso de estos beneficios, NetGamer MX verifica la dirección IP asociada a cada cuenta. <strong>Solo se otorga un bono de bienvenida y un bono de referido por dirección IP.</strong> Si el sistema detecta que ya existe una cuenta que recibió el bono de bienvenida o que fue registrada como referido desde la misma IP, la nueva cuenta no recibirá dicho beneficio, sin perjuicio de las demás funciones de la Plataforma.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">5. Vidas, Modo 1v1 y Suscripción Premium</h3>
