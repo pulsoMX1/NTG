@@ -5163,7 +5163,7 @@
 
         function suscribirsePartida(partida_id) {
             if (_canalPartida) { _canalPartida.unsubscribe(); _canalPartida = null; }
-            _canalPartida = _supabase.channel('partida-rt-' + partida_id + '-' + Date.now(), {
+            _canalPartida = _supabase.channel('partida-rt-' + partida_id, {
                     config: { presence: { key: currentUser.id } }
                 })
                 .on('postgres_changes', {
