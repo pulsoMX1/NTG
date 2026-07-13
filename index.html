@@ -437,6 +437,18 @@
         </div>
     </div>
 
+    <!-- ══ PANTALLA DE CUENTA SUSPENDIDA PERMANENTEMENTE (cubre absolutamente todo, no tiene botón de cerrar ni forma de ocultarse) ══ -->
+    <div id="pantalla-usuario-suspendido" class="hidden fixed inset-0 bg-slate-950 flex items-center justify-center z-[2147483647] p-6">
+        <div class="max-w-md w-full text-center space-y-5">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-3xl">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-black text-white">Tu cuenta fue suspendida permanentemente</h1>
+            <p id="motivo-usuario-suspendido" class="text-sm text-slate-400 leading-relaxed whitespace-pre-line"></p>
+            <p class="text-xs text-slate-600 pt-2">Si crees que esto es un error, contacta a soporte a través de otro medio. NetGamer</p>
+        </div>
+    </div>
+
     <div id="toast-sesion">
         <div id="toast-sesion-inner" class="flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold">
             <span id="toast-sesion-icon" class="text-xl shrink-0"></span>
@@ -3529,8 +3541,21 @@
                 const savedOK = await guardarIPEnSupabase(user.id, ip);
             }
 
-            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado, modal_ip_rechazado_visto').eq('id', user.id).single();
+            const { data, error } = await _supabase.from('perfiles').select('netcoins, total_referidos, bonus_bienvenida_reclamado, ip_usuario, ip_bonus_reclamado, modal_ip_rechazado_visto, suspendido_permanente, motivo_suspension').eq('id', user.id).single();
             if (!error && data) {
+
+                // Verificación de cuenta suspendida permanentemente — se hace
+                // ANTES que cualquier otra cosa, y no depende de nada que viva
+                // en el navegador (localStorage, variables en memoria, etc.):
+                // se lee directo de la base de datos en cada carga, así que
+                // sobrevive a recargas, borrado de localStorage, cambio de
+                // dispositivo, todo.
+                if (data.suspendido_permanente) {
+                    mostrarPantallaUsuarioSuspendido(data.motivo_suspension);
+                    suscribirseSuspensionPropia(user.id);
+                    return; // no seguir cargando nada más de la cuenta suspendida
+                }
+                suscribirseSuspensionPropia(user.id);
                 
                 actualizarTextosInterfaz(data.netcoins || 0);
                 const totalRef = data.total_referidos || 0;
@@ -3557,6 +3582,93 @@
                 }
             }
         }
+
+        // ══════════════════════════════════════════════════════════════════
+        // BLOQUEO DE CUENTA SUSPENDIDA PERMANENTEMENTE — misma filosofía que
+        // el bloqueo del sitio completo, pero por usuario individual y sin
+        // ningún camino de vuelta (no hay "reactivar" del lado del cliente).
+        // La verdad vive 100% en la base de datos (columna
+        // perfiles.suspendido_permanente), nunca en localStorage ni en
+        // variables de JS, así que ningún truco de recarga o borrado de
+        // datos del navegador lo esquiva.
+        // ══════════════════════════════════════════════════════════════════
+        function mostrarPantallaUsuarioSuspendido(motivo) {
+            document.getElementById('motivo-usuario-suspendido').innerText = motivo || 'Se ha suspendido tu cuenta de forma permanente.';
+            document.getElementById('pantalla-usuario-suspendido').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            ['app-container', 'landing-container', 'auth-container'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.pointerEvents = 'none';
+            });
+
+            // Bloquear también, del lado del cliente, cualquier llamada a
+            // Edge Functions — refuerzo extra por si alguien lograra
+            // manipular el DOM del overlay.
+            if (!_suspensionUsuarioBloqueoInstalado) {
+                _suspensionUsuarioBloqueoInstalado = true;
+                const invokeOriginal = _supabase.functions.invoke.bind(_supabase.functions);
+                _supabase.functions.invoke = function (nombreFn, opciones) {
+                    if (_usuarioSuspendidoPermanente) {
+                        return Promise.resolve({ data: null, error: { message: 'cuenta_suspendida' } });
+                    }
+                    return invokeOriginal(nombreFn, opciones);
+                };
+            }
+            _usuarioSuspendidoPermanente = true;
+        }
+
+        let _usuarioSuspendidoPermanente = false;
+        let _suspensionUsuarioBloqueoInstalado = false;
+        let _suscritoSuspensionPropia = false;
+
+        // Reasegurar el overlay si alguien intenta manipular el DOM para
+        // esconderlo (igual que hacemos con el bloqueo del sitio completo).
+        const _observerSuspensionUsuario = new MutationObserver(() => {
+            if (!_usuarioSuspendidoPermanente) return;
+            const overlay = document.getElementById('pantalla-usuario-suspendido');
+            if (overlay && overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('pantalla-usuario-suspendido');
+            if (overlay) {
+                _observerSuspensionUsuario.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+            }
+        });
+
+        // Escuchar en tiempo real por si el admin suspende la cuenta MIENTRAS
+        // el usuario ya está usando el sitio (no hace falta esperar a que
+        // recargue la página).
+        function suscribirseSuspensionPropia(userId) {
+            if (_suscritoSuspensionPropia) return;
+            _suscritoSuspensionPropia = true;
+            _supabase
+                .channel('suspension-propia-' + userId)
+                .on('postgres_changes', {
+                    event: 'UPDATE', schema: 'public', table: 'perfiles',
+                    filter: `id=eq.${userId}`
+                }, (payload) => {
+                    if (payload.new.suspendido_permanente) {
+                        mostrarPantallaUsuarioSuspendido(payload.new.motivo_suspension);
+                    }
+                })
+                .subscribe();
+        }
+
+        // Latido de presencia: cada 60s, mientras haya sesión activa, avisamos
+        // al servidor que este usuario sigue conectado (para que el panel
+        // admin pueda mostrar "en línea" / "última vez hace X").
+        setInterval(async () => {
+            if (!currentUser || _usuarioSuspendidoPermanente) return;
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session?.access_token) return;
+            _supabase.functions.invoke('latido-presencia', {
+                headers: { Authorization: `Bearer ${session.access_token}` }
+            }).catch(() => {});
+        }, 60000);
 
         function mostrarModalBonus() {
             document.getElementById('bonus-cantidad').innerText = NC_BONUS_BIENVENIDA;
