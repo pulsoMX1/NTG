@@ -192,7 +192,12 @@
                             <i class="fa-solid fa-user text-purple-400 text-sm"></i>
                         </div>
                         <div class="min-w-0">
-                            <p id="chat-user-email" class="font-bold text-sm text-white truncate">—</p>
+                            <p class="flex items-center gap-1.5 min-w-0">
+                                <span id="chat-user-email" class="font-bold text-sm text-white truncate">—</span>
+                                <span id="chat-user-premium-badge" class="hidden shrink-0 text-[10px] font-black uppercase tracking-wide text-amber-950 bg-gradient-to-r from-amber-400 to-yellow-500 px-1.5 py-0.5 rounded-md">
+                                    <i class="fa-solid fa-crown mr-0.5"></i>Premium
+                                </span>
+                            </p>
                             <p id="chat-user-id" class="text-xs text-slate-500 truncate font-mono">—</p>
                         </div>
                     </div>
@@ -571,7 +576,7 @@ async function cargarTickets() {
         .from('support_tickets')
         .select(`
             id, status, created_at, updated_at, user_id, unread_admin,
-            perfiles ( email )
+            perfiles ( email, is_premium, premium_hasta )
         `)
         .order('updated_at', { ascending: false });
 
@@ -695,6 +700,10 @@ async function abrirTicket(ticketId) {
         document.getElementById('chat-user-email').textContent = ticket.perfiles?.email || 'Usuario desconocido';
         document.getElementById('chat-user-id').textContent = `ID: ${ticket.user_id}`;
         actualizarBadgeStatus(ticket.status);
+
+        // Premium solo cuenta como activo si is_premium=true Y todavía no venció
+        const esPremiumActivo = !!(ticket.perfiles?.is_premium && ticket.perfiles?.premium_hasta && new Date(ticket.perfiles.premium_hasta) >= new Date());
+        document.getElementById('chat-user-premium-badge').classList.toggle('hidden', !esPremiumActivo);
 
         // Resetear unread
         if (ticket.unread_admin > 0) {
