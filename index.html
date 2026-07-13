@@ -6503,6 +6503,70 @@ let _anuncioMostrandose = false;
 // - IMAGEN: 10 segundos (fijo)
 const ANUNCIO_DURACION_MIN = 10;
 
+// ══════════════════════════════════════════════════════════════════
+// PERSISTENCIA ANTI-RECARGA: antes, todo el estado del anuncio (cuántos
+// segundos faltaban) vivía solo en una variable de JavaScript en memoria.
+// Al recargar la página, esa variable desaparecía y el usuario se
+// saltaba el anuncio obligatorio por completo. Ahora guardamos en
+// localStorage cuándo empezó el anuncio actual y cuánto dura, para que
+// si recarga a mitad de un anuncio, se lo volvamos a mostrar de
+// inmediato con el tiempo restante correcto (no reiniciado).
+// ══════════════════════════════════════════════════════════════════
+const ANUNCIO_STORAGE_KEY = 'netgamer_anuncio_pendiente';
+
+function _guardarAnuncioPendiente(anuncio, duracionSegundos, inicioTimestamp) {
+    try {
+        localStorage.setItem(ANUNCIO_STORAGE_KEY, JSON.stringify({
+            id: anuncio.id,
+            tipo: anuncio.tipo || (anuncio.media_url ? 'video' : 'imagen'),
+            media_url: anuncio.media_url || null,
+            imagen_url: anuncio.imagen_url || null,
+            link_destino: anuncio.link_destino || '#',
+            duracion: duracionSegundos,
+            inicio: inicioTimestamp
+        }));
+    } catch (e) { /* si localStorage falla (modo incógnito estricto, etc.), no rompemos nada */ }
+}
+
+function _limpiarAnuncioPendiente() {
+    try { localStorage.removeItem(ANUNCIO_STORAGE_KEY); } catch (e) {}
+}
+
+function _leerAnuncioPendiente() {
+    try {
+        const raw = localStorage.getItem(ANUNCIO_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+}
+
+// Al cargar la página, si había un anuncio a medias, lo retomamos con el
+// tiempo restante real (no desde cero) — o si ya se había cumplido el
+// tiempo mientras el usuario estaba fuera, simplemente lo descartamos.
+function _reanudarAnuncioPendienteSiExiste() {
+    const pendiente = _leerAnuncioPendiente();
+    if (!pendiente) return false;
+
+    // Si ya no hay sesión o el usuario ya es premium, ya no aplica forzar el anuncio
+    if (!currentUser || _esPremiumActivo()) {
+        _limpiarAnuncioPendiente();
+        return false;
+    }
+
+    const transcurrido = (Date.now() - pendiente.inicio) / 1000;
+    if (transcurrido >= pendiente.duracion) {
+        // El tiempo obligatorio ya se cumplió mientras estaba fuera, no hace falta re-mostrarlo
+        _limpiarAnuncioPendiente();
+        return false;
+    }
+
+    mostrarAnuncioPersonalizado(pendiente, {
+        segundosYaTranscurridos: transcurrido,
+        inicioOriginal: pendiente.inicio,
+        esReanudacion: true
+    });
+    return true;
+}
+
 function _esPremiumActivo() {
     return typeof isPremium !== 'undefined' && isPremium;
 }
@@ -6552,7 +6616,9 @@ async function intentarMostrarAnuncio() {
     mostrarAnuncioPersonalizado(anuncio);
 }
 
-function mostrarAnuncioPersonalizado(anuncio) {
+function mostrarAnuncioPersonalizado(anuncio, opciones = {}) {
+    const { segundosYaTranscurridos = 0, inicioOriginal = null, esReanudacion = false } = opciones;
+
     _anuncioMostrandose = true;
     _anuncioIdActual = anuncio.id;
 
@@ -6562,13 +6628,29 @@ function mostrarAnuncioPersonalizado(anuncio) {
     // Determinar si es video o imagen
     const tipo = anuncio.tipo || (anuncio.media_url ? 'video' : 'imagen');
     const mediaUrl = anuncio.media_url || anuncio.imagen_url;
+
+    const inicioTimestamp = inicioOriginal || Date.now();
     
     // Función para iniciar el countdown
     const iniciarCountdown = (duracion) => {
-        let seg = Math.ceil(duracion); // Redondear hacia arriba
+        // Guardar (o actualizar) el registro persistente con la duración real
+        // ya conocida, conservando el timestamp de inicio original.
+        _guardarAnuncioPendiente(anuncio, duracion, inicioTimestamp);
+
+        let seg = Math.ceil(duracion - segundosYaTranscurridos); // Redondear hacia arriba, restando lo ya visto
+        if (seg < 0) seg = 0;
+
         const badge = document.getElementById('anuncio-countdown-badge');
         const numEl = document.getElementById('anuncio-countdown-num');
         const btnCerrar = document.getElementById('btn-cerrar-anuncio');
+
+        if (seg <= 0) {
+            // El tiempo obligatorio ya se cumplió (ej. al reanudar tras recargar)
+            badge.classList.add('hidden');
+            btnCerrar.classList.remove('hidden');
+            return;
+        }
+
         badge.classList.remove('hidden');
         btnCerrar.classList.add('hidden');
         numEl.textContent = seg;
@@ -6584,11 +6666,17 @@ function mostrarAnuncioPersonalizado(anuncio) {
         }, 1000);
     };
     
-    if (tipo === 'video' && anuncio.media_url) {
+    if (tipo === 'video' && mediaUrl) {
         imgEl.classList.add('hidden');
         imgEl.src = '';
-        vidEl.src = anuncio.media_url;
+        vidEl.src = mediaUrl;
         vidEl.classList.remove('hidden');
+        // Si estamos reanudando, saltar el video hasta donde se había quedado
+        if (segundosYaTranscurridos > 0) {
+            vidEl.addEventListener('loadedmetadata', function() {
+                try { vidEl.currentTime = Math.min(segundosYaTranscurridos, vidEl.duration || segundosYaTranscurridos); } catch (e) {}
+            }, { once: true });
+        }
         
         // Esperar a que se carguen los metadatos para obtener la duración
         vidEl.addEventListener('loadedmetadata', function() {
@@ -6615,10 +6703,14 @@ function mostrarAnuncioPersonalizado(anuncio) {
     document.getElementById('modal-anuncio-personalizado').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
-    // Registrar impresión
-    _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
-        if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
-    });
+    // Registrar impresión — solo si es la primera vez que se muestra este
+    // anuncio (no al reanudarlo tras un recargo de página, para no contar
+    // la misma vista dos veces en las estadísticas).
+    if (!esReanudacion) {
+        _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
+            if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
+        });
+    }
 }
 
 function cerrarAnuncioPersonalizado() {
@@ -6635,6 +6727,7 @@ function cerrarAnuncioPersonalizado() {
     
     _anuncioMostrandose = false;
     _anuncioIdActual = null;
+    _limpiarAnuncioPendiente();
     programarSiguienteAnuncio();
 }
 
@@ -6652,7 +6745,13 @@ if (typeof verificarSesionActiva !== 'undefined') {
     verificarSesionActiva = async function() {
         await _verificarSesionActivaOriginal();
         if (currentUser && typeof programarSiguienteAnuncio === 'function') {
-            programarSiguienteAnuncio();
+            // Si había un anuncio a medias antes de recargar/cerrar la pestaña,
+            // lo reanudamos de inmediato con el tiempo restante real. Si no había
+            // ninguno pendiente, seguimos con el ciclo normal de programación.
+            const seReanudoAlgo = _reanudarAnuncioPendienteSiExiste();
+            if (!seReanudoAlgo) {
+                programarSiguienteAnuncio();
+            }
         }
     };
 }
