@@ -1138,6 +1138,31 @@ function actualizarTarjetaEstadoSitio(suspendido, motivo) {
     }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// Helper de seguridad: garantiza un access_token FRESCO antes de llamar
+// cualquier Edge Function sensible. El error "UNAUTHORIZED_INVALID_JWT_FORMAT"
+// pasa cuando la sesión ya expiró y access_token queda undefined —el header
+// termina siendo literalmente "Bearer undefined", que no es un JWT válido.
+// Aquí forzamos un refresh de la sesión primero; si de plano no hay sesión
+// (el admin ya no está logueado), avisamos claro en vez de mandar la
+// petición rota.
+// ══════════════════════════════════════════════════════════════════
+async function obtenerTokenSesionValido() {
+    let { data: { session } } = await _supabase.auth.getSession();
+
+    // Si no hay token (sesión vencida o nunca se refrescó sola), forzar refresh
+    if (!session?.access_token) {
+        const { data: refreshData } = await _supabase.auth.refreshSession();
+        session = refreshData?.session || null;
+    }
+
+    if (!session?.access_token) {
+        throw new Error('sesion_expirada');
+    }
+
+    return session.access_token;
+}
+
 async function cargarEstadoSitio() {
     const { data, error } = await _supabase.from('estado_sitio').select('suspendido, motivo').eq('id', 1).single();
     if (!error && data) actualizarTarjetaEstadoSitio(data.suspendido, data.motivo);
@@ -1164,10 +1189,10 @@ async function confirmarSuspenderSitio() {
     btn.innerText = 'Cerrando...';
 
     try {
-        const { data: { session } } = await _supabase.auth.getSession();
+        const token = await obtenerTokenSesionValido();
         const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/actualizar-estado-sitio', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ suspendido: true, motivo })
         });
         const data = await res.json();
@@ -1180,7 +1205,11 @@ async function confirmarSuspenderSitio() {
         cerrarModalSuspender();
         actualizarTarjetaEstadoSitio(true, motivo);
     } catch (e) {
-        alert('Error de red al suspender el sitio.');
+        if (e.message === 'sesion_expirada') {
+            alert('Tu sesión de administrador expiró. Vuelve a iniciar sesión e intenta de nuevo.');
+        } else {
+            alert('Error de red al suspender el sitio.');
+        }
     } finally {
         btn.disabled = false;
         btn.innerText = 'Cerrar NetGamer';
@@ -1192,10 +1221,10 @@ async function reactivarSitio() {
     btn.disabled = true;
 
     try {
-        const { data: { session } } = await _supabase.auth.getSession();
+        const token = await obtenerTokenSesionValido();
         const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/actualizar-estado-sitio', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ suspendido: false })
         });
         const data = await res.json();
@@ -1207,7 +1236,11 @@ async function reactivarSitio() {
 
         actualizarTarjetaEstadoSitio(false, null);
     } catch (e) {
-        alert('Error de red al reactivar el sitio.');
+        if (e.message === 'sesion_expirada') {
+            alert('Tu sesión de administrador expiró. Vuelve a iniciar sesión e intenta de nuevo.');
+        } else {
+            alert('Error de red al reactivar el sitio.');
+        }
     } finally {
         btn.disabled = false;
     }
@@ -1579,9 +1612,9 @@ async function procesarCanje(canjeId, nuevoStatus) {
     if (!confirm(`¿Estás seguro de que deseas marcar este canje como ${nuevoStatus}?`)) return;
 
     try {
-        // Obtener la sesión actual
-        const { data: { session } } = await _supabase.auth.getSession();
-        const token = session?.access_token || '';
+        // Obtener un token de sesión garantizado fresco (evita "Bearer undefined"
+        // si la sesión del admin ya había expirado)
+        const token = await obtenerTokenSesionValido();
 
         // Llamar a la Edge Function segura
         const response = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/procesar-canje', {
@@ -1607,7 +1640,11 @@ async function procesarCanje(canjeId, nuevoStatus) {
         }
         cargarCanjes();
     } catch(err) {
-        alert('Error al procesar el canje: ' + err.message);
+        if (err.message === 'sesion_expirada') {
+            alert('Tu sesión de administrador expiró. Vuelve a iniciar sesión e intenta de nuevo.');
+        } else {
+            alert('Error al procesar el canje: ' + err.message);
+        }
     }
 }
 </script>
