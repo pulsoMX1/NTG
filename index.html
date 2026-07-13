@@ -438,13 +438,16 @@
     </div>
 
     <!-- ══ PANTALLA DE CUENTA SUSPENDIDA PERMANENTEMENTE (cubre absolutamente todo, no tiene botón de cerrar ni forma de ocultarse) ══ -->
-    <div id="pantalla-usuario-suspendido" class="hidden fixed inset-0 bg-slate-950 flex items-center justify-center z-[2147483647] p-6">
+    <div id="pantalla-usuario-suspendido" class="hidden fixed inset-0 bg-slate-950 flex items-center justify-center z-[2147483647] p-6" style="position: fixed !important; z-index: 2147483647 !important;">
         <div class="max-w-md w-full text-center space-y-5">
             <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-3xl">
                 <i class="fa-solid fa-ban"></i>
             </div>
             <h1 class="text-xl sm:text-2xl font-black text-white">Tu cuenta fue suspendida permanentemente</h1>
             <p id="motivo-usuario-suspendido" class="text-sm text-slate-400 leading-relaxed whitespace-pre-line"></p>
+            <button onclick="cerrarSesionDesdeSuspension()" class="mt-2 inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white font-bold text-sm px-5 py-2.5 rounded-xl transition">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </button>
             <p class="text-xs text-slate-600 pt-2">Si crees que esto es un error, contacta a soporte a través de otro medio. NetGamer</p>
         </div>
     </div>
@@ -3593,8 +3596,22 @@
         // datos del navegador lo esquiva.
         // ══════════════════════════════════════════════════════════════════
         function mostrarPantallaUsuarioSuspendido(motivo) {
+            const overlay = document.getElementById('pantalla-usuario-suspendido');
+
+            // Garantizar que el overlay sea hijo DIRECTO de <body> — así se
+            // escapa de cualquier contenedor padre que pudiera tener su
+            // propio "contexto de apilamiento" (transform, filter, etc.)
+            // y que le hiciera perder el z-index máximo frente a otros
+            // elementos. Con esto queda SIEMPRE por encima de todo.
+            if (overlay && overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+            }
+
             document.getElementById('motivo-usuario-suspendido').innerText = motivo || 'Se ha suspendido tu cuenta de forma permanente.';
-            document.getElementById('pantalla-usuario-suspendido').classList.remove('hidden');
+            overlay.classList.remove('hidden');
+            overlay.style.position = 'fixed';
+            overlay.style.zIndex = '2147483647';
+            overlay.style.inset = '0';
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
             ['app-container', 'landing-container', 'auth-container'].forEach(id => {
@@ -3618,6 +3635,15 @@
             _usuarioSuspendidoPermanente = true;
         }
 
+        // Botón "Cerrar sesión" de la pantalla de suspensión: cierra la
+        // sesión de verdad y manda al usuario de vuelta al landing con una
+        // recarga completa de la página (nunca lo deja "atrapado" a medias).
+        async function cerrarSesionDesdeSuspension() {
+            try { await _supabase.auth.signOut(); } catch (e) {}
+            try { localStorage.clear(); } catch (e) {}
+            window.location.href = window.location.origin + window.location.pathname;
+        }
+
         let _usuarioSuspendidoPermanente = false;
         let _suspensionUsuarioBloqueoInstalado = false;
         let _suscritoSuspensionPropia = false;
@@ -3636,12 +3662,17 @@
             const overlay = document.getElementById('pantalla-usuario-suspendido');
             if (overlay) {
                 _observerSuspensionUsuario.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+                _observerSuspensionUsuario.observe(document.body, { childList: true });
             }
         });
 
         // Escuchar en tiempo real por si el admin suspende la cuenta MIENTRAS
         // el usuario ya está usando el sitio (no hace falta esperar a que
-        // recargue la página).
+        // recargue la página). Además de Realtime, agregamos un chequeo
+        // directo cada 10 segundos como respaldo — por si el canal de
+        // Realtime no llega a disparar (por ejemplo, si la tabla 'perfiles'
+        // no está agregada a la publicación de Realtime en Supabase), así
+        // este bloqueo NUNCA depende de un solo mecanismo.
         function suscribirseSuspensionPropia(userId) {
             if (_suscritoSuspensionPropia) return;
             _suscritoSuspensionPropia = true;
@@ -3656,6 +3687,20 @@
                     }
                 })
                 .subscribe();
+
+            setInterval(async () => {
+                if (_usuarioSuspendidoPermanente) return;
+                try {
+                    const { data } = await _supabase
+                        .from('perfiles')
+                        .select('suspendido_permanente, motivo_suspension')
+                        .eq('id', userId)
+                        .single();
+                    if (data?.suspendido_permanente) {
+                        mostrarPantallaUsuarioSuspendido(data.motivo_suspension);
+                    }
+                } catch (e) {}
+            }, 10000);
         }
 
         // Latido de presencia: cada 60s, mientras haya sesión activa, avisamos
