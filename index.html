@@ -1999,10 +1999,7 @@
                             </div>
                             <ul class="space-y-3 mb-6">
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
-                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la Web de netgamer
-                                </li>
-                                <li class="flex items-center gap-3 text-sm text-slate-200">
-                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la web de noticias pulsomx
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la plataforma
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
@@ -3562,6 +3559,7 @@
                     return; // no seguir cargando nada más de la cuenta suspendida
                 }
                 suscribirseSuspensionPropia(user.id);
+                _enviarLatidoPresencia();
                 
                 actualizarTextosInterfaz(data.netcoins || 0);
                 const totalRef = data.total_referidos || 0;
@@ -3703,20 +3701,22 @@
                         mostrarPantallaUsuarioSuspendido(data.motivo_suspension);
                     }
                 } catch (e) {}
-            }, 10000);
+            }, 4000);
         }
 
-        // Latido de presencia: cada 60s, mientras haya sesión activa, avisamos
-        // al servidor que este usuario sigue conectado (para que el panel
-        // admin pueda mostrar "en línea" / "última vez hace X").
-        setInterval(async () => {
+        // Latido de presencia: se manda UNA VEZ de inmediato al iniciar sesión
+        // (para que 'ultima_conexion' nunca quede vacío si el usuario se
+        // desconecta antes de que pase el primer minuto), y luego cada 60s
+        // mientras haya sesión activa.
+        async function _enviarLatidoPresencia() {
             if (!currentUser || _usuarioSuspendidoPermanente) return;
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session?.access_token) return;
             _supabase.functions.invoke('latido-presencia', {
                 headers: { Authorization: `Bearer ${session.access_token}` }
             }).catch(() => {});
-        }, 60000);
+        }
+        setInterval(_enviarLatidoPresencia, 60000);
 
         function mostrarModalBonus() {
             document.getElementById('bonus-cantidad').innerText = NC_BONUS_BIENVENIDA;
