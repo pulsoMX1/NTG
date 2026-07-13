@@ -2433,16 +2433,112 @@
         function mostrarPantallaSuspendido(motivo) {
             document.getElementById('motivo-sitio-suspendido').innerText = motivo || '';
             document.getElementById('pantalla-sitio-suspendido').classList.remove('hidden');
+            // Además de mostrar el overlay, bloqueamos de verdad la interacción con
+            // el resto de la página (scroll, clics, formularios) — así, aunque
+            // alguien manipule el CSS para "ver a través" del overlay, no puede
+            // interactuar con nada de abajo.
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            if (document.getElementById('app-container')) {
+                document.getElementById('app-container').style.pointerEvents = 'none';
+            }
+            if (document.getElementById('landing-container')) {
+                document.getElementById('landing-container').style.pointerEvents = 'none';
+            }
+            if (document.getElementById('auth-container')) {
+                document.getElementById('auth-container').style.pointerEvents = 'none';
+            }
         }
 
         function ocultarPantallaSuspendido() {
             document.getElementById('pantalla-sitio-suspendido').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            if (document.getElementById('app-container')) {
+                document.getElementById('app-container').style.pointerEvents = '';
+            }
+            if (document.getElementById('landing-container')) {
+                document.getElementById('landing-container').style.pointerEvents = '';
+            }
+            if (document.getElementById('auth-container')) {
+                document.getElementById('auth-container').style.pointerEvents = '';
+            }
         }
+
+        // ══════════════════════════════════════════════════════════════════
+        // BLINDAJE ANTI-MANIPULACIÓN DEL BLOQUEO
+        //
+        // El overlay por sí solo es solo una capa visual — cualquiera con las
+        // devtools abiertas podría intentar ocultarlo manualmente (quitando la
+        // clase 'hidden', llamando ocultarPantallaSuspendido() a mano, etc.).
+        // Aquí guardamos la "verdad" del servidor en una variable, y usamos un
+        // MutationObserver para que, si alguien manipula el DOM del overlay
+        // mientras el sitio sigue suspendido según el servidor, se reimponga
+        // de inmediato — en menos de un instante, sin depender de que el
+        // usuario nunca haya intentado nada raro.
+        // ══════════════════════════════════════════════════════════════════
+        let _sitioSuspendidoSegunServidor = false;
+        let _motivoSuspensionActual = '';
+
+        function _reforzarEstadoBloqueo() {
+            const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
+            const overlay = document.getElementById('pantalla-sitio-suspendido');
+            if (!overlay) return;
+
+            if (_sitioSuspendidoSegunServidor && !esAdmin) {
+                if (overlay.classList.contains('hidden')) {
+                    mostrarPantallaSuspendido(_motivoSuspensionActual);
+                }
+            }
+        }
+
+        const _observerBloqueo = new MutationObserver(() => _reforzarEstadoBloqueo());
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('pantalla-sitio-suspendido');
+            if (overlay) {
+                _observerBloqueo.observe(overlay, { attributes: true, attributeFilter: ['class', 'style'] });
+            }
+        });
+
+        // Verificación en bucle (además del realtime) — por si el canal de
+        // Realtime se cae en silencio o alguien logra interferir con el
+        // WebSocket, esto sigue chequeando la verdad directo en la base de
+        // datos cada 15 segundos sin depender de nada más.
+        setInterval(() => { verificarEstadoSitio(); }, 15000);
+
+        // ══════════════════════════════════════════════════════════════════
+        // SEGUNDA CAPA: bloquear también las llamadas reales a Edge Functions
+        // mientras el sitio está suspendido, no solo la vista. Así, aunque
+        // alguien lograra esconder el overlay del DOM, las acciones reales
+        // (jugar, comprar, canjear, etc.) igual quedan cortadas del lado del
+        // cliente antes de siquiera intentar la petición.
+        //
+        // IMPORTANTE — esto es un refuerzo, NO la protección definitiva: la
+        // única forma 100% infalible de bloquear esto es que cada Edge
+        // Function verifique 'estado_sitio.suspendido' ella misma en el
+        // servidor (un usuario muy insistente podría llamar a la función
+        // directamente sin pasar por esta página). Aun así, esto detiene a
+        // cualquiera que intente manipular solo el HTML/CSS/JS de la página.
+        // ══════════════════════════════════════════════════════════════════
+        const _functionsInvokeOriginal = _supabase.functions.invoke.bind(_supabase.functions);
+        _supabase.functions.invoke = function (nombreFn, opciones) {
+            const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
+            // Dejar pasar siempre la propia función que consulta o cambia el
+            // estado del sitio, para no bloquearnos a nosotros mismos.
+            const funcionesExentas = ['actualizar-estado-sitio'];
+            if (_sitioSuspendidoSegunServidor && !esAdmin && !funcionesExentas.includes(nombreFn)) {
+                return Promise.resolve({ data: null, error: { message: 'sitio_suspendido' } });
+            }
+            return _functionsInvokeOriginal(nombreFn, opciones);
+        };
 
         async function verificarEstadoSitio() {
             try {
                 const { data, error } = await _supabase.from('estado_sitio').select('suspendido, motivo').eq('id', 1).single();
                 if (error || !data) return;
+
+                _sitioSuspendidoSegunServidor = !!data.suspendido;
+                _motivoSuspensionActual = data.motivo || '';
 
                 const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
                 if (data.suspendido && !esAdmin) {
@@ -2460,6 +2556,9 @@
             _supabase
                 .channel('estado-sitio-global')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estado_sitio' }, (payload) => {
+                    _sitioSuspendidoSegunServidor = !!payload.new.suspendido;
+                    _motivoSuspensionActual = payload.new.motivo || '';
+
                     const esAdmin = currentUser && currentUser.email === ADMIN_EMAIL_SITIO;
                     if (payload.new.suspendido && !esAdmin) {
                         mostrarPantallaSuspendido(payload.new.motivo);
