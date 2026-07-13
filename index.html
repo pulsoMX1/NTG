@@ -3604,9 +3604,7 @@
         // datos del navegador lo esquiva.
         // ══════════════════════════════════════════════════════════════════
         function mostrarPantallaUsuarioSuspendido(motivo) {
-            console.log('[DIAG-BAN] mostrarPantallaUsuarioSuspendido() llamada con motivo:', motivo);
             const overlay = document.getElementById('pantalla-usuario-suspendido');
-            console.log('[DIAG-BAN] overlay encontrado en DOM:', !!overlay);
 
             // Garantizar que el overlay sea hijo DIRECTO de <body> — así se
             // escapa de cualquier contenedor padre que pudiera tener su
@@ -3643,7 +3641,6 @@
                 };
             }
             _usuarioSuspendidoPermanente = true;
-            console.log('[DIAG-BAN] Overlay mostrado. hidden presente?:', overlay.classList.contains('hidden'), '_usuarioSuspendidoPermanente:', _usuarioSuspendidoPermanente);
         }
 
         // Botón "Cerrar sesión" de la pantalla de suspensión: cierra la
@@ -3665,13 +3662,11 @@
             if (!_usuarioSuspendidoPermanente) return;
             const overlay = document.getElementById('pantalla-usuario-suspendido');
             if (overlay && overlay.classList.contains('hidden')) {
-                console.log('[DIAG-BAN] MutationObserver detectó que le agregaron "hidden" al overlay. Reimponiendo...');
                 overlay.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             }
         });
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('[DIAG-BAN] DOMContentLoaded disparado, adjuntando observer...');
             const overlay = document.getElementById('pantalla-usuario-suspendido');
             if (overlay) {
                 _observerSuspensionUsuario.observe(overlay, { attributes: true, attributeFilter: ['class'] });
