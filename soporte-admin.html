@@ -94,6 +94,9 @@
                 <button id="modulo-btn-sitio" onclick="cambiarModulo('sitio')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
                 </button>
+                <button id="modulo-btn-usuarios" onclick="cambiarModulo('usuarios')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-users mr-1.5"></i>Usuarios
+                </button>
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -121,6 +124,9 @@
         </button>
         <button id="modulo-btn-sitio-mobile" onclick="cambiarModulo('sitio')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
             <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
+        </button>
+        <button id="modulo-btn-usuarios-mobile" onclick="cambiarModulo('usuarios')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
+            <i class="fa-solid fa-users mr-1.5"></i>Usuarios
         </button>
     </div>
 
@@ -407,6 +413,50 @@
             <button id="btn-reactivar-sitio" onclick="reactivarSitio()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition items-center justify-center gap-2">
                 <i class="fa-solid fa-play"></i> Reactivar Sitio
             </button>
+        </div>
+    </div>
+
+    <!-- ── MÓDULO USUARIOS ── -->
+    <div id="modulo-usuarios" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-lg font-black text-white">Usuarios registrados</h2>
+                <span id="usuarios-total-count" class="text-xs text-slate-500 font-semibold"></span>
+            </div>
+            <p class="text-sm text-slate-400 mb-5">Estado en línea en tiempo real y suspensión permanente de cuentas.</p>
+
+            <input id="usuarios-buscador" type="text" placeholder="Buscar por correo o usuario..." oninput="filtrarListaUsuarios()"
+                class="w-full bg-slate-800 border border-slate-700 focus:border-purple-500 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition placeholder-slate-600 mb-4">
+
+            <div id="usuarios-loading" class="text-center text-slate-500 text-sm py-10">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando usuarios...
+            </div>
+
+            <div id="lista-usuarios" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAR SUSPENSIÓN DE USUARIO ══ -->
+<div id="modal-suspender-usuario" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+    <div class="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md shadow-2xl">
+        <div class="px-5 pt-5 pb-3 border-b border-slate-700/70">
+            <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+                <i class="fa-solid fa-user-slash text-rose-500"></i>
+                <span>¿Estás seguro que quieres suspender a <span id="suspender-usuario-email" class="text-rose-400"></span> permanentemente?</span>
+            </h3>
+        </div>
+        <div class="px-5 py-4 space-y-3">
+            <p class="text-xs text-slate-400">Esta acción es permanente. El usuario verá una pantalla de bloqueo total que nunca podrá quitar por su cuenta, con el motivo que escribas abajo.</p>
+            <div>
+                <label class="text-xs font-semibold text-slate-400 block mb-1.5">Motivo (se le mostrará al usuario)</label>
+                <textarea id="input-motivo-suspension-usuario" rows="4"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition resize-none">Por incumplir los Términos y Condiciones de NetGamer MX.</textarea>
+            </div>
+        </div>
+        <div class="px-5 pb-5 flex gap-2">
+            <button onclick="cerrarModalSuspenderUsuario()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl transition">Cancelar</button>
+            <button id="btn-confirmar-suspender-usuario" onclick="confirmarSuspenderUsuarioPermanente()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl transition">Confirmar suspensión permanente</button>
         </div>
     </div>
 </div>
@@ -1082,6 +1132,7 @@ function cambiarModulo(modulo) {
     const esCanjes = modulo === 'canjes';
     const esAnuncios = modulo === 'anuncios';
     const esSitio = modulo === 'sitio';
+    const esUsuarios = modulo === 'usuarios';
 
     document.getElementById('main-body').classList.toggle('hidden', !esSoporte);
     document.getElementById('modulo-canjes').classList.toggle('hidden', !esCanjes);
@@ -1090,20 +1141,23 @@ function cambiarModulo(modulo) {
     document.getElementById('modulo-anuncios').classList.toggle('flex', esAnuncios);
     document.getElementById('modulo-sitio').classList.toggle('hidden', !esSitio);
     document.getElementById('modulo-sitio').classList.toggle('flex', esSitio);
+    document.getElementById('modulo-usuarios').classList.toggle('hidden', !esUsuarios);
+    document.getElementById('modulo-usuarios').classList.toggle('flex', esUsuarios);
 
-    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-sitio', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-sitio-mobile'].forEach(id => {
+    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-sitio', 'modulo-btn-usuarios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-sitio-mobile', 'modulo-btn-usuarios-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const esEsteBtn = id.includes(modulo);
         el.classList.toggle('bg-purple-600', esEsteBtn);
         el.classList.toggle('text-white', esEsteBtn);
-        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('sitio')));
+        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('sitio') || id.includes('usuarios')));
         el.classList.toggle('text-slate-400', !esEsteBtn);
     });
 
     if (modulo === 'anuncios') cargarAnuncios();
     if (modulo === 'canjes') cargarCanjes();
     if (modulo === 'sitio') cargarEstadoSitio();
+    if (modulo === 'usuarios') cargarUsuarios();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1645,6 +1699,182 @@ async function procesarCanje(canjeId, nuevoStatus) {
         } else {
             alert('Error al procesar el canje: ' + err.message);
         }
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// MÓDULO USUARIOS — lista de correos registrados, estado en línea
+// en tiempo real, y suspensión permanente de cuentas.
+// ══════════════════════════════════════════════════════════
+
+let todosLosUsuarios = [];
+let usuariosEnLineaIds = new Set();
+let _usuarioParaSuspender = null; // { id, email }
+let _suscritoPresenciaUsuarios = false;
+
+async function cargarUsuarios() {
+    document.getElementById('usuarios-loading').classList.remove('hidden');
+    document.getElementById('lista-usuarios').innerHTML = '';
+
+    try {
+        const token = await obtenerTokenSesionValido();
+        const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/listar-usuarios-admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok || data?.error) {
+            document.getElementById('usuarios-loading').innerHTML = '<p class="text-rose-400 text-sm">No se pudo cargar la lista de usuarios: ' + (data?.error || 'error desconocido') + '</p>';
+            return;
+        }
+
+        todosLosUsuarios = data.usuarios || [];
+        document.getElementById('usuarios-loading').classList.add('hidden');
+        document.getElementById('usuarios-total-count').textContent = todosLosUsuarios.length + ' usuario(s)';
+
+        suscribirsePresenciaUsuarios();
+        renderizarListaUsuarios();
+    } catch (e) {
+        if (e.message === 'sesion_expirada') {
+            document.getElementById('usuarios-loading').innerHTML = '<p class="text-rose-400 text-sm">Tu sesión expiró. Vuelve a iniciar sesión.</p>';
+        } else {
+            document.getElementById('usuarios-loading').innerHTML = '<p class="text-rose-400 text-sm">Error de red al cargar usuarios.</p>';
+        }
+    }
+}
+
+function filtrarListaUsuarios() {
+    renderizarListaUsuarios();
+}
+
+function _formatearUltimaConexion(usuario) {
+    if (usuariosEnLineaIds.has(usuario.id)) {
+        return '<span class="flex items-center gap-1.5 text-emerald-400"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>En línea</span>';
+    }
+    if (!usuario.ultima_conexion) {
+        return '<span class="flex items-center gap-1.5 text-slate-500"><span class="w-1.5 h-1.5 bg-slate-600 rounded-full"></span>Sin conexión registrada</span>';
+    }
+    const ms = Date.now() - new Date(usuario.ultima_conexion).getTime();
+    const min = Math.floor(ms / 60000);
+    let texto;
+    if (min < 1) texto = 'hace un momento';
+    else if (min < 60) texto = `hace ${min} min`;
+    else if (min < 1440) texto = `hace ${Math.floor(min / 60)} h`;
+    else texto = `hace ${Math.floor(min / 1440)} d`;
+    return `<span class="flex items-center gap-1.5 text-slate-500"><span class="w-1.5 h-1.5 bg-slate-600 rounded-full"></span>Últ. vez ${texto}</span>`;
+}
+
+function renderizarListaUsuarios() {
+    const cont = document.getElementById('lista-usuarios');
+    const busqueda = (document.getElementById('usuarios-buscador')?.value || '').toLowerCase().trim();
+
+    const usuariosFiltrados = todosLosUsuarios.filter(u => {
+        if (!busqueda) return true;
+        return (u.email || '').toLowerCase().includes(busqueda) || (u.username || '').toLowerCase().includes(busqueda);
+    });
+
+    if (usuariosFiltrados.length === 0) {
+        cont.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">No se encontraron usuarios.</p>';
+        return;
+    }
+
+    cont.innerHTML = usuariosFiltrados.map(u => `
+        <div class="flex items-center justify-between gap-3 bg-slate-800/60 border border-slate-700 rounded-xl px-4 py-3">
+            <div class="min-w-0">
+                <p class="font-bold text-white text-sm truncate">${_escaparHtmlAdmin(u.email || 'Sin correo')}</p>
+                <div class="flex items-center gap-3 mt-0.5 text-xs">
+                    ${_formatearUltimaConexion(u)}
+                    ${u.username ? `<span class="text-slate-600">@${_escaparHtmlAdmin(u.username)}</span>` : ''}
+                </div>
+            </div>
+            ${u.suspendido_permanente
+                ? `<span class="shrink-0 text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-lg px-3 py-2"><i class="fa-solid fa-ban mr-1"></i>Suspendido</span>`
+                : `<button onclick='abrirModalSuspenderUsuario(${JSON.stringify(u.id)}, ${JSON.stringify(u.email || "")})' class="shrink-0 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg px-3 py-2 transition">Suspender</button>`
+            }
+        </div>
+    `).join('');
+}
+
+function _escaparHtmlAdmin(texto) {
+    if (!texto) return '';
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+// Reutilizamos el MISMO canal de presence que ya usa el sitio principal
+// ('presencia-usuarios') para saber, en tiempo real, quién está conectado
+// ahora mismo — sin necesitar ninguna Edge Function ni polling adicional
+// para esta parte.
+function suscribirsePresenciaUsuarios() {
+    if (_suscritoPresenciaUsuarios) return;
+    _suscritoPresenciaUsuarios = true;
+
+    const canal = _supabase.channel('presencia-usuarios');
+    canal
+        .on('presence', { event: 'sync' }, () => {
+            const estado = canal.presenceState();
+            usuariosEnLineaIds = new Set(Object.values(estado).flat().map(p => p.user_id).filter(Boolean));
+            renderizarListaUsuarios();
+        })
+        .subscribe();
+}
+
+function abrirModalSuspenderUsuario(userId, email) {
+    _usuarioParaSuspender = { id: userId, email: email };
+    document.getElementById('suspender-usuario-email').textContent = email || '(sin correo)';
+    document.getElementById('input-motivo-suspension-usuario').value = 'Por incumplir los Términos y Condiciones de NetGamer MX.';
+    document.getElementById('modal-suspender-usuario').classList.remove('hidden');
+}
+
+function cerrarModalSuspenderUsuario() {
+    document.getElementById('modal-suspender-usuario').classList.add('hidden');
+    _usuarioParaSuspender = null;
+}
+
+async function confirmarSuspenderUsuarioPermanente() {
+    if (!_usuarioParaSuspender) return;
+    const motivo = document.getElementById('input-motivo-suspension-usuario').value.trim();
+    if (!motivo) {
+        alert('Escribe un motivo para mostrarle al usuario.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirmar-suspender-usuario');
+    btn.disabled = true;
+    btn.innerText = 'Suspendiendo...';
+
+    try {
+        const token = await obtenerTokenSesionValido();
+        const res = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/suspender-usuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ userId: _usuarioParaSuspender.id, motivo })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data?.error) {
+            alert('No se pudo suspender al usuario: ' + (data?.error || 'error desconocido'));
+            return;
+        }
+
+        // Reflejar el cambio localmente sin tener que recargar toda la lista
+        const u = todosLosUsuarios.find(x => x.id === _usuarioParaSuspender.id);
+        if (u) { u.suspendido_permanente = true; u.motivo_suspension = motivo; }
+        renderizarListaUsuarios();
+
+        cerrarModalSuspenderUsuario();
+        mostrarToast('Usuario suspendido permanentemente', 'success');
+    } catch (e) {
+        if (e.message === 'sesion_expirada') {
+            alert('Tu sesión de administrador expiró. Vuelve a iniciar sesión e intenta de nuevo.');
+        } else {
+            alert('Error de red al suspender al usuario.');
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Confirmar suspensión permanente';
     }
 }
 </script>
