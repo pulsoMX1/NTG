@@ -105,6 +105,10 @@
                 <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
                 <span class="text-xs text-emerald-400 font-semibold">En línea</span>
             </div>
+            <div class="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full px-2.5 py-1">
+                <i class="fa-solid fa-users text-blue-400 text-xs"></i>
+                <span id="contador-usuarios-activos" class="text-xs text-blue-400 font-semibold">-- activos ahora</span>
+            </div>
             <button onclick="cerrarSesionAdmin()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition" title="Cerrar sesión">
                 <i class="fa-solid fa-right-from-bracket text-slate-400 text-sm"></i>
             </button>
@@ -545,6 +549,7 @@ async function iniciarSesionAdmin() {
     await cargarTickets();
     suscribirTicketsRealtime();
     suscribirAnunciosRealtime();
+    suscribirsePresenciaUsuarios();
 }
 
 function suscribirAnunciosRealtime() {
@@ -1123,6 +1128,7 @@ function mostrarToast(msg, tipo) {
         document.getElementById('admin-email-label').textContent = adminUser.email;
         await cargarTickets();
         suscribirTicketsRealtime();
+        suscribirsePresenciaUsuarios();
     } else if (session?.user) {
         await _supabase.auth.signOut();
     }
@@ -1813,18 +1819,28 @@ function _escaparHtmlAdmin(texto) {
 }
 
 // Reutilizamos el MISMO canal de presence que ya usa el sitio principal
-// ('presencia-usuarios') para saber, en tiempo real, quién está conectado
-// ahora mismo — sin necesitar ninguna Edge Function ni polling adicional
-// para esta parte.
+// para saber, en tiempo real, quién está conectado ahora mismo — sin
+// necesitar ninguna Edge Function ni polling adicional para esta parte.
+//
+// IMPORTANTE: el nombre de este canal ('landing-realtime') debe ser
+// IDÉNTICO al que usa el archivo principal de NetGamer (netgamer.html).
+// Si en algún momento cambias el nombre del canal en un lado, tienes que
+// cambiarlo también aquí, o este contador y el estado "En línea" por
+// usuario dejan de funcionar en silencio (sin error visible).
 function suscribirsePresenciaUsuarios() {
     if (_suscritoPresenciaUsuarios) return;
     _suscritoPresenciaUsuarios = true;
 
-    const canal = _supabase.channel('presencia-usuarios');
+    const canal = _supabase.channel('landing-realtime');
     canal
         .on('presence', { event: 'sync' }, () => {
             const estado = canal.presenceState();
             usuariosEnLineaIds = new Set(Object.values(estado).flat().map(p => p.user_id).filter(Boolean));
+            const contadorEl = document.getElementById('contador-usuarios-activos');
+            if (contadorEl) {
+                const n = usuariosEnLineaIds.size;
+                contadorEl.textContent = n === 1 ? '1 activo ahora' : `${n} activos ahora`;
+            }
             renderizarListaUsuarios();
         })
         .subscribe();
