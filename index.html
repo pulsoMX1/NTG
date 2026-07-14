@@ -1567,7 +1567,7 @@
                             <div class="flex items-start gap-2.5 bg-amber-500/8 border border-amber-500/20 rounded-xl px-3 py-2.5">
                                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs mt-0.5 shrink-0"></i>
                                 <p class="text-[11px] text-amber-200/80 leading-relaxed">
-                                    <strong class="text-amber-300">Recuerda:</strong> Juegas contra personas reales, no contra un bot. Cada apuesta es real — si ganas, los NC se acreditan de inmediato; si pierdes, se descuentan. Juega responsablemente.
+                                    <strong class="text-amber-300">Recuerda:</strong> Juegas contra otros jugadores reales cuando hay disponibles. Si no encontramos un rival humano a tiempo, jugarás contra la IA de NetGamer para que no te quedes esperando. Cada apuesta es real — si ganas, los NC se acreditan de inmediato; si pierdes, se descuentan. Juega responsablemente.
                                 </p>
                             </div>
 
@@ -5069,6 +5069,8 @@
         let _partidaActual = null;
         let _jugadorNum    = null;
         let _apuestaActual = 0;
+        let _juegoActual = null;
+        let _esPartidaVsBot = false;
         let _timerBusqueda = null;
         let _timerJugada   = null;
         let _canalPartida  = null;
@@ -5158,6 +5160,8 @@
             _buscandoPartida = true;
             document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = true);
             _apuestaActual = apuesta;
+            _juegoActual   = juego;
+            _esPartidaVsBot = false;
             _jugadaHecha   = false;
             _rondaActual   = 1;
             _puntosYo      = 0;
@@ -5304,6 +5308,7 @@
 
         function iniciarCountdownBusqueda() {
             let seg = 30;
+            let _yaOfrecioBot = false;
             document.getElementById('countdown-busqueda').textContent = seg;
             document.getElementById('barra-busqueda').style.width = '100%';
             _timerBusqueda = setInterval(async () => {
@@ -5311,6 +5316,18 @@
                 document.getElementById('countdown-busqueda').textContent = seg;
                 document.getElementById('barra-busqueda').style.width = (seg / 30 * 100) + '%';
                 if (seg > 0) Sonidos.tick();
+
+                // A 5 segundos de que se acabe el tiempo y sin rival humano
+                // todavía, ofrecemos jugar contra la IA de NetGamer en vez de
+                // cancelar la búsqueda y devolver la apuesta. Se avisa de
+                // forma clara — nunca se hace pasar la IA por una persona.
+                if (seg === 5 && !_yaOfrecioBot) {
+                    _yaOfrecioBot = true;
+                    clearInterval(_timerBusqueda);
+                    await _iniciarPartidaVsBot();
+                    return;
+                }
+
                 if (seg <= 0) {
                     clearInterval(_timerBusqueda);
                     await cancelarBusqueda();
@@ -5318,6 +5335,37 @@
                     mostrarNotificacion('No se encontró rival. Se devolvieron tus NC.', 'info');
                 }
             }, 1000);
+        }
+
+        async function _iniciarPartidaVsBot() {
+            mostrarNotificacion('🤖 No encontramos rival a tiempo — jugarás contra la IA de NetGamer', 'info');
+
+            // Dejar de escuchar la cola de emparejamiento: si llegara un rival
+            // humano justo en este instante, ya no queremos que nos empareje,
+            // porque estamos por entrar a una partida contra la IA.
+            if (_canalCola) { _canalCola.unsubscribe(); _canalCola = null; }
+
+            const { data: { session } } = await _supabase.auth.getSession();
+            const { data, error } = await _supabase.functions.invoke('jugar-vs-bot', {
+                body: { juego: _juegoActual, apuesta: _apuestaActual },
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
+
+            if (error || data?.error) {
+                // Si algo falla armando la partida contra la IA, no dejamos
+                // al usuario colgado: cancelamos y devolvemos la apuesta,
+                // igual que si nunca se hubiera encontrado rival.
+                mostrarNotificacion('⚠️ No se pudo iniciar la partida contra la IA. Se devolvieron tus NC.', 'error');
+                await cancelarBusqueda();
+                return;
+            }
+
+            _esPartidaVsBot = true;
+            _partidaActual  = data.partida_id;
+            _jugadorNum     = data.eres_jugador;
+            _nombreRival    = 'IA NetGamer';
+            mostrarFaseRivalEncontrado();
+            suscribirsePartida(data.partida_id);
         }
 
 
@@ -5495,6 +5543,7 @@
                 .on('presence', { event: 'join' }, ({ key }) => {
                 })
                 .on('presence', { event: 'leave' }, ({ key }) => {
+                    if (_esPartidaVsBot) return; // la IA no tiene presence — nada que detectar aquí
                     if (key === currentUser.id) return;
                     _manejarPosibleAbandonoRival(partida_id);
                 })
@@ -5502,10 +5551,11 @@
                     if (status === 'SUBSCRIBED') {
                         const trackResult = await _canalPartida.track({ online_at: new Date().toISOString() });
 
-                        // Respaldo: además del evento 'leave' (que a veces tarda o no llega
-                        // por congestión del servidor de Realtime), revisamos cada 5s de forma
-                        // directa si el rival sigue en la lista de presence.
+                        // La detección de abandono por presence no aplica a partidas
+                        // contra la IA (el bot nunca "está presente"), así que ese
+                        // respaldo solo se arranca en partidas contra rivales reales.
                         if (_pollPresenciaRival) clearInterval(_pollPresenciaRival);
+                        if (_esPartidaVsBot) return;
                         _pollPresenciaRival = setInterval(() => {
                             if (!_canalPartida || partida_id !== _partidaActual) {
                                 clearInterval(_pollPresenciaRival);
@@ -5532,6 +5582,7 @@
         // servidor para cerrar la partida y darnos la victoria automáticamente.
         let _timeoutConfirmarAbandono = null;
         function _manejarPosibleAbandonoRival(partida_id) {
+            if (_esPartidaVsBot) return; // salvaguarda extra: la IA nunca "abandona"
             if (_partidaFinalizada || partida_id !== _partidaActual) return;
             if (_timeoutConfirmarAbandono) return; // ya hay una confirmación en curso, no duplicar
 
@@ -5798,6 +5849,7 @@
             detenerWatchdogPartida();
             _partidaActual = null;
             _jugadorNum    = null;
+            _esPartidaVsBot = false;
             _jugadaHecha   = false;
             _rondaActual   = 1;
             _puntosYo      = 0;
