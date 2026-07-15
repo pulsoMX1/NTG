@@ -4117,9 +4117,16 @@
         }
 
         function seleccionarMontoSeguro(nc, mxn, label, tipo, tieneBalance) {
+            // Recalculamos el balance en tiempo real: el parámetro "tieneBalance" venía
+            // "congelado" con el valor que había al dibujar el botón. Si el usuario
+            // alcanzaba el saldo DESPUÉS (y el botón se habilitaba visualmente vía
+            // actualizarBotonesCanjes), ese valor viejo seguía marcando "false" y
+            // el clic nunca abría el formulario.
+            const balanceActual = parseInt((document.getElementById('user-balance')?.innerText || '0').replace(/[^0-9]/g, '')) || 0;
+            tieneBalance = balanceActual >= nc;
+
             // Si no tiene balance suficiente, mostrar notificación
             if (!tieneBalance) {
-                const balanceActual = parseInt((document.getElementById('user-balance')?.innerText || '0').replace(/[^0-9]/g, '')) || 0;
                 const falta = nc - balanceActual;
                 
                 // Mostrar notificación profesional
@@ -6930,9 +6937,12 @@ function mostrarAnuncioPersonalizado(anuncio, opciones = {}) {
     // anuncio (no al reanudarlo tras un recargo de página, para no contar
     // la misma vista dos veces en las estadísticas).
     if (!esReanudacion) {
-        _supabase.from('anuncios_personalizados').select('impresiones').eq('id', anuncio.id).single().then(({ data }) => {
-            if (data) _supabase.from('anuncios_personalizados').update({ impresiones: (data.impresiones || 0) + 1 }).eq('id', anuncio.id);
-        });
+        // Usamos un RPC atómico (igual patrón que incrementar_netcoins) en vez de
+        // leer y luego actualizar desde el cliente: ese select+update se puede quedar
+        // bloqueado silenciosamente por RLS (el cliente normalmente no tiene permiso
+        // de UPDATE sobre esta tabla) y por eso las impresiones no se registraban.
+        _supabase.rpc('incrementar_metrica_anuncio', { p_anuncio_id: anuncio.id, p_campo: 'impresiones' })
+            .then(({ error }) => { if (error) console.error('Error registrando impresión de anuncio:', error); });
     }
 }
 
@@ -6957,9 +6967,9 @@ function cerrarAnuncioPersonalizado() {
 function registrarClicAnuncio() {
     if (!_anuncioIdActual) return;
     const idAnuncio = _anuncioIdActual;
-    _supabase.from('anuncios_personalizados').select('clics').eq('id', idAnuncio).single().then(({ data }) => {
-        if (data) _supabase.from('anuncios_personalizados').update({ clics: (data.clics || 0) + 1 }).eq('id', idAnuncio);
-    });
+    // Mismo fix que en la impresión: RPC atómico en vez de select+update desde el cliente.
+    _supabase.rpc('incrementar_metrica_anuncio', { p_anuncio_id: idAnuncio, p_campo: 'clics' })
+        .then(({ error }) => { if (error) console.error('Error registrando clic de anuncio:', error); });
 }
 
 // Iniciar el ciclo de anuncios personalizados cuando el usuario se autentica
