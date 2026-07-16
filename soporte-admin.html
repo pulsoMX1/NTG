@@ -91,6 +91,9 @@
                 <button id="modulo-btn-anuncios" onclick="cambiarModulo('anuncios')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
                 </button>
+                <button id="modulo-btn-peliculas" onclick="cambiarModulo('peliculas')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-clapperboard mr-1.5"></i>Películas
+                </button>
                 <button id="modulo-btn-sitio" onclick="cambiarModulo('sitio')" class="modulo-btn text-xs font-bold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
                 </button>
@@ -125,6 +128,9 @@
         </button>
         <button id="modulo-btn-anuncios-mobile" onclick="cambiarModulo('anuncios')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
             <i class="fa-solid fa-rectangle-ad mr-1.5"></i>Anuncios
+        </button>
+        <button id="modulo-btn-peliculas-mobile" onclick="cambiarModulo('peliculas')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
+            <i class="fa-solid fa-clapperboard mr-1.5"></i>Películas
         </button>
         <button id="modulo-btn-sitio-mobile" onclick="cambiarModulo('sitio')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-slate-800 text-slate-400 transition">
             <i class="fa-solid fa-power-off mr-1.5"></i>Sitio
@@ -388,6 +394,118 @@
 
             <!-- Lista de anuncios -->
             <div id="lista-anuncios" class="space-y-3">
+                <div class="flex items-center justify-center py-12">
+                    <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!--        MÓDULO PELÍCULAS (Pulso Play)   -->
+    <!-- ══════════════════════════════════════ -->
+    <div id="modulo-peliculas" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
+        <div class="max-w-4xl mx-auto space-y-5">
+
+            <!-- Header + botón nuevo -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-black text-white">Películas IA — Pulso Play</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Feed vertical de PulsoMX. Los usuarios ganan NetCoins al ver cada película completa</p>
+                </div>
+                <button onclick="abrirFormNuevaPelicula()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition active:scale-95 flex items-center gap-2 flex-shrink-0">
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nueva Película</span>
+                </button>
+            </div>
+
+            <!-- Stats globales -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
+                    <p id="stat-peliculas-total" class="text-xl font-black text-white">0</p>
+                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">Películas activas</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
+                    <p id="stat-peliculas-duracion" class="text-xl font-black text-amber-400">0m</p>
+                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">Duración total del feed</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
+                    <p id="stat-peliculas-nc" class="text-xl font-black text-emerald-400">0</p>
+                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">NC en juego por vuelta</p>
+                </div>
+            </div>
+
+            <!-- Formulario nueva/editar película -->
+            <div id="form-pelicula-container" class="hidden bg-slate-800 border border-purple-500/30 rounded-2xl p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="form-pelicula-titulo" class="font-bold text-white text-sm">Nueva Película</h3>
+                    <button onclick="cerrarFormPelicula()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <input type="hidden" id="pelicula-edit-id">
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Título</label>
+                        <input type="text" id="input-pelicula-titulo" placeholder="Ej. El último salvavidas"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-purple-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Descripción (opcional)</label>
+                        <textarea id="input-pelicula-descripcion" rows="2" placeholder="De qué trata la película..."
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-purple-500 transition resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Video de la película</label>
+                        <input type="file" id="input-pelicula-video" accept="video/*" class="hidden" onchange="previewVideoPelicula(this)">
+                        <label for="input-pelicula-video" class="cursor-pointer w-full border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl flex flex-col items-center justify-center gap-2 py-6 transition">
+                            <i class="fa-solid fa-clapperboard text-slate-500 text-2xl"></i>
+                            <span class="text-xs text-slate-400" id="texto-pelicula-video">Click para subir el video</span>
+                        </label>
+                        <div id="preview-pelicula-video-container" class="hidden mt-3">
+                            <video id="preview-pelicula-video" controls class="max-h-64 rounded-xl border border-slate-700 mx-auto w-full"></video>
+                            <p class="text-xs text-emerald-400 font-semibold text-center mt-2">
+                                <i class="fa-solid fa-clock mr-1"></i>Duración detectada: <span id="texto-duracion-detectada">--</span>
+                            </p>
+                        </div>
+                        <input type="hidden" id="pelicula-video-url-existente">
+                        <input type="hidden" id="pelicula-duracion-segundos">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Miniatura / poster (opcional)</label>
+                        <input type="file" id="input-pelicula-miniatura" accept="image/*" class="hidden" onchange="previewMiniaturaPelicula(this)">
+                        <label for="input-pelicula-miniatura" class="cursor-pointer w-full border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl flex flex-col items-center justify-center gap-2 py-4 transition">
+                            <i class="fa-solid fa-image text-slate-500 text-xl"></i>
+                            <span class="text-xs text-slate-400" id="texto-pelicula-miniatura">Click para subir una miniatura</span>
+                        </label>
+                        <div id="preview-pelicula-miniatura-container" class="hidden mt-3">
+                            <img id="preview-pelicula-miniatura" class="max-h-40 rounded-xl border border-slate-700 mx-auto" />
+                        </div>
+                        <input type="hidden" id="pelicula-miniatura-url-existente">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">NetCoins de recompensa</label>
+                            <input type="number" id="input-pelicula-nc" value="40" min="1"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-purple-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Orden en el feed</label>
+                            <input type="number" id="input-pelicula-orden" value="0" min="0"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-purple-500 transition">
+                        </div>
+                    </div>
+
+                    <button onclick="guardarPelicula()" id="btn-guardar-pelicula"
+                        class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Película
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de películas -->
+            <div id="lista-peliculas" class="space-y-3">
                 <div class="flex items-center justify-center py-12">
                     <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
@@ -1146,6 +1264,7 @@ function cambiarModulo(modulo) {
     const esSoporte = modulo === 'soporte';
     const esCanjes = modulo === 'canjes';
     const esAnuncios = modulo === 'anuncios';
+    const esPeliculas = modulo === 'peliculas';
     const esSitio = modulo === 'sitio';
     const esUsuarios = modulo === 'usuarios';
 
@@ -1154,22 +1273,25 @@ function cambiarModulo(modulo) {
     document.getElementById('modulo-canjes').classList.toggle('flex', esCanjes);
     document.getElementById('modulo-anuncios').classList.toggle('hidden', esAnuncios ? false : true);
     document.getElementById('modulo-anuncios').classList.toggle('flex', esAnuncios);
+    document.getElementById('modulo-peliculas').classList.toggle('hidden', !esPeliculas);
+    document.getElementById('modulo-peliculas').classList.toggle('flex', esPeliculas);
     document.getElementById('modulo-sitio').classList.toggle('hidden', !esSitio);
     document.getElementById('modulo-sitio').classList.toggle('flex', esSitio);
     document.getElementById('modulo-usuarios').classList.toggle('hidden', !esUsuarios);
     document.getElementById('modulo-usuarios').classList.toggle('flex', esUsuarios);
 
-    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-sitio', 'modulo-btn-usuarios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-sitio-mobile', 'modulo-btn-usuarios-mobile'].forEach(id => {
+    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-peliculas', 'modulo-btn-sitio', 'modulo-btn-usuarios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-peliculas-mobile', 'modulo-btn-sitio-mobile', 'modulo-btn-usuarios-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const esEsteBtn = id.includes(modulo);
         el.classList.toggle('bg-purple-600', esEsteBtn);
         el.classList.toggle('text-white', esEsteBtn);
-        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('sitio') || id.includes('usuarios')));
+        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('peliculas') || id.includes('sitio') || id.includes('usuarios')));
         el.classList.toggle('text-slate-400', !esEsteBtn);
     });
 
     if (modulo === 'anuncios') cargarAnuncios();
+    if (modulo === 'peliculas') cargarPeliculas();
     if (modulo === 'canjes') cargarCanjes();
     if (modulo === 'sitio') cargarEstadoSitio();
     if (modulo === 'usuarios') cargarUsuarios();
@@ -1548,6 +1670,289 @@ async function eliminarAnuncio(id) {
     await _supabase.from('anuncios_personalizados').delete().eq('id', id);
     mostrarToast('Anuncio eliminado', 'success');
     cargarAnuncios();
+}
+
+// ══════════════════════════════════════════════
+//      MÓDULO PELÍCULAS (Pulso Play)
+// ══════════════════════════════════════════════
+let todasLasPeliculas = [];
+let peliculaVideoFile = null;
+let peliculaMiniaturaFile = null;
+
+async function cargarPeliculas() {
+    const { data, error } = await _supabase
+        .from('peliculas')
+        .select('*')
+        .order('orden', { ascending: true });
+
+    if (error || !data) return;
+    todasLasPeliculas = data;
+    renderListaPeliculas();
+    actualizarStatsPeliculas();
+}
+
+function actualizarStatsPeliculas() {
+    const activas = todasLasPeliculas.filter(p => p.activo);
+    const duracionTotal = activas.reduce((sum, p) => sum + (p.duracion_segundos || 0), 0);
+    const ncTotal = activas.reduce((sum, p) => sum + (p.netcoins_recompensa || 0), 0);
+    document.getElementById('stat-peliculas-total').textContent = activas.length;
+    document.getElementById('stat-peliculas-duracion').textContent = Math.round(duracionTotal / 60) + 'm';
+    document.getElementById('stat-peliculas-nc').textContent = ncTotal.toLocaleString();
+}
+
+function formatearDuracion(segundos) {
+    const m = Math.floor(segundos / 60);
+    const s = Math.round(segundos % 60);
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+}
+
+function renderListaPeliculas() {
+    const container = document.getElementById('lista-peliculas');
+
+    if (todasLasPeliculas.length === 0) {
+        container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-center">
+            <i class="fa-solid fa-clapperboard text-slate-700 text-3xl mb-3"></i>
+            <p class="text-sm text-slate-500">Aún no tienes películas subidas</p>
+        </div>`;
+        return;
+    }
+
+    container.innerHTML = todasLasPeliculas.map(p => {
+        return `<div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 flex gap-4">
+            ${p.miniatura_url
+                ? `<img src="${p.miniatura_url}" class="w-20 h-28 object-cover rounded-xl border border-slate-700 flex-shrink-0" />`
+                : `<div class="w-20 h-28 rounded-xl border border-slate-700 bg-slate-900 flex-shrink-0 flex items-center justify-center">
+                       <i class="fa-solid fa-clapperboard text-slate-600 text-lg"></i>
+                   </div>`
+            }
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                    <p class="font-bold text-white text-sm truncate">${p.titulo}</p>
+                    <span class="flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${p.activo ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' : 'bg-slate-700 text-slate-400 border border-slate-600'}">
+                        ${p.activo ? '● Activa' : '○ Pausada'}
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 truncate mb-2">${p.descripcion || 'Sin descripción'}</p>
+                <div class="flex items-center gap-3 text-xs text-slate-400 mb-3">
+                    <span><i class="fa-solid fa-clock mr-1 text-slate-500"></i>${formatearDuracion(p.duracion_segundos)}</span>
+                    <span><i class="fa-solid fa-coins mr-1 text-amber-400"></i>${p.netcoins_recompensa} NC</span>
+                    <span><i class="fa-solid fa-arrow-up-1-9 mr-1 text-slate-500"></i>Orden ${p.orden}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleActivoPelicula('${p.id}', ${!p.activo})" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition">
+                        ${p.activo ? '<i class="fa-solid fa-pause mr-1"></i>Pausar' : '<i class="fa-solid fa-play mr-1"></i>Activar'}
+                    </button>
+                    <button onclick="editarPelicula('${p.id}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition">
+                        <i class="fa-solid fa-pen mr-1"></i>Editar
+                    </button>
+                    <button onclick="eliminarPelicula('${p.id}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 transition">
+                        <i class="fa-solid fa-trash mr-1"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function abrirFormNuevaPelicula() {
+    document.getElementById('form-pelicula-titulo').textContent = 'Nueva Película';
+    document.getElementById('pelicula-edit-id').value = '';
+    document.getElementById('input-pelicula-titulo').value = '';
+    document.getElementById('input-pelicula-descripcion').value = '';
+    document.getElementById('input-pelicula-nc').value = '40';
+    document.getElementById('input-pelicula-orden').value = todasLasPeliculas.length;
+    document.getElementById('pelicula-video-url-existente').value = '';
+    document.getElementById('pelicula-miniatura-url-existente').value = '';
+    document.getElementById('pelicula-duracion-segundos').value = '';
+    document.getElementById('preview-pelicula-video-container').classList.add('hidden');
+    document.getElementById('preview-pelicula-miniatura-container').classList.add('hidden');
+    document.getElementById('input-pelicula-video').value = '';
+    document.getElementById('input-pelicula-miniatura').value = '';
+    peliculaVideoFile = null;
+    peliculaMiniaturaFile = null;
+    document.getElementById('form-pelicula-container').classList.remove('hidden');
+    document.getElementById('form-pelicula-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cerrarFormPelicula() {
+    document.getElementById('form-pelicula-container').classList.add('hidden');
+}
+
+function editarPelicula(id) {
+    const p = todasLasPeliculas.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('form-pelicula-titulo').textContent = 'Editar Película';
+    document.getElementById('pelicula-edit-id').value = p.id;
+    document.getElementById('input-pelicula-titulo').value = p.titulo || '';
+    document.getElementById('input-pelicula-descripcion').value = p.descripcion || '';
+    document.getElementById('input-pelicula-nc').value = p.netcoins_recompensa;
+    document.getElementById('input-pelicula-orden').value = p.orden;
+    document.getElementById('pelicula-video-url-existente').value = p.video_url || '';
+    document.getElementById('pelicula-miniatura-url-existente').value = p.miniatura_url || '';
+    document.getElementById('pelicula-duracion-segundos').value = p.duracion_segundos;
+    peliculaVideoFile = null;
+    peliculaMiniaturaFile = null;
+
+    if (p.video_url) {
+        document.getElementById('preview-pelicula-video').src = p.video_url;
+        document.getElementById('texto-duracion-detectada').textContent = formatearDuracion(p.duracion_segundos) + ' (ya guardada)';
+        document.getElementById('preview-pelicula-video-container').classList.remove('hidden');
+    } else {
+        document.getElementById('preview-pelicula-video-container').classList.add('hidden');
+    }
+    if (p.miniatura_url) {
+        document.getElementById('preview-pelicula-miniatura').src = p.miniatura_url;
+        document.getElementById('preview-pelicula-miniatura-container').classList.remove('hidden');
+    } else {
+        document.getElementById('preview-pelicula-miniatura-container').classList.add('hidden');
+    }
+
+    document.getElementById('form-pelicula-container').classList.remove('hidden');
+    document.getElementById('form-pelicula-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Al elegir el archivo de video: se lee su duración real con el propio
+// navegador (metadata del video) para no tener que medirla a mano.
+function previewVideoPelicula(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+
+    video.onloadedmetadata = function() {
+        peliculaVideoFile = file;
+        document.getElementById('pelicula-duracion-segundos').value = Math.round(video.duration);
+        document.getElementById('texto-duracion-detectada').textContent = formatearDuracion(video.duration);
+
+        const preview = document.getElementById('preview-pelicula-video');
+        preview.src = url;
+        document.getElementById('preview-pelicula-video-container').classList.remove('hidden');
+    };
+    video.onerror = function() {
+        mostrarToast('Error al procesar el video', 'error');
+        input.value = '';
+        URL.revokeObjectURL(url);
+    };
+    video.src = url;
+}
+
+function previewMiniaturaPelicula(input) {
+    const file = input.files[0];
+    if (!file) return;
+    peliculaMiniaturaFile = file;
+    const url = URL.createObjectURL(file);
+    document.getElementById('preview-pelicula-miniatura').src = url;
+    document.getElementById('preview-pelicula-miniatura-container').classList.remove('hidden');
+}
+
+async function guardarPelicula() {
+    const id = document.getElementById('pelicula-edit-id').value;
+    const titulo = document.getElementById('input-pelicula-titulo').value.trim();
+    const descripcion = document.getElementById('input-pelicula-descripcion').value.trim();
+    const nc = parseInt(document.getElementById('input-pelicula-nc').value) || 40;
+    const orden = parseInt(document.getElementById('input-pelicula-orden').value) || 0;
+    const videoExistente = document.getElementById('pelicula-video-url-existente').value;
+    const miniaturaExistente = document.getElementById('pelicula-miniatura-url-existente').value;
+    let duracion = parseInt(document.getElementById('pelicula-duracion-segundos').value) || 0;
+
+    if (!titulo) { mostrarToast('Falta el título', 'error'); return; }
+    if (!peliculaVideoFile && !videoExistente) { mostrarToast('Falta el video de la película', 'error'); return; }
+    if (!duracion) { mostrarToast('No se detectó la duración del video, vuelve a seleccionarlo', 'error'); return; }
+
+    const btn = document.getElementById('btn-guardar-pelicula');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i>Guardando...';
+
+    let videoUrl = videoExistente;
+    let miniaturaUrl = miniaturaExistente;
+
+    if (peliculaVideoFile) {
+        const ext = peliculaVideoFile.name.split('.').pop();
+        const path = `peliculas/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadError } = await _supabase.storage
+            .from('peliculas-videos')
+            .upload(path, peliculaVideoFile, { cacheControl: '3600', upsert: false });
+        if (uploadError) {
+            mostrarToast('Error al subir el video', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Película';
+            return;
+        }
+        const { data: { publicUrl } } = _supabase.storage.from('peliculas-videos').getPublicUrl(path);
+        videoUrl = publicUrl;
+    }
+
+    if (peliculaMiniaturaFile) {
+        const ext = peliculaMiniaturaFile.name.split('.').pop();
+        const path = `miniaturas/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadError } = await _supabase.storage
+            .from('peliculas-miniaturas')
+            .upload(path, peliculaMiniaturaFile, { cacheControl: '3600', upsert: false });
+        if (!uploadError) {
+            const { data: { publicUrl } } = _supabase.storage.from('peliculas-miniaturas').getPublicUrl(path);
+            miniaturaUrl = publicUrl;
+        }
+    }
+
+    const payload = {
+        titulo,
+        descripcion: descripcion || null,
+        video_url: videoUrl,
+        miniatura_url: miniaturaUrl || null,
+        duracion_segundos: duracion,
+        netcoins_recompensa: nc,
+        orden
+    };
+
+    let error;
+    if (id) {
+        ({ error } = await _supabase.from('peliculas').update(payload).eq('id', id));
+    } else {
+        payload.activo = true;
+        ({ error } = await _supabase.from('peliculas').insert(payload));
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Película';
+
+    if (error) {
+        mostrarToast('Error al guardar la película', 'error');
+        return;
+    }
+
+    mostrarToast(id ? 'Película actualizada' : 'Película creada', 'success');
+    cerrarFormPelicula();
+    cargarPeliculas();
+}
+
+async function toggleActivoPelicula(id, nuevoEstado) {
+    await _supabase.from('peliculas').update({ activo: nuevoEstado }).eq('id', id);
+    cargarPeliculas();
+}
+
+async function eliminarPelicula(id) {
+    const confirmar = confirm('¿Eliminar esta película permanentemente? Esta acción no se puede deshacer.');
+    if (!confirmar) return;
+
+    const pelicula = todasLasPeliculas.find(p => p.id === id);
+
+    if (pelicula?.video_url) {
+        const match = pelicula.video_url.match(/\/object\/public\/peliculas-videos\/(.+)$/);
+        if (match) {
+            await _supabase.storage.from('peliculas-videos').remove([decodeURIComponent(match[1])]);
+        }
+    }
+    if (pelicula?.miniatura_url) {
+        const matchMin = pelicula.miniatura_url.match(/\/object\/public\/peliculas-miniaturas\/(.+)$/);
+        if (matchMin) {
+            await _supabase.storage.from('peliculas-miniaturas').remove([decodeURIComponent(matchMin[1])]);
+        }
+    }
+
+    await _supabase.from('peliculas').delete().eq('id', id);
+    mostrarToast('Película eliminada', 'success');
+    cargarPeliculas();
 }
 
 // ══════════════════════════════════════════════
