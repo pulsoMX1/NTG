@@ -4457,10 +4457,19 @@
 
             btn.innerText = '🎰 Girando...';
 
-            // 3. Calcular los grados para que la animación caiga en el slice correcto
+            // 3. Calcular los grados para que la animación caiga en el slice correcto.
+            // Importante: el destino se calcula relativo al ángulo ACTUAL de la
+            // ruleta (no desde 0), y siempre sumamos vueltas completas hacia
+            // adelante para que la animación tenga la misma "fuerza" en todos los
+            // giros del día (antes, del 2do giro en adelante, el destino ya
+            // calculado podía caer muy cerca del ángulo donde se había quedado la
+            // ruleta, y se veía como si apenas se moviera).
             const slice = (2 * Math.PI) / RULETA_PREMIOS.length;
-            const anguloDestino = (Math.PI * 2 * 5) - (idxGanador * slice) - (slice / 2) + (Math.PI * 1.5);
+            const destinoBase = -(idxGanador * slice) - (slice / 2) + (Math.PI * 1.5);
             const inicio = ruletaAngulo;
+            let anguloDestino = destinoBase;
+            while (anguloDestino <= inicio) anguloDestino += 2 * Math.PI;
+            anguloDestino += 2 * Math.PI * 5; // 5 vueltas extra de "fuerza" en cada giro
             const duracion = 4000;
             const startTime = performance.now();
 
