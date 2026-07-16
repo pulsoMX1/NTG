@@ -1957,6 +1957,11 @@
                                 </li>
 
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <span class="w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-rotate text-purple-400 text-xs"></i></span>
+                                    <span><strong class="text-white">5 giros diarios</strong> <span class="text-slate-400 text-xs">en la Ruleta Diaria</span></span>
+                                </li>
+
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <span class="w-7 h-7 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-crown text-amber-400 text-xs"></i></span>
                                     Badge <span class="text-amber-400 font-bold ml-1">👑 Premium</span> en tu perfil
                                 </li>
@@ -1997,6 +2002,10 @@
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
                                     <span><strong class="text-white">Vidas ilimitadas</strong> <span class="text-slate-400">para jugar sin límite</span></span>
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+                                    <span><strong class="text-white">5 giros diarios</strong> <span class="text-slate-400">en la Ruleta Diaria</span></span>
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Badge <span class="text-amber-400 font-bold">👑 Premium</span> en tu perfil
@@ -4370,22 +4379,32 @@
             if (!currentUser) return;
             const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Monterrey' });
             const { data } = await _supabase.from('perfiles')
-                .select('ultimo_giro_ruleta')
+                .select('ultimo_giro_ruleta, giros_ruleta_hoy')
                 .eq('id', currentUser.id)
                 .single();
 
+            // Premium: 5 giros gratis al día. Usuario normal: 1.
+            const limiteGiros = isPremium ? 5 : 1;
+            const ultimoGiro = (data?.ultimo_giro_ruleta || '').slice(0, 10);
+            // Si el último giro no fue hoy, es un día nuevo: el contador arranca en 0.
+            const girosUsadosHoy = (ultimoGiro === hoy) ? (data?.giros_ruleta_hoy || 0) : 0;
+            const girosRestantes = limiteGiros - girosUsadosHoy;
+
+            actualizarBotonRuleta(girosRestantes, limiteGiros);
+        }
+
+        function actualizarBotonRuleta(girosRestantes, limiteGiros) {
             const btn = document.getElementById('btn-girar');
             if (!btn) return;
 
-            const ultimoGiro = (data?.ultimo_giro_ruleta || '').slice(0, 10);
-            if (ultimoGiro === hoy) {
+            if (girosRestantes <= 0) {
                 btn.disabled = true;
                 btn.innerText = '✅ Ya giraste hoy';
                 btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
                 iniciarCuentaRegresiva();
             } else {
                 btn.disabled = false;
-                btn.innerText = '🎰 ¡Girar Gratis!';
+                btn.innerText = limiteGiros > 1 ? `🎰 ¡Girar Gratis! (${girosRestantes}/${limiteGiros})` : '🎰 ¡Girar Gratis!';
                 btn.className = 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-900 font-extrabold px-8 py-3 rounded-2xl shadow-lg shadow-amber-500/30 transition active:scale-95 text-sm sm:text-base';
             }
         }
@@ -4462,10 +4481,12 @@
                     
                     mostrarNotificacion(`¡Ganaste ${ncGanadas} NetCoins en la ruleta!`, "success");
 
-                    btn.disabled = true;
-                    btn.innerText = '✅ Ya giraste hoy';
-                    btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
-                    iniciarCuentaRegresiva();
+                    // Si la Edge Function nos dice cuántos giros quedan (premium puede
+                    // tener más de 1 al día), reflejamos eso en el botón en vez de
+                    // asumir que ya se acabaron los giros de hoy.
+                    const limiteGirosHoy = isPremium ? 5 : 1;
+                    const girosRestantesHoy = (typeof data.girosRestantes === 'number') ? data.girosRestantes : 0;
+                    actualizarBotonRuleta(girosRestantesHoy, limiteGirosHoy);
                 }
             }
             
@@ -4745,7 +4766,7 @@
             <p>NetGamer MX es una plataforma de recompensas y entretenimiento competitivo en la que los usuarios pueden ganar una moneda virtual interna llamada <strong>NetCoins (NC)</strong> mediante distintas actividades, incluyendo:</p>
             <p>a) Completar ofertas, encuestas y tareas en los muros de ofertas (offerwalls) integrados de proveedores asociados (por ejemplo AdGem).</p>
             <p>b) Leer noticias dentro de la sección correspondiente de la Plataforma.</p>
-            <p>c) Participar en la Ruleta Diaria, que otorga una cantidad aleatoria de NetCoins una vez cada 24 horas.</p>
+            <p>c) Participar en la Ruleta Diaria, que otorga una cantidad aleatoria de NetCoins una vez cada 24 horas (hasta 5 veces al día para usuarios con suscripción Premium activa).</p>
             <p>d) Jugar partidas competitivas 1v1 en tiempo real contra otros usuarios, apostando y ganando NetCoins según el resultado de la partida.</p>
             <p>e) Invitar a otros usuarios mediante el sistema de referidos.</p>
             <p>f) Reclamar el bono de bienvenida al registrarse por primera vez.</p>
