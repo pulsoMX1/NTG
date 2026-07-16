@@ -1083,10 +1083,10 @@
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-amber-400"><i class="fa-solid fa-rotate mr-2"></i>Ruleta Diaria</h3>
-                                <p class="text-slate-400 text-xs mt-0.5">Gira gratis una vez al día y gana NetCoins</p>
+                                <p id="ruleta-subtitulo" class="text-slate-400 text-xs mt-0.5">Gira gratis una vez al día y gana NetCoins</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs text-slate-400">Próximo giro en:</p>
+                                <p id="ruleta-countdown-label" class="text-xs text-slate-400">Próximo giro en:</p>
                                 <p id="ruleta-countdown" class="text-amber-400 font-extrabold text-sm">--:--:--</p>
                             </div>
                         </div>
@@ -4393,7 +4393,21 @@
             actualizarBotonRuleta(girosRestantes, limiteGiros);
         }
 
+        function actualizarTextosRuleta() {
+            const subtitulo = document.getElementById('ruleta-subtitulo');
+            const countdownLabel = document.getElementById('ruleta-countdown-label');
+            if (subtitulo) {
+                subtitulo.innerText = isPremium
+                    ? '👑 Premium: gira 5 veces al día gratis y gana NetCoins'
+                    : 'Gira gratis una vez al día y gana NetCoins';
+            }
+            if (countdownLabel) {
+                countdownLabel.innerText = isPremium ? 'Próximos giros en:' : 'Próximo giro en:';
+            }
+        }
+
         function actualizarBotonRuleta(girosRestantes, limiteGiros) {
+            actualizarTextosRuleta();
             const btn = document.getElementById('btn-girar');
             if (!btn) return;
 
@@ -6113,6 +6127,7 @@
                 _premiumFechas = null; // reset after use
             }
             document.getElementById('premium-oferta').classList.toggle('hidden', isPremium);
+            if (typeof actualizarTextosRuleta === 'function') actualizarTextosRuleta();
         }
 
         // Modal "¿Cansado de los anuncios?"
