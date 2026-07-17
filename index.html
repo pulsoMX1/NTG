@@ -2156,7 +2156,7 @@
                     window.crearIframeAdSandbox = function(srcdocHtml, cssTexto) {
                         var ifr = document.createElement('iframe');
                         ifr.title = 'Publicidad';
-                        ifr.setAttribute('sandbox', 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms');
+                        ifr.setAttribute('sandbox', 'allow-popups allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-forms');
                         ifr.setAttribute('frameborder', '0');
                         ifr.setAttribute('scrolling', 'no');
                         ifr.style.cssText = cssTexto;
@@ -6280,7 +6280,7 @@
     <!-- Forzar sandbox en iframes de anuncios inyectados dinámicamente -->
     <script>
     (function() {
-        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms';
+        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-popups-to-escape-sandbox allow-forms';
         var AD_DOMAINS = ['highperformanceformat.com', 'effectivecpmnetwork.com'];
 
         function isAdIframe(iframe) {
