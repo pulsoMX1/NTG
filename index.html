@@ -1083,10 +1083,10 @@
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-amber-400"><i class="fa-solid fa-rotate mr-2"></i>Ruleta Diaria</h3>
-                                <p id="ruleta-subtitulo" class="text-slate-400 text-xs mt-0.5">Gira gratis una vez al día y gana NetCoins</p>
+                                <p class="text-slate-400 text-xs mt-0.5">Gira gratis una vez al día y gana NetCoins</p>
                             </div>
                             <div class="text-right">
-                                <p id="ruleta-countdown-label" class="text-xs text-slate-400">Próximo giro en:</p>
+                                <p class="text-xs text-slate-400">Próximo giro en:</p>
                                 <p id="ruleta-countdown" class="text-amber-400 font-extrabold text-sm">--:--:--</p>
                             </div>
                         </div>
@@ -1952,13 +1952,16 @@
                             <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">Tus beneficios activos</h3>
                             <ul class="space-y-3">
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <span class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-ban text-emerald-400 text-xs"></i></span>
+                                    Sin anuncios en toda la web de NetGamerMX
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <span class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-ban text-emerald-400 text-xs"></i></span>
+                                    Sin anuncios en toda la web de noticias PulsoMX
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <span class="w-7 h-7 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-heart text-rose-400 text-xs"></i></span>
                                     <span><strong class="text-white">Vidas ilimitadas</strong> <span class="text-slate-400 text-xs">para jugar sin límite</span></span>
-                                </li>
-
-                                <li class="flex items-center gap-3 text-sm text-slate-200">
-                                    <span class="w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-rotate text-purple-400 text-xs"></i></span>
-                                    <span><strong class="text-white">5 giros diarios</strong> <span class="text-slate-400 text-xs">en la Ruleta Diaria</span></span>
                                 </li>
 
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
@@ -2000,12 +2003,14 @@
                             </div>
                             <ul class="space-y-3 mb-6">
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
-                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
-                                    <span><strong class="text-white">Vidas ilimitadas</strong> <span class="text-slate-400">para jugar sin límite</span></span>
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la web de NetGamerMX
+                                </li>
+                                <li class="flex items-center gap-3 text-sm text-slate-200">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Sin anuncios en toda la Web de noticias PulsoMX
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
-                                    <span><strong class="text-white">5 giros diarios</strong> <span class="text-slate-400">en la Ruleta Diaria</span></span>
+                                    <span><strong class="text-white">Vidas ilimitadas</strong> <span class="text-slate-400">para jugar sin límite</span></span>
                                 </li>
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
                                     <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i> Badge <span class="text-amber-400 font-bold">👑 Premium</span> en tu perfil
@@ -2117,7 +2122,7 @@
                                 <span class="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center shrink-0"><i class="fa-solid fa-crown text-amber-400 text-sm"></i></span>
                                 <div class="text-left">
                                     <p class="text-sm font-extrabold text-amber-300">Obtener Premium</p>
-                                    <p class="text-[11px] text-slate-400">Vidas ilimitadas · badge · más</p>
+                                    <p class="text-[11px] text-slate-400">Vidas ilimitadas · sin anuncios · más</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-amber-500/60 text-xs group-hover:text-amber-400 transition"></i>
@@ -2256,7 +2261,7 @@
                                 <p class="text-sm font-extrabold text-white">NetGamer Premium</p>
                                 <span class="text-[10px] bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded-full px-2 py-0.5 font-bold">+BENEFICIOS</span>
                             </div>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Vidas ilimitadas + badge + más</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Vidas ilimitadas + sin anuncios + más</p>
                         </div>
                     </div>
                     <div class="text-right shrink-0">
@@ -2270,20 +2275,20 @@
         </div>
     </div>
 
-    <!-- Modal Premium (actualmente desactivado, ver programarModalPremiumAds) -->
+    <!-- Modal: Eliminar anuncios con Premium -->
     <div id="modal-premium-ads" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[5000] p-4">
         <div class="bg-slate-800 border border-amber-500/40 rounded-2xl w-full max-w-sm text-center p-6 shadow-2xl shadow-amber-900/30 relative">
             <button onclick="cerrarModalPremiumAds()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-700 rounded-full w-7 h-7 flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </button>
-            <div class="text-4xl mb-3">👑</div>
-            <h3 class="text-xl font-black text-white mb-1">Sácale más provecho a NetGamer</h3>
-            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white">$49 MXN/mes</strong>.</p>
+            <div class="text-4xl mb-3">😤</div>
+            <h3 class="text-xl font-black text-white mb-1">¿Cansado de los anuncios?</h3>
+            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> los eliminas todos por solo <strong class="text-white">$49 MXN/mes</strong>.</p>
             <button onclick="cerrarModalPremiumAds(); switchTab('tab-premium', null)"
                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-3 rounded-xl transition active:scale-95 mb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-crown"></i> Quiero Premium
             </button>
-            <button onclick="cerrarModalPremiumAds()" class="text-slate-500 text-xs hover:text-slate-300 transition">No gracias</button>
+            <button onclick="cerrarModalPremiumAds()" class="text-slate-500 text-xs hover:text-slate-300 transition">No gracias, seguir viendo anuncios</button>
         </div>
     </div>
 
@@ -4379,46 +4384,22 @@
             if (!currentUser) return;
             const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Monterrey' });
             const { data } = await _supabase.from('perfiles')
-                .select('ultimo_giro_ruleta, giros_ruleta_hoy')
+                .select('ultimo_giro_ruleta')
                 .eq('id', currentUser.id)
                 .single();
 
-            // Premium: 5 giros gratis al día. Usuario normal: 1.
-            const limiteGiros = isPremium ? 5 : 1;
-            const ultimoGiro = (data?.ultimo_giro_ruleta || '').slice(0, 10);
-            // Si el último giro no fue hoy, es un día nuevo: el contador arranca en 0.
-            const girosUsadosHoy = (ultimoGiro === hoy) ? (data?.giros_ruleta_hoy || 0) : 0;
-            const girosRestantes = limiteGiros - girosUsadosHoy;
-
-            actualizarBotonRuleta(girosRestantes, limiteGiros);
-        }
-
-        function actualizarTextosRuleta() {
-            const subtitulo = document.getElementById('ruleta-subtitulo');
-            const countdownLabel = document.getElementById('ruleta-countdown-label');
-            if (subtitulo) {
-                subtitulo.innerText = isPremium
-                    ? '👑 Premium: gira 5 veces al día gratis y gana NetCoins'
-                    : 'Gira gratis una vez al día y gana NetCoins';
-            }
-            if (countdownLabel) {
-                countdownLabel.innerText = isPremium ? 'Próximos giros en:' : 'Próximo giro en:';
-            }
-        }
-
-        function actualizarBotonRuleta(girosRestantes, limiteGiros) {
-            actualizarTextosRuleta();
             const btn = document.getElementById('btn-girar');
             if (!btn) return;
 
-            if (girosRestantes <= 0) {
+            const ultimoGiro = (data?.ultimo_giro_ruleta || '').slice(0, 10);
+            if (ultimoGiro === hoy) {
                 btn.disabled = true;
                 btn.innerText = '✅ Ya giraste hoy';
                 btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
                 iniciarCuentaRegresiva();
             } else {
                 btn.disabled = false;
-                btn.innerText = limiteGiros > 1 ? `🎰 ¡Girar Gratis! (${girosRestantes}/${limiteGiros})` : '🎰 ¡Girar Gratis!';
+                btn.innerText = '🎰 ¡Girar Gratis!';
                 btn.className = 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-900 font-extrabold px-8 py-3 rounded-2xl shadow-lg shadow-amber-500/30 transition active:scale-95 text-sm sm:text-base';
             }
         }
@@ -4471,19 +4452,10 @@
 
             btn.innerText = '🎰 Girando...';
 
-            // 3. Calcular los grados para que la animación caiga en el slice correcto.
-            // Importante: el destino se calcula relativo al ángulo ACTUAL de la
-            // ruleta (no desde 0), y siempre sumamos vueltas completas hacia
-            // adelante para que la animación tenga la misma "fuerza" en todos los
-            // giros del día (antes, del 2do giro en adelante, el destino ya
-            // calculado podía caer muy cerca del ángulo donde se había quedado la
-            // ruleta, y se veía como si apenas se moviera).
+            // 3. Calcular los grados para que la animación caiga en el slice correcto
             const slice = (2 * Math.PI) / RULETA_PREMIOS.length;
-            const destinoBase = -(idxGanador * slice) - (slice / 2) + (Math.PI * 1.5);
+            const anguloDestino = (Math.PI * 2 * 5) - (idxGanador * slice) - (slice / 2) + (Math.PI * 1.5);
             const inicio = ruletaAngulo;
-            let anguloDestino = destinoBase;
-            while (anguloDestino <= inicio) anguloDestino += 2 * Math.PI;
-            anguloDestino += 2 * Math.PI * 5; // 5 vueltas extra de "fuerza" en cada giro
             const duracion = 4000;
             const startTime = performance.now();
 
@@ -4504,12 +4476,10 @@
                     
                     mostrarNotificacion(`¡Ganaste ${ncGanadas} NetCoins en la ruleta!`, "success");
 
-                    // Si la Edge Function nos dice cuántos giros quedan (premium puede
-                    // tener más de 1 al día), reflejamos eso en el botón en vez de
-                    // asumir que ya se acabaron los giros de hoy.
-                    const limiteGirosHoy = isPremium ? 5 : 1;
-                    const girosRestantesHoy = (typeof data.girosRestantes === 'number') ? data.girosRestantes : 0;
-                    actualizarBotonRuleta(girosRestantesHoy, limiteGirosHoy);
+                    btn.disabled = true;
+                    btn.innerText = '✅ Ya giraste hoy';
+                    btn.className = 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-400 cursor-not-allowed font-extrabold px-8 py-3 rounded-2xl shadow-lg transition text-sm sm:text-base';
+                    iniciarCuentaRegresiva();
                 }
             }
             
@@ -4754,7 +4724,7 @@
             <p><strong>g) Datos técnicos y analíticos:</strong> información de interacción con la interfaz, estadísticas agregadas de uso (usuarios en línea, montos pagados a la comunidad) y datos generados por anuncios publicitarios mostrados dentro de la Plataforma.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">3. Uso de la información</h3>
-            <p>Utilizamos tu información para: (i) crear, verificar y administrar tu cuenta; (ii) acreditar el bono de bienvenida, las recompensas de referidos y las ganancias obtenidas por tareas u ofertas completadas; (iii) procesar solicitudes de canje y pagos; (iv) prevenir fraude, abuso del sistema de bonos/referidos y el uso de múltiples cuentas, mediante la verificación cruzada de direcciones IP; (v) brindarte soporte técnico a través del chat integrado; (vi) mostrar publicidad y gestionar el sistema de anuncios personalizados y de red (por ejemplo, EffectiveCPM y HighPerformanceFormat); y (vii) mejorar la Plataforma mediante estadísticas de uso agregadas y anónimas.</p>
+            <p>Utilizamos tu información para: (i) crear, verificar y administrar tu cuenta; (ii) acreditar el bono de bienvenida, las recompensas de referidos y las ganancias obtenidas por tareas u ofertas completadas; (iii) procesar solicitudes de canje y pagos; (iv) prevenir fraude, abuso del sistema de bonos/referidos y el uso de múltiples cuentas, mediante la verificación cruzada de direcciones IP; (v) brindarte soporte técnico a través del chat integrado; (vi) mostrar publicidad y gestionar el sistema de anuncios personalizados y de red (por ejemplo, EffectiveCPM y HighPerformanceFormat) a usuarios no premium; y (vii) mejorar la Plataforma mediante estadísticas de uso agregadas y anónimas.</p>
             <p>Compartimos identificadores anónimos de usuario (UUID) con nuestros proveedores de ofertas (offerwalls) exclusivamente para verificar la finalización de tareas/ofertas y otorgar automáticamente los créditos correspondientes en NetCoins.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">4. Sistema antifraude basado en IP</h3>
@@ -4764,7 +4734,7 @@
             <p>La Plataforma puede utilizar almacenamiento de sesión (sessionStorage) del navegador para recordar temporalmente información como códigos de referido durante el proceso de registro. Los anuncios mostrados por nuestras redes publicitarias asociadas pueden utilizar sus propias cookies o tecnologías similares conforme a sus propias políticas.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">6. Con quién compartimos tu información</h3>
-            <p>No vendemos tu información personal a terceros. Compartimos datos únicamente con: (a) Supabase, nuestro proveedor de infraestructura en la nube (base de datos, autenticación y funciones de servidor); (b) MercadoPago, para el procesamiento de pagos de vidas ilimitadas y premium; (c) proveedores de muros de ofertas (offerwalls) como AdGem y similares, únicamente mediante identificador anónimo (UUID); y (d) redes de publicidad asociadas, para la entrega de anuncios dentro de la Plataforma.</p>
+            <p>No vendemos tu información personal a terceros. Compartimos datos únicamente con: (a) Supabase, nuestro proveedor de infraestructura en la nube (base de datos, autenticación y funciones de servidor); (b) MercadoPago, para el procesamiento de pagos de vidas ilimitadas y premium; (c) proveedores de muros de ofertas (offerwalls) como AdGem y similares, únicamente mediante identificador anónimo (UUID); y (d) redes de publicidad asociadas, para la entrega de anuncios a usuarios no premium.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">7. Retención y seguridad de datos</h3>
             <p>Empleamos estándares de seguridad de la industria a través de nuestra arquitectura en la nube (Supabase/PostgreSQL) para encriptar contraseñas, aplicar políticas de seguridad a nivel de fila (RLS) sobre la información de tu perfil, y procesar las modificaciones sensibles de cuenta (saldo, IP, estado premium, etc.) exclusivamente mediante funciones de servidor protegidas, nunca directamente desde el cliente. Conservamos tus datos mientras tu cuenta permanezca activa o mientras sea necesario para cumplir obligaciones legales, resolver disputas o hacer cumplir estos acuerdos.</p>
@@ -4789,7 +4759,7 @@
             <p>NetGamer MX es una plataforma de recompensas y entretenimiento competitivo en la que los usuarios pueden ganar una moneda virtual interna llamada <strong>NetCoins (NC)</strong> mediante distintas actividades, incluyendo:</p>
             <p>a) Completar ofertas, encuestas y tareas en los muros de ofertas (offerwalls) integrados de proveedores asociados (por ejemplo AdGem).</p>
             <p>b) Leer noticias dentro de la sección correspondiente de la Plataforma.</p>
-            <p>c) Participar en la Ruleta Diaria, que otorga una cantidad aleatoria de NetCoins una vez cada 24 horas (hasta 5 veces al día para usuarios con suscripción Premium activa).</p>
+            <p>c) Participar en la Ruleta Diaria, que otorga una cantidad aleatoria de NetCoins una vez cada 24 horas.</p>
             <p>d) Jugar partidas competitivas 1v1 en tiempo real contra otros usuarios, apostando y ganando NetCoins según el resultado de la partida.</p>
             <p>e) Invitar a otros usuarios mediante el sistema de referidos.</p>
             <p>f) Reclamar el bono de bienvenida al registrarse por primera vez.</p>
@@ -4803,7 +4773,7 @@
             <p>Para prevenir el abuso de estos beneficios, NetGamer MX verifica la dirección IP asociada a cada cuenta. <strong>Solo se otorga un bono de bienvenida y un bono de referido por dirección IP.</strong> Si el sistema detecta que ya existe una cuenta que recibió el bono de bienvenida o que fue registrada como referido desde la misma IP, la nueva cuenta no recibirá dicho beneficio, sin perjuicio de las demás funciones de la Plataforma.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">5. Vidas, Modo 1v1 y Suscripción Premium</h3>
-            <p>El modo de juego competitivo 1v1 utiliza un sistema de "vidas" que se consumen al participar en partidas. Los usuarios pueden recargar vidas mediante compras individuales o adquirir <strong>vidas ilimitadas</strong> a través de una suscripción premium, procesada mediante MercadoPago. Todas las compras dentro de la Plataforma (vidas, premium) son procesadas de forma segura mediante funciones de servidor y la pasarela de pago MercadoPago; NetGamer MX no almacena información financiera sensible.</p>
+            <p>El modo de juego competitivo 1v1 utiliza un sistema de "vidas" que se consumen al participar en partidas. Los usuarios pueden recargar vidas mediante compras individuales o adquirir <strong>vidas ilimitadas</strong> a través de una suscripción premium, procesada mediante MercadoPago. Los usuarios con suscripción premium activa dejan de visualizar publicidad dentro de la Plataforma mientras dicha suscripción permanezca vigente. Todas las compras dentro de la Plataforma (vidas, premium) son procesadas de forma segura mediante funciones de servidor y la pasarela de pago MercadoPago; NetGamer MX no almacena información financiera sensible.</p>
             <p>Las apuestas realizadas en las partidas 1v1 se descuentan y acreditan exclusivamente en NetCoins, moneda virtual interna sin valor monetario directo hasta el momento de un canje aprobado conforme a la sección 6.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">6. Proceso de Canje y Retiro de Recompensas</h3>
@@ -4820,7 +4790,7 @@
             <p>Cualquier infracción detectada, ya sea mediante revisión manual o mecanismos automáticos, resultará en el <strong>baneo permanente de la cuenta</strong> y el decomiso de los fondos ("NetCoins") almacenados, sin derecho a compensación.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">8. Publicidad</h3>
-            <p>Todos los usuarios de la Plataforma verán publicidad dentro de la misma, incluyendo banners, anuncios de video/imagen personalizados y anuncios provenientes de redes publicitarias asociadas. Estos anuncios ayudan a financiar el pago de recompensas a la comunidad. La interacción con dichos anuncios (por ejemplo, clics) puede ser registrada con fines estadísticos y de facturación con los anunciantes.</p>
+            <p>Los usuarios que no cuenten con una suscripción premium activa verán publicidad dentro de la Plataforma, incluyendo banners, anuncios de video/imagen personalizados y anuncios provenientes de redes publicitarias asociadas. Estos anuncios ayudan a financiar el pago de recompensas a la comunidad. La interacción con dichos anuncios (por ejemplo, clics) puede ser registrada con fines estadísticos y de facturación con los anunciantes.</p>
 
             <h3 class="font-bold text-white mb-2 mt-4">9. Soporte al Cliente</h3>
             <p>NetGamer MX ofrece un canal de soporte mediante chat integrado en la Plataforma, a través del cual los usuarios pueden enviar mensajes y archivos adjuntos para resolver dudas, incidencias o problemas relacionados con su cuenta, canjes o partidas.</p>
@@ -6057,20 +6027,65 @@
         }
 
         async function aplicarEstadoPremium() {
-            // Beneficio "sin anuncios" removido de Premium a petición de Edgar.
-            // Ya NO se oculta ningún anuncio para usuarios premium; el resto de
-            // beneficios (vidas ilimitadas, badge, tab de estado, fechas, etc.)
-            // sigue funcionando igual, controlado por isPremium más abajo.
+            // Inyectar/quitar CSS global para ocultar social bar y ads externos
             const styleId = 'premium-ad-blocker';
             let styleEl = document.getElementById(styleId);
-            if (styleEl) styleEl.remove();
+            if (isPremium) {
+                if (!styleEl) {
+                    styleEl = document.createElement('style');
+                    styleEl.id = styleId;
+                    styleEl.textContent = `
+                        /* Ocultar TODOS los anuncios para premium */
+                        #snigel-cmp-framework, .snigel-cmp-framework,
+                        div[id*="adngin"], div[class*="adngin"],
+                        div[id*="social-bar"], div[class*="social-bar"],
+                        div[id*="socialbar"], div[class*="socialbar"],
+                        div[id*="sticky-footer"], div[class*="sticky-footer"],
+                        div[id*="floating"], div[class*="floating-ad"],
+                        div[id*="adsterra"], div[class*="adsterra"],
+                        div[id*="aso-"], div[class*="aso-"],
+                        div[id*="_ad_"], div[class*="_ad_"],
+                        iframe[src*="effectivecpmnetwork"],
+                        iframe[src*="highperformanceformat"],
+                        iframe[src*="adsterra"],
+                        div[id*="container-08103591ba362aeb7a7ee360f307d4ac"],
+                        #ad-native-banner, #ad-mobile-320-wrap, #ad-desktop-728,
+                        /* Social Bar Adsterra — se inyecta como fixed en body */
+                        body > div[style*="position: fixed"],
+                        body > div[style*="position:fixed"],
+                        body > iframe[style*="position: fixed"],
+                        body > iframe[style*="position:fixed"] { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
+                    `;
+                    document.head.appendChild(styleEl);
+                }
+            } else {
+                if (styleEl) styleEl.remove();
+            }
 
-            // Anuncios siempre activos (beneficio "sin anuncios" removido de Premium)
-            document.body.classList.add('ads-enabled');
-            _detenerAdObserver();
+            // Activar o desactivar anuncios según premium
+            if (!isPremium) {
+                document.body.classList.add('ads-enabled');
+                _detenerAdObserver();
+            } else {
+                document.body.classList.remove('ads-enabled');
+                _limpiarAnunciosDom(); // eliminar lo que ya está en DOM
+                _iniciarAdObserver(); // vigilar y eliminar lo que se inyecte después
+            }
 
             // 🗑️  SOCIAL BAR ELIMINADO - NO SE CARGA NI COMO PREMIUM NI COMO NO PREMIUM
             // Las líneas que cargaban sb-script-1 y sb-script-2 fueron ELIMINADAS
+
+            // Si es premium, remover scripts y contenedores del social bar
+            if (isPremium) {
+                ['sb-script-1', 'sb-script-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                });
+                // Remover elementos inyectados por el social bar
+                document.querySelectorAll('body > div[style*="position: fixed"], body > div[style*="position:fixed"], body > iframe[style*="position: fixed"], body > iframe[style*="position:fixed"]').forEach(el => el.remove());
+                const sb = document.getElementById('container-08103591ba362aeb7a7ee360f307d4ac');
+                if (sb) sb.innerHTML = '';
+            }
 
             // Elementos de anuncios a ocultar/mostrar
             const adEls = [
@@ -6082,8 +6097,8 @@
             // Iframes de anuncios del <head> invoke container
             const nativeContainer = document.getElementById('container-08103591ba362aeb7a7ee360f307d4ac');
 
-            adEls.forEach(el => { if (el) el.style.display = ''; });
-            if (nativeContainer) nativeContainer.style.display = '';
+            adEls.forEach(el => { if (el) el.style.display = isPremium ? 'none' : ''; });
+            if (nativeContainer) nativeContainer.style.display = isPremium ? 'none' : '';
 
             // Banners premium en UI
             const bannerCanjear = document.getElementById('canjear-banner-premium');
@@ -6127,7 +6142,22 @@
                 _premiumFechas = null; // reset after use
             }
             document.getElementById('premium-oferta').classList.toggle('hidden', isPremium);
-            if (typeof actualizarTextosRuleta === 'function') actualizarTextosRuleta();
+
+            // Si es premium, ocultar popunder/flotante (script ya ejecutado, pero ocultamos su iframe si existe)
+            if (isPremium) {
+                document.querySelectorAll('iframe').forEach(f => {
+                    const src = f.src || '';
+                    if (src.includes('effectivecpmnetwork') || src.includes('highperformanceformat')) {
+                        f.style.display = 'none';
+                    }
+                });
+                // Limpiar ad containers del DOM
+                document.querySelectorAll('[id^="container-"]').forEach(el => {
+                    if (el.id !== 'app-container' && el.id !== 'auth-container') {
+                        el.style.display = 'none';
+                    }
+                });
+            }
         }
 
         // Modal "¿Cansado de los anuncios?"
@@ -6143,10 +6173,8 @@
 
         // Mostrar el modal ~15 segundos después de entrar a la app
         function programarModalPremiumAds() {
-            // Desactivado: el pitch "elimina los anuncios con Premium" ya no aplica,
-            // Premium dejó de quitar anuncios. Se deja la función (no-op) para no
-            // romper la llamada existente más abajo.
-            return;
+            if (isPremium) return;
+            setTimeout(mostrarModalPremiumAds, 15000);
         }
 
         // Pago con MercadoPago vía Supabase Edge Function
@@ -6770,11 +6798,7 @@ function _reanudarAnuncioPendienteSiExiste() {
 }
 
 function _esPremiumActivo() {
-    // Beneficio "sin anuncios" removido de Premium a petición de Edgar:
-    // los anuncios personalizados ahora se muestran también a usuarios premium.
-    // Se deja la función (en vez de borrarla) por si algo más la referencia,
-    // pero ya no bloquea la aparición de anuncios.
-    return false;
+    return typeof isPremium !== 'undefined' && isPremium;
 }
 
 function programarSiguienteAnuncio() {
@@ -6913,15 +6937,12 @@ function mostrarAnuncioPersonalizado(anuncio, opciones = {}) {
     // anuncio (no al reanudarlo tras un recargo de página, para no contar
     // la misma vista dos veces en las estadísticas).
     if (!esReanudacion) {
-        // RPC con dedupe real: hace upsert en anuncios_vistas (user_id, anuncio_id) y
-        // solo suma +1 a anuncios_personalizados.impresiones la primera vez que este
-        // usuario ve este anuncio en particular. Antes se leía y actualizaba
-        // directo desde el cliente sin este control y sin manejo de errores, así que
-        // fallaba en silencio si RLS bloqueaba el update.
-        if (currentUser && currentUser.id) {
-            _supabase.rpc('registrar_impresion_anuncio', { p_user_id: currentUser.id, p_anuncio_id: anuncio.id })
-                .then(({ error }) => { if (error) console.error('Error registrando impresión de anuncio:', error); });
-        }
+        // Usamos un RPC atómico (igual patrón que incrementar_netcoins) en vez de
+        // leer y luego actualizar desde el cliente: ese select+update se puede quedar
+        // bloqueado silenciosamente por RLS (el cliente normalmente no tiene permiso
+        // de UPDATE sobre esta tabla) y por eso las impresiones no se registraban.
+        _supabase.rpc('incrementar_metrica_anuncio', { p_anuncio_id: anuncio.id, p_campo: 'impresiones' })
+            .then(({ error }) => { if (error) console.error('Error registrando impresión de anuncio:', error); });
     }
 }
 
@@ -6945,11 +6966,9 @@ function cerrarAnuncioPersonalizado() {
 
 function registrarClicAnuncio() {
     if (!_anuncioIdActual) return;
-    if (!currentUser || !currentUser.id) return;
     const idAnuncio = _anuncioIdActual;
-    // Mismo patrón de dedupe que la impresión: solo cuenta el primer clic de
-    // este usuario sobre este anuncio.
-    _supabase.rpc('registrar_clic_anuncio', { p_user_id: currentUser.id, p_anuncio_id: idAnuncio })
+    // Mismo fix que en la impresión: RPC atómico en vez de select+update desde el cliente.
+    _supabase.rpc('incrementar_metrica_anuncio', { p_anuncio_id: idAnuncio, p_campo: 'clics' })
         .then(({ error }) => { if (error) console.error('Error registrando clic de anuncio:', error); });
 }
 
