@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,8 82,26 82,74 50,92 18,74 18,26%22 fill=%22%237c3aed%22/><polygon points=%2250,18 74,32 74,68 50,82 26,68 26,32%22 fill=%22%236d28d9%22/><text x=%2250%22 y=%2272%22 text-anchor=%22middle%22 font-family=%22system-ui,sans-serif%22 font-weight=%22900%22 font-size=%2254%22 fill=%22white%22 dy=%22-4%22>N</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-    <!-- CSP para bloquear redirects no autorizados desde iframes de anuncios -->
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self'; form-action 'self';">
     <title>NetGamerMX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1050,15 +1048,6 @@
             <main id="main-content" class="flex-1 p-3 sm:p-6 overflow-y-auto">
 
                 <div id="tab-inicio" class="tab-content active space-y-4 sm:space-y-6">
-                    <div class="bg-gradient-to-r from-rose-800 to-fuchsia-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl">
-                        <h2 class="text-xl sm:text-3xl font-black mb-2">¡Consigue Dinero Real Viendo K-Dramas!</h2>
-                        <p class="text-rose-200 text-xs sm:text-sm mb-4 sm:mb-6">Disfruta tus novelas coreanas favoritas, acumula NetCoins y canjéalos por premios digitales o transferencias bancarias.</p>
-                        <button onclick="irAKdramas()"
-                            class="bg-white text-fuchsia-900 font-extrabold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition duration-200 text-sm sm:text-base">
-                            <i class="fa-solid fa-clapperboard mr-2"></i>Ver K-Dramas
-                        </button>
-                    </div>
-
                     <div class="bg-gradient-to-r from-purple-800 to-indigo-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl">
                         <h2 class="text-xl sm:text-3xl font-black mb-2">¡Consigue Dinero Real Leyendo Noticias!</h2>
                         <p class="text-purple-200 text-xs sm:text-sm mb-4 sm:mb-6">Infórmate con las noticias más relevantes, acumula NetCoins y canjéalos por premios digitales o transferencias bancarias.</p>
@@ -1330,7 +1319,7 @@
                                 <div class="text-center">
                                     <h3 class="text-lg sm:text-xl font-extrabold text-white group-hover:text-blue-300 transition-colors">PayPal</h3>
                                     <p class="text-slate-400 text-xs mt-1">Saldo directo a tu cuenta</p>
-                                    <span class="inline-block mt-2 bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30">Desde 100,000 NC</span>
+                                    <span class="inline-block mt-2 bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30">Desde 200,000 NC</span>
                                 </div>
                                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <i class="fa-solid fa-arrow-right text-blue-400 text-sm"></i>
@@ -1344,7 +1333,7 @@
                                 <div class="text-center">
                                     <h3 class="text-lg sm:text-xl font-extrabold text-white group-hover:text-emerald-300 transition-colors">Transferencia SPEI</h3>
                                     <p class="text-slate-400 text-xs mt-1">A cualquier banco mexicano</p>
-                                    <span class="inline-block mt-2 bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">Desde 100,000 NC</span>
+                                    <span class="inline-block mt-2 bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">Desde 200,000 NC</span>
                                 </div>
                                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <i class="fa-solid fa-arrow-right text-emerald-400 text-sm"></i>
@@ -1358,7 +1347,7 @@
                                 <div class="text-center">
                                     <h3 class="text-lg sm:text-xl font-extrabold text-white group-hover:text-red-300 transition-colors">Robux</h3>
                                     <p class="text-slate-400 text-xs mt-1">Robux para Roblox</p>
-                                    <span class="inline-block mt-2 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30">Desde 322,500 NC</span>
+                                    <span class="inline-block mt-2 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30">Desde 258,000 NC</span>
                                 </div>
                                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <i class="fa-solid fa-arrow-right text-red-400 text-sm"></i>
@@ -1372,7 +1361,7 @@
                                 <div class="text-center">
                                     <h3 class="text-lg sm:text-xl font-extrabold text-white group-hover:text-orange-300 transition-colors">Diamantes Free Fire</h3>
                                     <p class="text-slate-400 text-xs mt-1">Recarga directa a tu ID</p>
-                                    <span class="inline-block mt-2 bg-orange-500/20 text-orange-400 text-xs font-bold px-3 py-1 rounded-full border border-orange-500/30">Desde 100,000 NC</span>
+                                    <span class="inline-block mt-2 bg-orange-500/20 text-orange-400 text-xs font-bold px-3 py-1 rounded-full border border-orange-500/30">Desde 200,000 NC</span>
                                 </div>
                                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <i class="fa-solid fa-arrow-right text-orange-400 text-sm"></i>
@@ -2154,7 +2143,7 @@
 
                 <!-- Anuncio Banner Desktop 728x90 (abajo, solo escritorio) -->
                 <div class="hidden sm:flex justify-center mt-4 mb-2">
-                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" loading="lazy" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
+                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
                     <script>
                     (function(){
                         var atOptions = { 'key': '1e445d6376d731d4b4b8b14f689c49ee', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
@@ -3965,12 +3954,12 @@
                 placeholderBanco: 'PayPal',
                 esSoloId: false,
                 montos: [
-                    { nc: 100000,    mxn: 20,   label: '$20 MXN' },
-                    { nc: 200000,    mxn: 50,   label: '$50 MXN' },
-                    { nc: 400000,   mxn: 100,   label: '$100 MXN' },
-                    { nc: 500000,   mxn: 200,  label: '$200 MXN' },
-                    { nc: 1000000,   mxn: 500,  label: '$500 MXN' },
-                    { nc: 2000000,  mxn: 1000,  label: '$1000 MXN' },
+                    { nc: 200000,    mxn: 100,   label: '$100 MXN' },
+                    { nc: 500000,    mxn: 250,   label: '$250 MXN' },
+                    { nc: 1000000,   mxn: 500,   label: '$500 MXN' },
+                    { nc: 2000000,   mxn: 1000,  label: '$1000 MXN' },
+                    { nc: 5000000,   mxn: 2500,  label: '$2500 MXN' },
+                    { nc: 10000000,  mxn: 5000,  label: '$5000 MXN' },
                 ]
             },
             spei: {
@@ -3982,12 +3971,12 @@
                 placeholderBanco: 'BBVA, Santander, HSBC...',
                 esSoloId: false,
                 montos: [
-                    { nc: 100000,    mxn: 20,   label: '$20 MXN' },
-                    { nc: 200000,    mxn: 50,   label: '$50 MXN' },
-                    { nc: 400000,   mxn: 100,   label: '$100 MXN' },
-                    { nc: 500000,   mxn: 200,  label: '$200 MXN' },
-                    { nc: 1000000,   mxn: 500,  label: '$500 MXN' },
-                    { nc: 2000000,  mxn: 1000,  label: '$1000 MXN' },
+                    { nc: 200000,    mxn: 100,   label: '$100 MXN' },
+                    { nc: 500000,    mxn: 250,   label: '$250 MXN' },
+                    { nc: 1000000,   mxn: 500,   label: '$500 MXN' },
+                    { nc: 2000000,   mxn: 1000,  label: '$1000 MXN' },
+                    { nc: 5000000,   mxn: 2500,  label: '$2500 MXN' },
+                    { nc: 10000000,  mxn: 5000,  label: '$5000 MXN' },
                 ]
             },
             robux: {
@@ -3999,12 +3988,12 @@
                 placeholderBanco: 'Roblox',
                 esSoloId: false,
                 montos: [
-                    { nc: 322500,    mxn: 129,   label: '~400 Robux' },
-                    { nc: 622500,    mxn: 249,   label: '~800 Robux' },
-                    { nc: 747500,    mxn: 299,   label: '~1,200 Robux' },
-                    { nc: 998000,   mxn: 499,   label: '~1,700 Robux' },
-                    { nc: 1598000,   mxn: 799,   label: '~3,150 Robux' },
-                    { nc: 2600000,   mxn: 1299,  label: '~4,500 Robux' },
+                    { nc: 258000,    mxn: 129,   label: '~400 Robux' },
+                    { nc: 516000,    mxn: 258,   label: '~800 Robux' },
+                    { nc: 600000,    mxn: 300,   label: '~1,200 Robux' },
+                    { nc: 1000000,   mxn: 500,   label: '~1,700 Robux' },
+                    { nc: 1600000,   mxn: 800,   label: '~3,150 Robux' },
+                    { nc: 2600000,   mxn: 1300,  label: '~4,500 Robux' },
                 ]
             },
             freefire: {
@@ -4015,10 +4004,10 @@
                 placeholderDestino: 'Ingresa tu ID numérico',
                 esSoloId: true, // Esta bandera activa el nuevo comportamiento que pediste
                 montos: [
-                    { nc: 100000,   mxn: 20,   label: '100 Diamantes' },
-                    { nc: 400000,   mxn: 100,   label: '520 Diamantes' },
-                    { nc: 500000,  mxn: 200,   label: '1060 Diamantes' },
-                    { nc: 1898000,  mxn: 949,  label: '5600 Diamantes' },
+                    { nc: 200000,   mxn: 100,   label: '520 Diamantes' },
+                    { nc: 620000,   mxn: 310,   label: '1060 Diamantes' },
+                    { nc: 1000000,  mxn: 500,   label: '2180 Diamantes' },
+                    { nc: 2000000,  mxn: 1000,  label: '5600 Diamantes' },
                 ]
             }
         };
@@ -4896,18 +4885,6 @@
             
             // Abrimos el blog en una pestaña nueva, mandando el ID oculto en la URL
             window.open(`${urlNoticias}?uid=${currentUser.id}`, '_blank');
-        }
-
-        function irAKdramas() {
-            if (!currentUser) {
-                mostrarNotificacion("Debes iniciar sesión para ganar monedas viendo K-Dramas.", "error");
-                return;
-            }
-            // Cambia esta URL por la verdadera URL donde esté hospedado kdramas.html
-            const urlKdramas = "https://pulsomx1.github.io/K-Dramas/";
-
-            // Abrimos el sitio de K-Dramas en una pestaña nueva, mandando el ID oculto en la URL
-            window.open(`${urlKdramas}?uid=${currentUser.id}`, '_blank');
         }
 
 
@@ -6260,7 +6237,7 @@
     <!-- Forzar sandbox en iframes de anuncios inyectados dinámicamente -->
     <script>
     (function() {
-        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation';
+        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms';
         var AD_DOMAINS = ['highperformanceformat.com', 'effectivecpmnetwork.com'];
 
         function isAdIframe(iframe) {
@@ -6273,51 +6250,26 @@
             var src = iframe.src || '';
             var id  = iframe.id || '';
             // Saltar iframes de muros de ofertas propios
-            if (id === 'iframe-cpalead' || id === 'iframe-adgem' || id === 'iframe-bitlabs' || id === 'iframe-monlix') return;
-            
-            // Aplicar sandbox SIEMPRE a iframes de Adsterra o que no tengan ID
-            // Esto evita que escapen de seguridad
-            var esAdIframe = src.includes('highperformanceformat') || src.includes('effectivecpmnetwork') || src.includes('adsterra') || !id || id.indexOf('iframe-') === -1;
-            
-            if (esAdIframe) {
+            if (id === 'iframe-cpalead' || id === 'iframe-adgem' || id === 'iframe-bitlabs') return;
+            if (!iframe.hasAttribute('sandbox')) {
                 iframe.setAttribute('sandbox', AD_SANDBOX);
             }
         }
 
-        // Observar iframes nuevos agregados al DOM con high priority
+        // Observar iframes nuevos agregados al DOM
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType !== 1) return;
-                    if (node.tagName === 'IFRAME') {
-                        applySandbox(node);
-                        // Aplicar de nuevo después de un tick para asegurar que se aplique
-                        requestAnimationFrame(() => applySandbox(node));
-                    }
-                    if (node.querySelectorAll) {
-                        node.querySelectorAll('iframe').forEach(function(ifrm) {
-                            applySandbox(ifrm);
-                            requestAnimationFrame(() => applySandbox(ifrm));
-                        });
-                    }
+                    if (node.tagName === 'IFRAME') applySandbox(node);
+                    node.querySelectorAll && node.querySelectorAll('iframe').forEach(applySandbox);
                 });
             });
         });
 
-        // Iniciar observación INMEDIATAMENTE, no esperar load
-        observer.observe(document.documentElement, { childList: true, subtree: true });
+        observer.observe(document.body, { childList: true, subtree: true });
 
-        // Aplicar a iframes ya existentes apenas el script se ejecute
-        document.querySelectorAll('iframe').forEach(applySandbox);
-        
-        // También aplicar cuando el DOM esté ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('iframe').forEach(applySandbox);
-            });
-        }
-        
-        // Y al load completo como último recurso
+        // Aplicar a iframes ya existentes al cargar
         window.addEventListener('load', function() {
             document.querySelectorAll('iframe').forEach(applySandbox);
         });
