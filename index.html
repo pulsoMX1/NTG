@@ -2150,16 +2150,31 @@
 
                 </div>
 
-                <!-- Anuncio Banner Desktop 728x90 (abajo, solo escritorio) -->
-                <div class="hidden sm:flex justify-center mt-4 mb-2">
-                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
+                <!-- Anuncio Banner Desktop 728x90 (abajo, solo escritorio) — sandbox agresivo (iframe + srcdoc, el script de Adsterra NUNCA corre en la página principal) -->
+                <script>
+                if (!window.crearIframeAdSandbox) {
+                    window.crearIframeAdSandbox = function(srcdocHtml, cssTexto) {
+                        var ifr = document.createElement('iframe');
+                        ifr.title = 'Publicidad';
+                        ifr.setAttribute('sandbox', 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms');
+                        ifr.setAttribute('frameborder', '0');
+                        ifr.setAttribute('scrolling', 'no');
+                        ifr.style.cssText = cssTexto;
+                        ifr.srcdoc = srcdocHtml;
+                        return ifr;
+                    };
+                }
+                </script>
+                <div class="hidden sm:flex justify-center mt-4 mb-2" id="ad-desktop-728">
                     <script>
                     (function(){
-                        var atOptions = { 'key': '1e445d6376d731d4b4b8b14f689c49ee', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
-                        window._adOptions728 = atOptions;
+                        var wrap = document.currentScript.parentElement;
+                        wrap.appendChild(window.crearIframeAdSandbox(
+                            "<html><body style='margin:0;overflow:hidden;'><script>atOptions = {'key':'1e445d6376d731d4b4b8b14f689c49ee','format':'iframe','height':90,'width':728,'params':{}};<\/script><script src='https://www.highperformanceformat.com/1e445d6376d731d4b4b8b14f689c49ee/invoke.js'><\/script></body></html>",
+                            'width:728px;height:90px;border:none;overflow:hidden;'
+                        ));
                     })();
                     </script>
-                    <script src="https://www.highperformanceformat.com/1e445d6376d731d4b4b8b14f689c49ee/invoke.js"></script>
                 </div>
 
                 <!-- Anuncio Native Banner (visible en móvil y escritorio) -->
@@ -2170,13 +2185,20 @@
             </main>
         </div>
 
-        <!-- Anuncio Banner Móvil 320x50 (solo en móvil, encima del bottom nav) -->
+        <!-- Anuncio Banner Móvil 320x50 (solo en móvil, encima del bottom nav) — sandbox agresivo (iframe + srcdoc, el script de Adsterra NUNCA corre en la página principal) -->
         <div class="sm:hidden fixed bottom-[72px] left-0 right-0 z-40 flex justify-center pointer-events-none">
             <div class="pointer-events-auto" id="ad-mobile-320-wrap">
                 <script>
-                atOptions = { 'key': 'c63e0cc3b3ff8e73aa2120d125f516eb', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };
+                (function(){
+                    var wrap = document.currentScript.parentElement;
+                    if (window.crearIframeAdSandbox) {
+                        wrap.appendChild(window.crearIframeAdSandbox(
+                            "<html><body style='margin:0;overflow:hidden;'><script>atOptions = {'key':'c63e0cc3b3ff8e73aa2120d125f516eb','format':'iframe','height':50,'width':320,'params':{}};<\/script><script src='https://www.highperformanceformat.com/c63e0cc3b3ff8e73aa2120d125f516eb/invoke.js'><\/script></body></html>",
+                            'width:320px;height:50px;max-width:100%;border:none;'
+                        ));
+                    }
+                })();
                 </script>
-                <script src="https://www.highperformanceformat.com/c63e0cc3b3ff8e73aa2120d125f516eb/invoke.js"></script>
             </div>
         </div>
 
