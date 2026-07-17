@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,8 82,26 82,74 50,92 18,74 18,26%22 fill=%22%237c3aed%22/><polygon points=%2250,18 74,32 74,68 50,82 26,68 26,32%22 fill=%22%236d28d9%22/><text x=%2250%22 y=%2272%22 text-anchor=%22middle%22 font-family=%22system-ui,sans-serif%22 font-weight=%22900%22 font-size=%2254%22 fill=%22white%22 dy=%22-4%22>N</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <!-- CSP para bloquear redirects no autorizados desde iframes de anuncios -->
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self'; form-action 'self';">
     <title>NetGamerMX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -2152,7 +2154,7 @@
 
                 <!-- Anuncio Banner Desktop 728x90 (abajo, solo escritorio) -->
                 <div class="hidden sm:flex justify-center mt-4 mb-2">
-                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
+                    <iframe sandbox="allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation" loading="lazy" src="about:blank" id="ad-desktop-728" style="width:728px;height:90px;border:none;overflow:hidden;" scrolling="no"></iframe>
                     <script>
                     (function(){
                         var atOptions = { 'key': '1e445d6376d731d4b4b8b14f689c49ee', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };
@@ -6258,7 +6260,7 @@
     <!-- Forzar sandbox en iframes de anuncios inyectados dinámicamente -->
     <script>
     (function() {
-        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox allow-forms';
+        var AD_SANDBOX = 'allow-popups allow-scripts allow-same-origin allow-top-navigation-by-user-activation';
         var AD_DOMAINS = ['highperformanceformat.com', 'effectivecpmnetwork.com'];
 
         function isAdIframe(iframe) {
@@ -6271,26 +6273,51 @@
             var src = iframe.src || '';
             var id  = iframe.id || '';
             // Saltar iframes de muros de ofertas propios
-            if (id === 'iframe-cpalead' || id === 'iframe-adgem' || id === 'iframe-bitlabs') return;
-            if (!iframe.hasAttribute('sandbox')) {
+            if (id === 'iframe-cpalead' || id === 'iframe-adgem' || id === 'iframe-bitlabs' || id === 'iframe-monlix') return;
+            
+            // Aplicar sandbox SIEMPRE a iframes de Adsterra o que no tengan ID
+            // Esto evita que escapen de seguridad
+            var esAdIframe = src.includes('highperformanceformat') || src.includes('effectivecpmnetwork') || src.includes('adsterra') || !id || id.indexOf('iframe-') === -1;
+            
+            if (esAdIframe) {
                 iframe.setAttribute('sandbox', AD_SANDBOX);
             }
         }
 
-        // Observar iframes nuevos agregados al DOM
+        // Observar iframes nuevos agregados al DOM con high priority
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType !== 1) return;
-                    if (node.tagName === 'IFRAME') applySandbox(node);
-                    node.querySelectorAll && node.querySelectorAll('iframe').forEach(applySandbox);
+                    if (node.tagName === 'IFRAME') {
+                        applySandbox(node);
+                        // Aplicar de nuevo después de un tick para asegurar que se aplique
+                        requestAnimationFrame(() => applySandbox(node));
+                    }
+                    if (node.querySelectorAll) {
+                        node.querySelectorAll('iframe').forEach(function(ifrm) {
+                            applySandbox(ifrm);
+                            requestAnimationFrame(() => applySandbox(ifrm));
+                        });
+                    }
                 });
             });
         });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+        // Iniciar observación INMEDIATAMENTE, no esperar load
+        observer.observe(document.documentElement, { childList: true, subtree: true });
 
-        // Aplicar a iframes ya existentes al cargar
+        // Aplicar a iframes ya existentes apenas el script se ejecute
+        document.querySelectorAll('iframe').forEach(applySandbox);
+        
+        // También aplicar cuando el DOM esté ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('iframe').forEach(applySandbox);
+            });
+        }
+        
+        // Y al load completo como último recurso
         window.addEventListener('load', function() {
             document.querySelectorAll('iframe').forEach(applySandbox);
         });
