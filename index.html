@@ -150,11 +150,11 @@
         #ad-native-banner, #ad-mobile-320-wrap, #ad-desktop-728 {
             display: none !important;
         }
-        /* TODOS los anuncios permanentemente ocultos - sin excepciones */
+        /* Clase que activa los anuncios para no-premium */
         body.ads-enabled #ad-native-banner,
         body.ads-enabled #ad-mobile-320-wrap,
         body.ads-enabled #ad-desktop-728 {
-            display: none !important;
+            display: flex !important;
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -2165,27 +2165,37 @@
                     };
                 }
                 </script>
-                <div class="hidden sm:flex justify-center mt-4 mb-2" id="ad-desktop-728">
-                    <script>
-                    (function(){
-                        var wrap = document.currentScript.parentElement;
-                        wrap.appendChild(window.crearIframeAdSandbox(
-                            "<html><body style='margin:0;overflow:hidden;'><script>atOptions = {'key':'1e445d6376d731d4b4b8b14f689c49ee','format':'iframe','height':90,'width':728,'params':{}};<\/script><script src='https://www.highperformanceformat.com/1e445d6376d731d4b4b8b14f689c49ee/invoke.js'><\/script></body></html>",
-                            'width:728px;height:90px;border:none;overflow:hidden;'
-                        ));
-                    })();
-                    </script>
-                </div>
-
-                <!-- Anuncio Native Banner (visible en móvil y escritorio) -->
-                <div id="ad-native-banner" class="flex justify-center mt-6 mb-2">
-                    <div id="container-08103591ba362aeb7a7ee360f307d4ac"></div>
-                </div>
+                <!-- Anuncios removidos del main - van fuera flotantes -->
 
             </main>
         </div>
 
-        <!-- Anuncio Banner Móvil 320x50 (solo en móvil, encima del bottom nav) — sandbox agresivo (iframe + srcdoc, el script de Adsterra NUNCA corre en la página principal) -->
+        <!-- 🎯 ANUNCIOS SOBREPOSICIONADOS ARRIBA (FUERA del main - NO aparecen en cada sección) -->
+        <!-- Desktop 728x90 Flotante -->
+        <div class="hidden sm:flex fixed top-20 left-0 right-0 z-40 justify-center pointer-events-none" id="ad-desktop-728">
+            <div class="pointer-events-auto">
+                <script>
+                (function(){
+                    var wrap = document.currentScript.parentElement;
+                    if (window.crearIframeAdSandbox) {
+                        wrap.appendChild(window.crearIframeAdSandbox(
+                            "<html><body style='margin:0;overflow:hidden;'><script>atOptions = {'key':'1e445d6376d731d4b4b8b14f689c49ee','format':'iframe','height':90,'width':728,'params':{}};<\/script><script src='https://www.highperformanceformat.com/1e445d6376d731d4b4b8b14f689c49ee/invoke.js'><\/script></body></html>",
+                            'width:728px;height:90px;border:none;overflow:hidden;'
+                        ));
+                    }
+                })();
+                </script>
+            </div>
+        </div>
+
+        <!-- Native Banner Flotante Arriba -->
+        <div class="flex fixed top-20 left-0 right-0 z-40 justify-center pointer-events-none" id="ad-native-banner">
+            <div class="pointer-events-auto">
+                <div id="container-08103591ba362aeb7a7ee360f307d4ac"></div>
+            </div>
+        </div>
+
+        <!-- Mobile 320x50 Fijo Abajo -->
         <div class="sm:hidden fixed bottom-[72px] left-0 right-0 z-40 flex justify-center pointer-events-none">
             <div class="pointer-events-auto" id="ad-mobile-320-wrap">
                 <script>
