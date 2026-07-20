@@ -817,6 +817,9 @@
                 </div>
             </section>
 
+            <!-- Marcador invisible para detectar final del landing -->
+            <div id="landing-scroll-end-marker" style="height: 1px; pointer-events: none;"></div>
+
         </main>
 
         <!-- Footer -->
@@ -3067,30 +3070,42 @@
         function mostrarHintScrollLanding() {
             const hint = document.getElementById('landing-scroll-hint');
             const main = document.querySelector('#landing-container main');
-            if (!hint || !main) return;
+            const endMarker = document.getElementById('landing-scroll-end-marker');
+            
+            if (!hint || !main || !endMarker) return;
 
             clearTimeout(window._landingHintTimer);
             window._landingHintTimer = setTimeout(() => hint.classList.add('visible'), 700);
 
             if (!main.dataset.hintScrollBound) {
                 main.dataset.hintScrollBound = 'true';
+                
+                // Escuchar scroll simple: si scrolleaste más de 40px, ocultar
                 main.addEventListener('scroll', () => {
                     if (document.getElementById('landing-container').classList.contains('hidden')) return;
-                    
-                    const scrollTop = main.scrollTop;
-                    const clientHeight = main.clientHeight;
-                    const scrollHeight = main.scrollHeight;
-                    
-                    // Detectar si estamos cerca del final (dentro de 100px del bottom)
-                    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-                    const isAtEnd = distanceFromBottom < 100;
-                    
-                    if (scrollTop > 40 || isAtEnd) {
+                    if (main.scrollTop > 40) {
                         hint.classList.remove('visible');
-                    } else {
-                        hint.classList.add('visible');
                     }
                 }, { passive: true });
+                
+                // Usar Intersection Observer para detectar cuando el marcador es visible (llegaste al final)
+                const observerOptions = {
+                    root: main,
+                    threshold: 0.1
+                };
+                
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (document.getElementById('landing-container').classList.contains('hidden')) return;
+                        if (entry.isIntersecting) {
+                            hint.classList.remove('visible');
+                        } else if (main.scrollTop <= 40) {
+                            hint.classList.add('visible');
+                        }
+                    });
+                }, observerOptions);
+                
+                observer.observe(endMarker);
             }
         }
 
