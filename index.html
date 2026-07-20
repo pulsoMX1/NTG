@@ -3070,43 +3070,31 @@
         function mostrarHintScrollLanding() {
             const hint = document.getElementById('landing-scroll-hint');
             const main = document.querySelector('#landing-container main');
-            const endMarker = document.getElementById('landing-scroll-end-marker');
-            
-            if (!hint || !main || !endMarker) return;
+            if (!hint || !main) return;
 
             clearTimeout(window._landingHintTimer);
+            clearTimeout(window._landingHintAutoHideTimer);
+            
+            hint.classList.remove('visible');
             window._landingHintTimer = setTimeout(() => hint.classList.add('visible'), 700);
 
             if (!main.dataset.hintScrollBound) {
                 main.dataset.hintScrollBound = 'true';
                 
-                // Escuchar scroll simple: si scrolleaste más de 40px, ocultar
-                main.addEventListener('scroll', () => {
+                // Desaparecer apenas el usuario haga CUALQUIER scroll
+                const handleScroll = () => {
                     if (document.getElementById('landing-container').classList.contains('hidden')) return;
-                    if (main.scrollTop > 40) {
-                        hint.classList.remove('visible');
-                    }
-                }, { passive: true });
-                
-                // Usar Intersection Observer para detectar cuando el marcador es visible (llegaste al final)
-                const observerOptions = {
-                    root: main,
-                    threshold: 0.1
+                    hint.classList.remove('visible');
+                    main.removeEventListener('scroll', handleScroll, { passive: true });
                 };
                 
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (document.getElementById('landing-container').classList.contains('hidden')) return;
-                        if (entry.isIntersecting) {
-                            hint.classList.remove('visible');
-                        } else if (main.scrollTop <= 40) {
-                            hint.classList.add('visible');
-                        }
-                    });
-                }, observerOptions);
-                
-                observer.observe(endMarker);
+                main.addEventListener('scroll', handleScroll, { passive: true });
             }
+            
+            // Auto-ocultar después de 8 segundos sin importar nada
+            window._landingHintAutoHideTimer = setTimeout(() => {
+                hint.classList.remove('visible');
+            }, 8000);
         }
 
         function toggleAuthViews(showLogin) {
