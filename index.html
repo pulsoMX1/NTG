@@ -150,10 +150,11 @@
         #ad-native-banner, #ad-mobile-320-wrap, #ad-desktop-728 {
             display: none !important;
         }
-        /* Clase que activa los anuncios para no-premium - PERO MANTENER ad-native-banner oculto */
+        /* TODOS los anuncios permanentemente ocultos - sin excepciones */
+        body.ads-enabled #ad-native-banner,
         body.ads-enabled #ad-mobile-320-wrap,
         body.ads-enabled #ad-desktop-728 {
-            display: flex !important;
+            display: none !important;
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
