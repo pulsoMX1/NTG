@@ -3076,8 +3076,16 @@
                 main.dataset.hintScrollBound = 'true';
                 main.addEventListener('scroll', () => {
                     if (document.getElementById('landing-container').classList.contains('hidden')) return;
-                    const isAtEnd = main.scrollTop + main.clientHeight >= main.scrollHeight - 20;
-                    if (main.scrollTop > 40 || isAtEnd) {
+                    
+                    const scrollTop = main.scrollTop;
+                    const clientHeight = main.clientHeight;
+                    const scrollHeight = main.scrollHeight;
+                    
+                    // Detectar si estamos cerca del final (dentro de 100px del bottom)
+                    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+                    const isAtEnd = distanceFromBottom < 100;
+                    
+                    if (scrollTop > 40 || isAtEnd) {
                         hint.classList.remove('visible');
                     } else {
                         hint.classList.add('visible');
