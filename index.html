@@ -3076,7 +3076,8 @@
                 main.dataset.hintScrollBound = 'true';
                 main.addEventListener('scroll', () => {
                     if (document.getElementById('landing-container').classList.contains('hidden')) return;
-                    if (main.scrollTop > 40) {
+                    const isAtEnd = main.scrollTop + main.clientHeight >= main.scrollHeight - 20;
+                    if (main.scrollTop > 40 || isAtEnd) {
                         hint.classList.remove('visible');
                     } else {
                         hint.classList.add('visible');
