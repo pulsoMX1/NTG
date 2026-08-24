@@ -7486,6 +7486,28 @@ if (typeof verificarSesionActiva !== 'undefined') {
     const _verificarSesionActivaOriginal = verificarSesionActiva;
     verificarSesionActiva = async function() {
         await _verificarSesionActivaOriginal();
+        
+        // ═══════════════════════════════════════════════════
+        // SISTEMA DE RECOMPENSAS DIARIAS - INTEGRACIÓN
+        // ═══════════════════════════════════════════════════
+        
+        // Esperar a que currentUser esté definido
+        let intentos = 0;
+        const checkUser = setInterval(() => {
+            if (typeof currentUser !== 'undefined' && currentUser) {
+                console.log('[Recompensas] currentUser encontrado:', currentUser.id);
+                verificarYMostrarRecompensasDiarias(currentUser.id);
+                clearInterval(checkUser);
+            }
+            intentos++;
+            if (intentos > 100) { // Máximo 10 segundos de espera
+                clearInterval(checkUser);
+                console.warn('[Recompensas] No se pudo encontrar currentUser después de 10 segundos');
+            }
+        }, 100);
+        
+        // ═══════════════════════════════════════════════════
+        
         if (currentUser && typeof programarSiguienteAnuncio === 'function') {
             // Si había un anuncio a medias antes de recargar/cerrar la pestaña,
             // lo reanudamos de inmediato con el tiempo restante real. Si no había
