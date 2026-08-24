@@ -472,6 +472,340 @@
             border-color: rgba(71, 85, 105, 0.7) !important;
             outline: none !important;
         }
+
+        /* ════════════════════════════════════════════════════════════════
+           🎁 SISTEMA DE RECOMPENSAS DIARIAS - ESTILOS PROFESIONALES
+        ════════════════════════════════════════════════════════════════ */
+
+        #modal-recompensas-diarias {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #modal-recompensas-diarias.activo {
+            display: flex;
+        }
+
+        .recompensas-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(20, 30, 55, 0.9) 100%);
+            border: 2px solid rgba(124, 58, 237, 0.4);
+            border-radius: 2rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            animation: recompensasEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes recompensasEntrada {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .recompensas-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .recompensas-titulo {
+            font-size: 1.875rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .recompensas-subtitulo {
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .recompensas-progreso {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .progreso-label {
+            font-size: 0.75rem;
+            color: rgba(226, 232, 255, 0.6);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progreso-barra {
+            width: 100%;
+            height: 8px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .progreso-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .dia-card {
+            position: relative;
+            aspect-ratio: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(100, 116, 139, 0.3);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .dia-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(99, 102, 241, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dia-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(124, 58, 237, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .dia-card:hover::before {
+            opacity: 1;
+        }
+
+        .dia-card.disponible {
+            border-color: rgba(16, 185, 129, 0.6);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .dia-card.disponible:hover {
+            background: rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .dia-card.reclamado {
+            border-color: rgba(124, 58, 237, 0.6);
+            background: rgba(124, 58, 237, 0.2);
+            opacity: 1;
+        }
+
+        .dia-card.bloqueado {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .dia-numero {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: rgba(226, 232, 255, 0.8);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .dia-nc {
+            font-size: 0.75rem;
+            color: rgba(251, 191, 36, 0.9);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dia-card.reclamado .dia-numero,
+        .dia-card.reclamado .dia-nc {
+            color: rgba(168, 85, 247, 1);
+        }
+
+        .dia-checkmark {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .dia-card.reclamado .dia-checkmark {
+            display: flex;
+        }
+
+        .recompensas-info {
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .recompensas-info strong {
+            color: rgba(251, 191, 36, 1);
+        }
+
+        .btn-reclamar-diario {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .btn-reclamar-diario:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-reclamar-diario:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-reclamar-diario:disabled {
+            background: rgba(100, 116, 139, 0.5);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-cerrar-recompensas {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1.5px solid rgba(100, 116, 139, 0.3);
+            border-radius: 0.75rem;
+            color: rgba(226, 232, 255, 0.7);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-cerrar-recompensas:hover {
+            background: rgba(30, 41, 59, 1);
+            border-color: rgba(124, 58, 237, 0.5);
+            color: rgba(226, 232, 255, 1);
+            transform: rotate(90deg);
+        }
+
+        .recompensas-completadas {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .recompensas-completas-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .recompensas-completas-titulo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: rgba(251, 191, 36, 1);
+            margin-bottom: 0.5rem;
+        }
+
+        .recompensas-completas-desc {
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .estado-reclamacion {
+            font-size: 0.75rem;
+            color: rgba(226, 232, 255, 0.6);
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .recompensas-card {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+
+            .recompensas-titulo {
+                font-size: 1.5rem;
+            }
+
+            .dias-grid {
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+                gap: 0.5rem;
+            }
+        }
+
+        /* ════════════════════════════════════════════════════════════════
+           FIN ESTILOS RECOMPENSAS DIARIAS
+        ════════════════════════════════════════════════════════════════ */
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
@@ -500,6 +834,42 @@
                 <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
             </button>
             <p class="text-xs text-slate-600 pt-2">Si crees que esto es un error, contacta a soporte a través de otro medio. NetGamer</p>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         🎁 MODAL DE RECOMPENSAS DIARIAS - PROFESIONAL Y SEGURO
+         ════════════════════════════════════════════════════════════════ -->
+    <div id="modal-recompensas-diarias">
+        <div class="recompensas-card">
+            <button onclick="cerrarModalRecompensas()" class="btn-cerrar-recompensas">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="recompensas-header">
+                <h2 class="recompensas-titulo">🎁 Recompensas Diarias</h2>
+                <p class="recompensas-subtitulo">Reclama tus NetCoins cada día</p>
+            </div>
+
+            <!-- Progreso -->
+            <div class="recompensas-progreso">
+                <div class="progreso-label">Progreso</div>
+                <div class="progreso-barra">
+                    <div class="progreso-fill" id="progreso-fill" style="width: 14.29%;"></div>
+                </div>
+                <div class="estado-reclamacion" id="estado-reclamacion">Día 1 de 7</div>
+            </div>
+
+            <!-- Contenido dinámico (se llena con JavaScript) -->
+            <div id="recompensas-contenido">
+                <!-- Aquí va el grid de días o el mensaje de completado -->
+            </div>
+
+            <!-- Info -->
+            <div class="recompensas-info">
+                ⏰ Las recompensas se resetean cada día a las <strong>12:00 AM</strong> (hora local). 
+                Completa los 7 días para obtener el máximo de NetCoins.
+            </div>
         </div>
     </div>
 
@@ -7104,7 +7474,241 @@ if (typeof verificarSesionActiva !== 'undefined') {
                 programarSiguienteAnuncio();
             }
         }
+        
+        // ════════════════════════════════════════════════════════════════
+        // SISTEMA DE RECOMPENSAS DIARIAS - INICIALIZACIÓN SEGURA
+        // ════════════════════════════════════════════════════════════════
+        if (currentUser) {
+            setTimeout(() => {
+                cargarRecompensasDiarias(currentUser);
+            }, 500);
+        }
     };
+}
+
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE RECOMPENSAS DIARIAS - FUNCIONES PRINCIPALES
+// ════════════════════════════════════════════════════════════════
+
+const RECOMPENSAS_POR_DIA = [500, 600, 700, 800, 900, 1000, 1500];
+
+async function cargarRecompensasDiarias(user) {
+    try {
+        const hoy = new Date().toISOString().split('T')[0];
+        
+        const { data, error } = await _supabase
+            .from('recompensas_diarias')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('fecha_reset', hoy)
+            .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error cargando recompensas:', error);
+            return;
+        }
+
+        // Si existe registro de hoy, cargar su estado
+        if (data) {
+            mostrarModalRecompensas(data);
+        } else {
+            // Si no existe, crear uno nuevo o verificar si completó los 7 días
+            const { data: ultimoRegistro, error: errorUltimo } = await _supabase
+                .from('recompensas_diarias')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('fecha_reset', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (ultimoRegistro && ultimoRegistro.completado) {
+                // Ya completó los 7 días, no mostrar más
+                return;
+            }
+
+            // Crear nuevo registro para hoy (día 1)
+            const { data: nuevoRegistro } = await _supabase
+                .from('recompensas_diarias')
+                .insert({
+                    user_id: user.id,
+                    dia_actual: 1,
+                    fecha_reset: hoy,
+                    completado: false
+                })
+                .select()
+                .single();
+
+            if (nuevoRegistro) {
+                mostrarModalRecompensas(nuevoRegistro);
+            }
+        }
+    } catch (err) {
+        console.error('Error en cargarRecompensasDiarias:', err);
+    }
+}
+
+function mostrarModalRecompensas(registro) {
+    const modal = document.getElementById('modal-recompensas-diarias');
+    const contenido = document.getElementById('recompensas-contenido');
+    const progreso = document.getElementById('progreso-fill');
+    const estado = document.getElementById('estado-reclamacion');
+
+    // Calcular progreso
+    const porcentaje = (registro.dia_actual / 7) * 100;
+    progreso.style.width = porcentaje + '%';
+    estado.textContent = `Día ${registro.dia_actual} de 7`;
+
+    if (registro.completado) {
+        // Mostrar pantalla de completado
+        contenido.innerHTML = `
+            <div class="recompensas-completadas">
+                <div class="recompensas-completas-icon">🎉</div>
+                <h3 class="recompensas-completas-titulo">¡Completado!</h3>
+                <p class="recompensas-completas-desc">
+                    Has reclamado todas las recompensas de los 7 días.
+                    <br><br>
+                    <strong>Total obtenido: ${RECOMPENSAS_POR_DIA.reduce((a, b) => a + b, 0).toLocaleString()} NC</strong>
+                    <br><br>
+                    Vuelve mañana para un nuevo ciclo.
+                </p>
+            </div>
+        `;
+    } else {
+        // Mostrar grid de días
+        let diasHTML = '<div class="dias-grid">';
+        
+        for (let i = 1; i <= 7; i++) {
+            const yaPasó = i < registro.dia_actual;
+            const esHoy = i === registro.dia_actual;
+            const yaReclamado = i < registro.dia_actual;
+            
+            let claseCard = 'dia-card';
+            if (yaReclamado) claseCard += ' reclamado';
+            if (esHoy) claseCard += ' disponible';
+            if (yaPasó && !yaReclamado) claseCard += ' bloqueado';
+
+            diasHTML += `
+                <div class="${claseCard}">
+                    <div class="dia-numero">Día ${i}</div>
+                    <div class="dia-nc">${RECOMPENSAS_POR_DIA[i - 1]} NC</div>
+                    ${yaReclamado ? '<div class="dia-checkmark">✓</div>' : ''}
+                </div>
+            `;
+        }
+        
+        diasHTML += '</div>';
+        
+        const btnHTML = registro.dia_actual <= 7 ? `
+            <button class="btn-reclamar-diario" onclick="reclamarRecompensaDiaria()">
+                🎁 Reclamar ${RECOMPENSAS_POR_DIA[registro.dia_actual - 1]} NetCoins
+            </button>
+        ` : '';
+
+        contenido.innerHTML = diasHTML + btnHTML;
+    }
+
+    // Guardar estado en sessionStorage para acceso desde función de reclamación
+    sessionStorage.setItem('recompensas_actual', JSON.stringify(registro));
+
+    // Mostrar modal
+    modal.classList.add('activo');
+}
+
+function cerrarModalRecompensas() {
+    const modal = document.getElementById('modal-recompensas-diarias');
+    modal.classList.remove('activo');
+}
+
+async function reclamarRecompensaDiaria() {
+    try {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = '⏳ Procesando...';
+
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+            mostrarToastError('Sesión expirada');
+            btn.disabled = false;
+            return;
+        }
+
+        // Llamar Edge Function segura
+        const { data, error } = await _supabase.functions.invoke('reclamar-recompensa-diaria', {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+
+        if (error) {
+            mostrarToastError(error.message || 'Error reclamando recompensa');
+            btn.disabled = false;
+            btn.textContent = '🎁 Reclamar NetCoins';
+            return;
+        }
+
+        // Éxito
+        mostrarToastExito(`¡+${data.ncOtorgados} NC reclamados!`);
+        
+        // Actualizar balance en la interfaz
+        const nuevoBalance = data.nuevoTotal || 0;
+        actualizarTextosInterfaz(nuevoBalance);
+
+        // Recargar modal
+        setTimeout(() => {
+            cargarRecompensasDiarias(currentUser);
+        }, 1000);
+
+    } catch (err) {
+        console.error('Error reclamando recompensa:', err);
+        mostrarToastError('Error procesando tu reclamación');
+        event.target.disabled = false;
+    }
+}
+
+function mostrarToastExito(mensaje) {
+    const toast = document.getElementById('toast-sesion');
+    const toastInner = document.getElementById('toast-sesion-inner');
+    
+    toastInner.className = 'flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold bg-emerald-900/50 border-emerald-500/50 text-emerald-100';
+    document.getElementById('toast-sesion-icon').className = 'text-xl shrink-0';
+    document.getElementById('toast-sesion-icon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+    document.getElementById('toast-sesion-titulo').textContent = '¡Éxito!';
+    document.getElementById('toast-sesion-msg').textContent = mensaje;
+    
+    toast.classList.add('toast-enter');
+    toast.style.display = 'flex';
+    
+    setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toast.classList.remove('toast-exit');
+        }, 300);
+    }, 3000);
+}
+
+function mostrarToastError(mensaje) {
+    const toast = document.getElementById('toast-sesion');
+    const toastInner = document.getElementById('toast-sesion-inner');
+    
+    toastInner.className = 'flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold bg-rose-900/50 border-rose-500/50 text-rose-100';
+    document.getElementById('toast-sesion-icon').className = 'text-xl shrink-0';
+    document.getElementById('toast-sesion-icon').innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
+    document.getElementById('toast-sesion-titulo').textContent = 'Error';
+    document.getElementById('toast-sesion-msg').textContent = mensaje;
+    
+    toast.classList.add('toast-enter');
+    toast.style.display = 'flex';
+    
+    setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toast.classList.remove('toast-exit');
+        }, 300);
+    }, 3000);
 }
 
 </script>
