@@ -472,6 +472,118 @@
             border-color: rgba(71, 85, 105, 0.7) !important;
             outline: none !important;
         }
+
+        /* ════════════════════════════════════════ */
+        /* ESTILOS RECOMPENSAS DIARIAS */
+        /* ════════════════════════════════════════ */
+
+        #rewards-calendar {
+            perspective: 1000px;
+        }
+
+        .reward-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Día no reclamado y no disponible */
+        .reward-day.locked {
+            background: linear-gradient(135deg, rgba(71, 85, 105, 0.3), rgba(51, 65, 85, 0.3));
+            color: #94a3b8;
+            border-color: rgba(71, 85, 105, 0.5);
+        }
+
+        /* Día disponible para reclamar */
+        .reward-day.available {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(147, 51, 234, 0.3));
+            color: #c4b5fd;
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+            animation: pulse-reward 2s ease-in-out infinite;
+        }
+
+        /* Día ya reclamado */
+        .reward-day.claimed {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3));
+            color: #86efac;
+            border-color: #22c55e;
+        }
+
+        /* Animación de pulso para disponible */
+        @keyframes pulse-reward {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+            }
+        }
+
+        /* Checkmark para reclamado */
+        .reward-day.claimed::before {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.875rem;
+            color: #22c55e;
+        }
+
+        .reward-day .reward-day-number {
+            font-size: 0.875rem;
+            font-weight: 900;
+        }
+
+        .reward-day .reward-day-amount {
+            font-size: 0.625rem;
+            opacity: 0.8;
+        }
+
+        /* Hover effect */
+        .reward-day.available:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+        }
+
+        .reward-day.claimed:hover {
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        /* Botón reclamar deshabilitado */
+        #claim-reward-btn:disabled {
+            background: linear-gradient(135deg, rgba(71, 85, 105, 0.5), rgba(51, 65, 85, 0.5));
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Animación de entrada del modal */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #daily-rewards-modal:not(.hidden) > div {
+            animation: slideUp 0.3s ease-out;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
@@ -6501,7 +6613,276 @@
     </div>
 </div>
 
+<!-- MODAL RECOMPENSAS DIARIAS -->
+<div id="daily-rewards-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl shadow-2xl border border-purple-500/30 max-w-md w-full p-8 relative">
+        <!-- Botón cerrar X -->
+        <button onclick="cerrarRecompensasDiarias()" class="absolute top-6 right-6 w-8 h-8 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center text-white transition active:scale-90">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+            <div class="text-5xl mb-3">🎁</div>
+            <h2 class="text-2xl font-black text-white mb-2">Recompensas Diarias</h2>
+            <p class="text-slate-400 text-sm">Reclama NetCoins cada día</p>
+        </div>
+
+        <!-- Calendario de 7 días -->
+        <div id="rewards-calendar" class="grid grid-cols-7 gap-2 mb-6">
+            <!-- Se llena con JavaScript -->
+        </div>
+
+        <!-- Info del día actual -->
+        <div id="rewards-info" class="bg-slate-700/50 rounded-2xl p-4 mb-6 text-center">
+            <p class="text-slate-400 text-sm mb-2">Recompensa disponible</p>
+            <p id="rewards-amount" class="text-3xl font-black text-amber-400">0 NC</p>
+            <p id="rewards-next-claim" class="text-xs text-slate-500 mt-2"></p>
+        </div>
+
+        <!-- Botón reclamar -->
+        <button id="claim-reward-btn" onclick="reclamarRecompensaDiaria()" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-4 rounded-2xl transition active:scale-95 mb-3">
+            <i class="fa-solid fa-star mr-2"></i> Reclamar Recompensa
+        </button>
+
+        <!-- Botón cerrar alternativo -->
+        <button onclick="cerrarRecompensasDiarias()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold py-2 rounded-xl transition">
+            Cerrar
+        </button>
+
+        <!-- Info de progreso -->
+        <div id="rewards-progress" class="mt-6 text-center">
+            <div class="w-full bg-slate-700 rounded-full h-2 mb-2 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-purple-600 to-amber-500 h-full transition-all" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-xs text-slate-400">0/7 días completados</p>
+        </div>
+    </div>
+</div>
+
 <script>
+
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE RECOMPENSAS DIARIAS
+// ════════════════════════════════════════════════════════════════
+
+const DAILY_REWARDS = {
+    1: 500,
+    2: 600,
+    3: 700,
+    4: 800,
+    5: 900,
+    6: 1000,
+    7: 1500
+};
+
+let rewardsData = null;
+let rewardsStatus = null;
+
+// Obtener datos de recompensas del usuario
+async function cargarRecompensasDiarias(userId) {
+    try {
+        // Obtener estado de recompensas
+        const { data: statusData } = await _supabase
+            .from('daily_rewards_status')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+        if (statusData?.completed) {
+            console.log('[Recompensas] Usuario completó todos los 7 días - no mostrar modal');
+            return false; // No mostrar modal
+        }
+
+        // Obtener recompensas del usuario (crear si no existen)
+        const { data: rewards } = await _supabase
+            .from('daily_rewards')
+            .select('*')
+            .eq('user_id', userId)
+            .order('day_number', { ascending: true });
+
+        if (!rewards || rewards.length === 0) {
+            // Primera vez: crear los 7 días
+            console.log('[Recompensas] Primera vez - creando 7 días');
+            const daysToCreate = Array.from({ length: 7 }, (_, i) => ({
+                user_id: userId,
+                day_number: i + 1,
+                claimed: false,
+                reward_amount: DAILY_REWARDS[i + 1]
+            }));
+
+            const { data: newRewards } = await _supabase
+                .from('daily_rewards')
+                .insert(daysToCreate)
+                .select();
+
+            rewardsData = newRewards;
+        } else {
+            rewardsData = rewards;
+        }
+
+        // Crear status si no existe
+        if (!statusData) {
+            await _supabase
+                .from('daily_rewards_status')
+                .insert([{ user_id: userId, completed: false }]);
+        }
+
+        rewardsStatus = statusData || { completed: false, last_claimed_date: null };
+
+        // Renderizar modal
+        renderizarCalendarioRecompensas();
+        return true; // Mostrar modal
+    } catch (err) {
+        console.error('[Recompensas] Error cargando recompensas:', err);
+        return false;
+    }
+}
+
+// Renderizar calendario de recompensas
+function renderizarCalendarioRecompensas() {
+    if (!rewardsData) return;
+
+    const calendar = document.getElementById('rewards-calendar');
+    const infoDiv = document.getElementById('rewards-info');
+    const progressDiv = document.getElementById('rewards-progress');
+    const claimBtn = document.getElementById('claim-reward-btn');
+
+    calendar.innerHTML = '';
+
+    let claimedCount = 0;
+    let canClaimToday = false;
+    let tomorrowRewardAmount = 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    rewardsData.forEach(reward => {
+        const dayDiv = document.createElement('div');
+        const { claimed, day_number, reward_amount, claimed_at } = reward;
+
+        if (claimed) {
+            claimedCount++;
+            dayDiv.className = 'reward-day claimed';
+        } else {
+            // Verificar si puede reclamar hoy
+            const lastClaimDate = rewardsStatus?.last_claimed_date ? new Date(rewardsStatus.last_claimed_date) : null;
+            if (lastClaimDate) {
+                lastClaimDate.setHours(0, 0, 0, 0);
+            }
+
+            const lastClaimedIsToday = lastClaimDate?.getTime() === today.getTime();
+            const allPreviousClaimed = rewardsData.slice(0, day_number - 1).every(r => r.claimed);
+
+            if (!lastClaimedIsToday && allPreviousClaimed) {
+                dayDiv.className = 'reward-day available';
+                canClaimToday = true;
+                tomorrowRewardAmount = reward_amount;
+            } else {
+                dayDiv.className = 'reward-day locked';
+            }
+        }
+
+        dayDiv.innerHTML = `
+            <div class="reward-day-number">Día ${day_number}</div>
+            <div class="reward-day-amount">${reward_amount} NC</div>
+        `;
+
+        calendar.appendChild(dayDiv);
+    });
+
+    // Actualizar info
+    infoDiv.innerHTML = `
+        <p class="text-slate-400 text-sm mb-2">Recompensa disponible</p>
+        <p id="rewards-amount" class="text-3xl font-black text-amber-400">${tomorrowRewardAmount} NC</p>
+        <p id="rewards-next-claim" class="text-xs text-slate-500 mt-2">
+            ${canClaimToday ? '✅ Disponible ahora' : '⏰ Vuelve mañana a las 12:00 AM'}
+        </p>
+    `;
+
+    // Botón reclamar
+    claimBtn.disabled = !canClaimToday;
+    claimBtn.className = canClaimToday 
+        ? 'w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-4 rounded-2xl transition active:scale-95 mb-3'
+        : 'w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold py-4 rounded-2xl transition mb-3 opacity-50 cursor-not-allowed';
+
+    // Progreso
+    const progressPercent = (claimedCount / 7) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    document.getElementById('progress-text').textContent = `${claimedCount}/7 días completados`;
+}
+
+// Reclamar recompensa diaria
+async function reclamarRecompensaDiaria() {
+    if (!currentUser || !rewardsData) return;
+
+    const btn = document.getElementById('claim-reward-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Procesando...';
+
+    try {
+        // Llamar Edge Function para procesar de forma segura
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        const { data, error } = await _supabase.functions.invoke('reclamar-recompensa-diaria', {
+            body: {},
+            headers: { Authorization: `Bearer ${session?.access_token}` }
+        });
+
+        if (error || data?.error) {
+            mostrarNotificacion('Error al reclamar recompensa', 'error');
+            btn.disabled = false;
+            btn.textContent = '⭐ Reclamar Recompensa';
+            return;
+        }
+
+        if (data?.success) {
+            // Actualizar datos locales
+            const dayIndex = data.day_number - 1;
+            if (rewardsData[dayIndex]) {
+                rewardsData[dayIndex].claimed = true;
+                rewardsData[dayIndex].claimed_at = new Date().toISOString();
+            }
+
+            // Actualizar status
+            rewardsStatus.last_claimed_date = new Date().toISOString().split('T')[0];
+
+            if (data.day_number === 7) {
+                rewardsStatus.completed = true;
+                mostrarNotificacion(`🎉 ¡Completaste toda la semana! +${data.reward_amount} NC`, 'success');
+                setTimeout(() => cerrarRecompensasDiarias(), 2000);
+            } else {
+                mostrarNotificacion(`✅ +${data.reward_amount} NetCoins reclamados`, 'success');
+                // Actualizar UI
+                setTimeout(() => renderizarCalendarioRecompensas(), 500);
+            }
+
+            // Actualizar NetCoins del usuario
+            await cargarDatosPerfil(currentUser);
+        }
+    } catch (err) {
+        console.error('[Recompensas] Error reclamando:', err);
+        mostrarNotificacion('Error al procesar la recompensa', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '⭐ Reclamar Recompensa';
+    }
+}
+
+// Cerrar modal de recompensas
+function cerrarRecompensasDiarias() {
+    document.getElementById('daily-rewards-modal').classList.add('hidden');
+}
+
+// Mostrar modal de recompensas (llamar al cargar la página si el usuario no completó los 7 días)
+async function verificarYMostrarRecompensasDiarias(userId) {
+    const debesMostrar = await cargarRecompensasDiarias(userId);
+    if (debesMostrar) {
+        document.getElementById('daily-rewards-modal').classList.remove('hidden');
+    }
+}
+
+// ════════════════════════════════════════════════════════════════
 //         SOPORTE TÉCNICO - LÓGICA
 
 let supportTicketId = null;
@@ -7095,6 +7476,28 @@ if (typeof verificarSesionActiva !== 'undefined') {
     const _verificarSesionActivaOriginal = verificarSesionActiva;
     verificarSesionActiva = async function() {
         await _verificarSesionActivaOriginal();
+        
+        // ═══════════════════════════════════════════════════
+        // SISTEMA DE RECOMPENSAS DIARIAS - INTEGRACIÓN
+        // ═══════════════════════════════════════════════════
+        
+        // Esperar a que currentUser esté definido
+        let intentos = 0;
+        const checkUser = setInterval(() => {
+            if (typeof currentUser !== 'undefined' && currentUser) {
+                console.log('[Recompensas] currentUser encontrado:', currentUser.id);
+                verificarYMostrarRecompensasDiarias(currentUser.id);
+                clearInterval(checkUser);
+            }
+            intentos++;
+            if (intentos > 100) { // Máximo 10 segundos de espera
+                clearInterval(checkUser);
+                console.warn('[Recompensas] No se pudo encontrar currentUser después de 10 segundos');
+            }
+        }, 100);
+        
+        // ═══════════════════════════════════════════════════
+        
         if (currentUser && typeof programarSiguienteAnuncio === 'function') {
             // Si había un anuncio a medias antes de recargar/cerrar la pestaña,
             // lo reanudamos de inmediato con el tiempo restante real. Si no había
