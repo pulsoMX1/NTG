@@ -7,15 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>NetGamerMX</title>
     
-    <!-- Sistema automático de detección de moneda por IP -->
+    <!-- Detección de moneda por IP (SOLO para PayPal) -->
     <script>
-    window.MONEDA_GLOBAL = 'MXN'; // Default
-    window.TASACAMBIO = 17.5; // 1 USD = 17.5 MXN (aproximado)
+    window.MONEDA_PAYPAL = 'MXN'; // Default
     
-    // Tabla de conversión MXN -> USD (redondeada)
-    window.CONVERSION_PRECIOS = {
-        '29': { usd: 2, label: '$2 USD' },
-        '49': { usd: 3, label: '$3 USD' },
+    // Tabla de conversión MXN → USD SOLO para PayPal
+    window.PAYPAL_CONVERSIONES = {
         '20': { usd: 1, label: '$1 USD' },
         '50': { usd: 3, label: '$3 USD' },
         '100': { usd: 6, label: '$6 USD' },
@@ -29,16 +26,15 @@
         .then(res => res.json())
         .then(data => {
             if (data && data.country_code === 'MX') {
-                window.MONEDA_GLOBAL = 'MXN';
+                window.MONEDA_PAYPAL = 'MXN';
             } else {
-                window.MONEDA_GLOBAL = 'USD';
+                window.MONEDA_PAYPAL = 'USD';
             }
-            window.dispatchEvent(new CustomEvent('monedaDetectada'));
+            window.dispatchEvent(new CustomEvent('monedaPayPalDetectada'));
         })
         .catch(() => {
-            // Si falla la detección, quedarse con MXN por defecto
-            window.MONEDA_GLOBAL = 'MXN';
-            window.dispatchEvent(new CustomEvent('monedaDetectada'));
+            window.MONEDA_PAYPAL = 'MXN';
+            window.dispatchEvent(new CustomEvent('monedaPayPalDetectada'));
         });
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -675,7 +671,7 @@
                             <div class="space-y-8">
                                 <div class="space-y-2">
                                     <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Ganancia promedio de nuestros usuarios</p>
-                                    <div class="text-5xl font-black bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent" data-precio-mxn="100">$100 MXN</div>
+                                    <div class="text-5xl font-black bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">$100MXN</div>
                                 </div>
                                 <div class="space-y-3 pt-6 border-t border-slate-800">
                                     <div class="flex items-center gap-3">
@@ -2080,7 +2076,7 @@
                         <!-- Botón renovar -->
                         <button onclick="iniciarPagoPremium()"
                             class="w-full bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 font-bold py-3 rounded-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — <span data-precio-mxn="49">$49 MXN</span>
+                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — $49 MXN
                         </button>
 
                     </div>
@@ -2099,7 +2095,7 @@
                                 <span class="bg-amber-500 text-black text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">Más Popular</span>
                             </div>
                             <div class="text-center mb-6 mt-2">
-                                <div class="text-5xl font-black text-white mb-1" data-precio-mxn="49"><span class="precio-valor">$49</span> <span class="text-2xl text-slate-400 font-semibold precio-moneda">MXN</span></div>
+                                <div class="text-5xl font-black text-white mb-1">$49 <span class="text-2xl text-slate-400 font-semibold">MXN</span></div>
                                 <p class="text-slate-400 text-sm">por mes · cancela cuando quieras</p>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -2120,7 +2116,7 @@
                             </ul>
                             <button onclick="iniciarPagoPremium()" id="btn-pagar-premium"
                                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-4 rounded-xl shadow-lg shadow-amber-700/30 transition-all active:scale-95 text-base flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-crown"></i><span>Premium — <span data-precio-mxn="49">$49 MXN</span>/mes</span>
+                                <i class="fa-solid fa-crown"></i><span>Premium — $49 MXN/mes</span>
                             </button>
                             <p class="text-center text-xs text-slate-500 mt-3">Pago seguro vía MercadoPago · Tarjeta, OXXO, transferencia</p>
                         </div>
@@ -2361,7 +2357,7 @@
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="text-lg font-black text-rose-400 group-hover:text-rose-300" data-precio-mxn="29">$29 MXN</p>
+                        <p class="text-lg font-black text-rose-400 group-hover:text-rose-300">$29 MXN</p>
                         <p class="text-[10px] text-slate-500">pago único</p>
                     </div>
                 </button>
@@ -2386,7 +2382,7 @@
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300" data-precio-mxn="49">$49 MXN</p>
+                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300">$49 MXN</p>
                         <p class="text-[10px] text-slate-500">por mes</p>
                     </div>
                 </button>
@@ -2404,7 +2400,7 @@
             </button>
             <div class="text-4xl mb-3">👑</div>
             <h3 class="text-xl font-black text-white mb-1">Sácale más provecho a NetGamer</h3>
-            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white"><span data-precio-mxn="49">$49 MXN</span>/mes</strong>.</p>
+            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white">$49 MXN/mes</strong>.</p>
             <button onclick="cerrarModalPremiumAds(); switchTab('tab-premium', null)"
                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-3 rounded-xl transition active:scale-95 mb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-crown"></i> Quiero Premium
@@ -7143,52 +7139,25 @@ if (typeof verificarSesionActiva !== 'undefined') {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// SISTEMA DE CONVERSIÓN DE MONEDAS AUTOMÁTICO (DETECCIÓN POR IP)
+// CONVERSIÓN DE MONEDA PARA PAYPAL ÚNICAMENTE
 // ══════════════════════════════════════════════════════════════════════════
-function aplicarConversionMonedas() {
-    if (window.MONEDA_GLOBAL === 'USD') {
-        // Cambiar todos los elementos con data-precio-mxn
-        document.querySelectorAll('[data-precio-mxn]').forEach(elem => {
-            const mxn = elem.getAttribute('data-precio-mxn');
-            if (window.CONVERSION_PRECIOS[mxn]) {
-                const conversion = window.CONVERSION_PRECIOS[mxn];
-                const precioValorElem = elem.querySelector('.precio-valor');
-                const precioMonedaElem = elem.querySelector('.precio-moneda');
-                
-                if (precioValorElem) {
-                    precioValorElem.textContent = `$${conversion.usd}`;
-                } else if (precioMonedaElem) {
-                    elem.innerHTML = `$${conversion.usd} <span class="precio-moneda">USD</span>`;
-                } else {
-                    elem.textContent = `$${conversion.usd} USD`;
+window.addEventListener('monedaPayPalDetectada', function() {
+    if (window.MONEDA_PAYPAL === 'USD' && typeof CANJES_CONFIG !== 'undefined') {
+        // SOLO modificar PayPal, dejar SPEI/Robux/Free Fire intactos
+        if (CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
+            CANJES_CONFIG.paypal.montos = CANJES_CONFIG.paypal.montos.map(monto => {
+                const mxnStr = monto.mxn.toString();
+                if (window.PAYPAL_CONVERSIONES[mxnStr]) {
+                    const conversion = window.PAYPAL_CONVERSIONES[mxnStr];
+                    return {
+                        ...monto,
+                        usd: conversion.usd,
+                        label: conversion.label
+                    };
                 }
-            }
-        });
-        
-        // Cambiar CANJES_CONFIG si existe
-        if (typeof CANJES_CONFIG !== 'undefined') {
-            Object.keys(CANJES_CONFIG).forEach(metodo => {
-                if (CANJES_CONFIG[metodo].montos && Array.isArray(CANJES_CONFIG[metodo].montos)) {
-                    CANJES_CONFIG[metodo].montos.forEach(monto => {
-                        if (window.CONVERSION_PRECIOS[monto.mxn.toString()]) {
-                            const conversion = window.CONVERSION_PRECIOS[monto.mxn.toString()];
-                            monto.label = conversion.label;
-                            monto.usd = conversion.usd;
-                        }
-                    });
-                }
+                return monto;
             });
         }
-    }
-}
-
-// Escuchar cuando la moneda es detectada
-window.addEventListener('monedaDetectada', function() {
-    // Esperar a que el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', aplicarConversionMonedas);
-    } else {
-        aplicarConversionMonedas();
     }
 });
 
