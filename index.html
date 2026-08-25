@@ -6112,8 +6112,16 @@
 
             try {
                 const { data: { session } } = await _supabase.auth.getSession();
+                
+                // Detectar moneda por IP
+                const monedaPago = window.MONEDA_PAYPAL || 'MXN';
+                
                 const { data, error } = await _supabase.functions.invoke('comprar-vidas', {
-                    body: { cantidad, precio_mxn: precioMXN },
+                    body: { 
+                        cantidad, 
+                        precio_mxn: precioMXN,
+                        currency: monedaPago  // Agregar moneda al request
+                    },
                     headers: { Authorization: `Bearer ${session?.access_token}` }
                 });
 
@@ -6334,8 +6342,16 @@
 
             try {
                 const { data: { session: pmSession } } = await _supabase.auth.getSession();
+                
+                // Detectar moneda por IP (usar la variable global MONEDA_PAYPAL que ya existe)
+                const monedaPago = window.MONEDA_PAYPAL || 'MXN';
+                
                 const { data, error } = await _supabase.functions.invoke('create-payment', {
-                    body: { user_id: currentUser.id, plan: 'premium_mensual' },
+                    body: { 
+                        user_id: currentUser.id, 
+                        plan: 'premium_mensual',
+                        currency: monedaPago  // Agregar moneda al request
+                    },
                     headers: { Authorization: `Bearer ${pmSession?.access_token}` }
                 });
 
