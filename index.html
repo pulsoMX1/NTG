@@ -210,6 +210,39 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* Selector de moneda CSS */
+        .currency-selector {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 0.375rem;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .currency-btn {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            border: 1px solid transparent;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: rgba(226, 232, 255, 0.6);
+        }
+
+        .currency-btn.active {
+            background: rgba(124, 58, 237, 0.6);
+            color: #e0e7ff;
+            border-color: rgba(124, 58, 237, 0.8);
+        }
+
+        .currency-btn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            color: #e0e7ff;
+        }
+
         /* Sidebar desktop */
         #sidebar { width: 256px; min-width: 256px; transition: width 0.25s ease, min-width 0.25s ease; }
         #sidebar.collapsed { width: 72px; min-width: 72px; }
@@ -475,6 +508,14 @@
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+
+    <!-- SELECTOR DE MONEDA - INTERNACIONAL MXN/USD -->
+    <div id="currency-selector-container" class="fixed top-4 right-4 z-50 hidden">
+        <div class="currency-selector">
+            <button class="currency-btn active" data-currency="MXN" onclick="cambiarMoneda('MXN')">MXN</button>
+            <button class="currency-btn" data-currency="USD" onclick="cambiarMoneda('USD')">USD</button>
+        </div>
+    </div>
 
     <!-- ══ PANTALLA DE SITIO SUSPENDIDO (cubre absolutamente todo) ══ -->
     <div id="pantalla-sitio-suspendido" class="hidden fixed inset-0 bg-slate-950 flex items-center justify-center z-[2147483647] p-6">
@@ -2064,7 +2105,7 @@
                                 <span class="bg-amber-500 text-black text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">Más Popular</span>
                             </div>
                             <div class="text-center mb-6 mt-2">
-                                <div class="text-5xl font-black text-white mb-1">$49 <span class="text-2xl text-slate-400 font-semibold">MXN</span></div>
+                                <div id="precio-premium-mensual" class="text-5xl font-black text-white mb-1">$49 MXN</div>
                                 <p class="text-slate-400 text-sm">por mes · cancela cuando quieras</p>
                             </div>
                             <ul class="space-y-3 mb-6">
@@ -7107,6 +7148,153 @@ if (typeof verificarSesionActiva !== 'undefined') {
     };
 }
 
+</script>
+
+<script>
+// ============================================================================
+// SISTEMA DE INTERNACIONALIZACIÓN NETGAMER - CONVERSIÓN DE MONEDAS MXN/USD
+// ============================================================================
+// Este script convierte precios entre MXN y USD sin afectar la lógica interna
+// Todos los datos en Supabase siguen siendo en MXN
+// Solo cambia lo que VE el usuario en la pantalla
+
+let currentCurrency = localStorage.getItem('netgamer_currency') || 'MXN';
+const exchangeRate = 0.058; // 1 MXN = 0.058 USD (ajusta según necesites)
+
+// Precios base en MXN
+const basePrices = {
+    premium_monthly: 49,
+    premium_yearly: 490,
+};
+
+function cambiarMoneda(currency) {
+    currentCurrency = currency;
+    localStorage.setItem('netgamer_currency', currency);
+    
+    // Actualizar botones activos
+    document.querySelectorAll('.currency-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.currency === currency);
+    });
+    
+    // Actualizar todos los precios en la página
+    actualizarPreciosEnPagina();
+}
+
+function convertirPrecio(precioMXN) {
+    if (currentCurrency === 'USD') {
+        return (precioMXN * exchangeRate).toFixed(2);
+    }
+    return precioMXN.toFixed(2);
+}
+
+function obtenerSimbolo() {
+    return '$';
+}
+
+function obtenerFormatoPrecio(precioMXN) {
+    const precioConvertido = convertirPrecio(precioMXN);
+    return `${obtenerSimbolo()}${precioConvertido} ${currentCurrency}`;
+}
+
+function actualizarPreciosEnPagina() {
+    // Actualizar membresía mensual
+    const precioMensual = document.getElementById('precio-premium-mensual');
+    if (precioMensual) {
+        precioMensual.textContent = obtenerFormatoPrecio(basePrices.premium_monthly);
+    }
+    
+    // Actualizar membresía anual
+    const precioAnual = document.getElementById('precio-premium-anual');
+    if (precioAnual) {
+        precioAnual.textContent = obtenerFormatoPrecio(basePrices.premium_yearly);
+    }
+    
+    // Actualizar precios en tabla de canje
+    document.querySelectorAll('[data-price-mxn]').forEach(element => {
+        const precioMXN = parseFloat(element.dataset.priceMxn);
+        element.textContent = obtenerFormatoPrecio(precioMXN);
+    });
+    
+    // Actualizar referencias a precios en texto
+    actualizarTextosConPrecios();
+}
+
+function actualizarTextosConPrecios() {
+    // Buscar y actualizar texto "Premium — $49 MXN/mes" u similar
+    document.querySelectorAll('*').forEach(el => {
+        if (el.childNodes.length > 0) {
+            el.childNodes.forEach(node => {
+                if (node.nodeType === 3) { // Text node
+                    const texto = node.textContent;
+                    // Patrones de precios en MXN
+                    if (texto.includes('$49') || texto.includes('$490') || texto.includes('Premium')) {
+                        if (texto.includes('$49 MXN') && !texto.includes('USD')) {
+                            node.textContent = texto.replace(/\$49 MXN/g, obtenerFormatoPrecio(49));
+                        }
+                        if (texto.includes('$490 MXN') && !texto.includes('USD')) {
+                            node.textContent = texto.replace(/\$490 MXN/g, obtenerFormatoPrecio(490));
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+function inicializarSelectorMoneda() {
+    const container = document.getElementById('currency-selector-container');
+    
+    // Mostrar selector solo cuando el usuario esté autenticado
+    if (container && currentUser && currentUser.id) {
+        container.classList.remove('hidden');
+    }
+    
+    // Establecer moneda actual en los botones
+    document.querySelectorAll('.currency-btn').forEach(btn => {
+        if (btn.dataset.currency === currentCurrency) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Actualizar precios iniciales
+    actualizarPreciosEnPagina();
+}
+
+// Ejecutar cuando el documento esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(inicializarSelectorMoneda, 1000);
+});
+
+// Ejecutar también cuando el usuario se autentica
+if (typeof verificarSesionActiva !== 'undefined') {
+    const _verificarSesionActivaOriginal = verificarSesionActiva;
+    verificarSesionActiva = async function() {
+        await _verificarSesionActivaOriginal();
+        if (currentUser && currentUser.id) {
+            setTimeout(inicializarSelectorMoneda, 500);
+        }
+    };
+}
+
+// Re-ejecutar actualización cada vez que algo en canje-catalogo cambie
+const observer = new MutationObserver(() => {
+    actualizarPreciosEnPagina();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const canjesCatalogo = document.getElementById('canje-catalogo');
+        if (canjesCatalogo) {
+            observer.observe(canjesCatalogo, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        }
+    }, 1500);
+});
 </script>
 
 </body>
