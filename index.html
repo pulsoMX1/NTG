@@ -2076,7 +2076,7 @@
                         <!-- Botón renovar -->
                         <button onclick="iniciarPagoPremium()"
                             class="w-full bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 font-bold py-3 rounded-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — $49 MXN
+                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — <span data-precio-mxn="49">$49 MXN</span>
                         </button>
 
                     </div>
@@ -2116,7 +2116,7 @@
                             </ul>
                             <button onclick="iniciarPagoPremium()" id="btn-pagar-premium"
                                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-4 rounded-xl shadow-lg shadow-amber-700/30 transition-all active:scale-95 text-base flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-crown"></i><span>Premium — $49 MXN/mes</span>
+                                <i class="fa-solid fa-crown"></i><span>Premium — <span data-precio-mxn="49">$49 MXN</span>/mes</span>
                             </button>
                             <p class="text-center text-xs text-slate-500 mt-3">Pago seguro vía MercadoPago · Tarjeta, OXXO, transferencia</p>
                         </div>
@@ -2382,7 +2382,7 @@
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300">$49 MXN</p>
+                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300" data-precio-mxn="49">$49 MXN</p>
                         <p class="text-[10px] text-slate-500">por mes</p>
                     </div>
                 </button>
@@ -2400,7 +2400,7 @@
             </button>
             <div class="text-4xl mb-3">👑</div>
             <h3 class="text-xl font-black text-white mb-1">Sácale más provecho a NetGamer</h3>
-            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white">$49 MXN/mes</strong>.</p>
+            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white"><span data-precio-mxn="49">$49 MXN</span>/mes</strong>.</p>
             <button onclick="cerrarModalPremiumAds(); switchTab('tab-premium', null)"
                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-3 rounded-xl transition active:scale-95 mb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-crown"></i> Quiero Premium
@@ -7139,12 +7139,12 @@ if (typeof verificarSesionActiva !== 'undefined') {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// CONVERSIÓN DE MONEDA PARA PAYPAL ÚNICAMENTE
+// CONVERSIÓN DE MONEDA: PayPal + Premium (data-precio-mxn)
 // ══════════════════════════════════════════════════════════════════════════
 window.addEventListener('monedaPayPalDetectada', function() {
-    if (window.MONEDA_PAYPAL === 'USD' && typeof CANJES_CONFIG !== 'undefined') {
-        // SOLO modificar PayPal, dejar SPEI/Robux/Free Fire intactos
-        if (CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
+    if (window.MONEDA_PAYPAL === 'USD') {
+        // 1. Modificar PayPal
+        if (typeof CANJES_CONFIG !== 'undefined' && CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
             CANJES_CONFIG.paypal.montos = CANJES_CONFIG.paypal.montos.map(monto => {
                 const mxnStr = monto.mxn.toString();
                 if (window.PAYPAL_CONVERSIONES[mxnStr]) {
@@ -7158,6 +7158,20 @@ window.addEventListener('monedaPayPalDetectada', function() {
                 return monto;
             });
         }
+        
+        // 2. Modificar Premium (data-precio-mxn)
+        document.querySelectorAll('[data-precio-mxn="49"]').forEach(elem => {
+            if (window.PAYPAL_CONVERSIONES['49']) {
+                const conversion = window.PAYPAL_CONVERSIONES['49'];
+                // Si el elemento contiene "/mes", mantenerlo
+                const tieneSlash = elem.textContent.includes('/');
+                if (tieneSlash) {
+                    elem.innerHTML = `$${conversion.usd} USD`;
+                } else {
+                    elem.textContent = `$${conversion.usd} USD`;
+                }
+            }
+        });
     }
 });
 
