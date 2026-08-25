@@ -7141,39 +7141,43 @@ if (typeof verificarSesionActiva !== 'undefined') {
 // ══════════════════════════════════════════════════════════════════════════
 // CONVERSIÓN DE MONEDA: PayPal + Premium (data-precio-mxn)
 // ══════════════════════════════════════════════════════════════════════════
-window.addEventListener('monedaPayPalDetectada', function() {
-    if (window.MONEDA_PAYPAL === 'USD') {
-        // 1. Modificar PayPal
-        if (typeof CANJES_CONFIG !== 'undefined' && CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
-            CANJES_CONFIG.paypal.montos = CANJES_CONFIG.paypal.montos.map(monto => {
-                const mxnStr = monto.mxn.toString();
-                if (window.PAYPAL_CONVERSIONES[mxnStr]) {
-                    const conversion = window.PAYPAL_CONVERSIONES[mxnStr];
-                    return {
-                        ...monto,
-                        usd: conversion.usd,
-                        label: conversion.label
-                    };
-                }
-                return monto;
-            });
-        }
-        
-        // 2. Modificar Premium (data-precio-mxn)
-        document.querySelectorAll('[data-precio-mxn="49"]').forEach(elem => {
-            if (window.PAYPAL_CONVERSIONES['49']) {
-                const conversion = window.PAYPAL_CONVERSIONES['49'];
-                // Si el elemento contiene "/mes", mantenerlo
-                const tieneSlash = elem.textContent.includes('/');
-                if (tieneSlash) {
-                    elem.innerHTML = `$${conversion.usd} USD`;
-                } else {
-                    elem.textContent = `$${conversion.usd} USD`;
-                }
+function aplicarConversionesMonedas() {
+    if (window.MONEDA_PAYPAL !== 'USD') return;
+    
+    // 1. Modificar PayPal
+    if (typeof CANJES_CONFIG !== 'undefined' && CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
+        CANJES_CONFIG.paypal.montos = CANJES_CONFIG.paypal.montos.map(monto => {
+            const mxnStr = monto.mxn.toString();
+            if (window.PAYPAL_CONVERSIONES[mxnStr]) {
+                const conversion = window.PAYPAL_CONVERSIONES[mxnStr];
+                return {
+                    ...monto,
+                    usd: conversion.usd,
+                    label: conversion.label
+                };
             }
+            return monto;
         });
     }
-});
+    
+    // 2. Modificar Premium - SIMPLE Y DIRECTO
+    document.querySelectorAll('[data-precio-mxn="49"]').forEach(elem => {
+        // Reemplazar directamente "$49 MXN" por "$3 USD"
+        const textoOriginal = elem.textContent.trim();
+        
+        if (textoOriginal.includes('$49') || textoOriginal.includes('49')) {
+            // Reemplazar manteniendo la estructura (si tiene "/mes", mantenerlo)
+            const nuevoTexto = textoOriginal.replace(/\$49\s*MXN/, '$3 USD');
+            elem.textContent = nuevoTexto;
+        }
+    });
+}
+
+// Ejecutar cuando se detecta la moneda
+window.addEventListener('monedaPayPalDetectada', aplicarConversionesMonedas);
+
+// También ejecutar después de un pequeño delay para asegurar que el DOM está listo
+setTimeout(aplicarConversionesMonedas, 500);
 
 </script>
 
