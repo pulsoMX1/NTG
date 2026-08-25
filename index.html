@@ -2639,6 +2639,7 @@
         const bitlabsAppToken = "8b10d67e-42fe-448a-809f-2bdb45d7b79a";
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window._supabase = _supabase;
         let currentUser = null;
         const ADMIN_EMAIL_SITIO = 'ed8108868@gmail.com';
 
