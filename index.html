@@ -6409,10 +6409,18 @@
                 paypal.Buttons({
                     createOrder: (data, actions) => {
                         return actions.order.create({
+                            intent: 'CAPTURE',
                             purchase_units: [{
+                                reference_id: currentUser.id,
                                 amount: {
                                     currency_code: 'USD',
                                     value: '3.00',
+                                    breakdown: {
+                                        item_total: {
+                                            currency_code: 'USD',
+                                            value: '3.00'
+                                        }
+                                    }
                                 },
                                 description: 'NetGamer MX Premium — Sin Anuncios',
                                 items: [{
@@ -6422,7 +6430,7 @@
                                         currency_code: 'USD',
                                         value: '3.00',
                                     },
-                                    quantity: '1',
+                                    quantity: 1,
                                 }],
                             }],
                         });
@@ -6453,10 +6461,13 @@
                     },
 
                     onError: (err) => {
-                        console.error(err);
-                        mostrarNotificacion('Error en PayPal: ' + err.message, 'error');
+                        console.error('PayPal Error:', err);
+                        mostrarNotificacion('Error en PayPal: ' + (err.message || err), 'error');
                     }
-                }).render('#paypal-buttons-premium');
+                }).render('#paypal-buttons-premium').catch(err => {
+                    console.error('Error renderizando PayPal:', err);
+                    mostrarNotificacion('Error cargando PayPal: ' + err.message, 'error');
+                });
 
             } catch (err) {
                 mostrarNotificacion('Error: ' + err.message, 'error');
