@@ -6,43 +6,9 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><polygon points=%2250,8 82,26 82,74 50,92 18,74 18,26%22 fill=%22%237c3aed%22/><polygon points=%2250,18 74,32 74,68 50,82 26,68 26,32%22 fill=%22%236d28d9%22/><text x=%2250%22 y=%2272%22 text-anchor=%22middle%22 font-family=%22system-ui,sans-serif%22 font-weight=%22900%22 font-size=%2254%22 fill=%22white%22 dy=%22-4%22>N</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>NetGamerMX</title>
-    
-    <!-- Detección de moneda por IP (SOLO para PayPal) -->
-    <script>
-    window.MONEDA_PAYPAL = 'MXN'; // Default
-    
-    // Tabla de conversión MXN → USD SOLO para PayPal
-    window.PAYPAL_CONVERSIONES = {
-        '20': { usd: 1, label: '$1 USD' },
-        '50': { usd: 3, label: '$3 USD' },
-        '100': { usd: 6, label: '$6 USD' },
-        '200': { usd: 11, label: '$11 USD' },
-        '500': { usd: 29, label: '$29 USD' },
-        '1000': { usd: 57, label: '$57 USD' }
-    };
-    
-    // Detectar país por IP
-    fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.country_code === 'MX') {
-                window.MONEDA_PAYPAL = 'MXN';
-            } else {
-                window.MONEDA_PAYPAL = 'USD';
-            }
-            window.dispatchEvent(new CustomEvent('monedaPayPalDetectada'));
-        })
-        .catch(() => {
-            window.MONEDA_PAYPAL = 'MXN';
-            window.dispatchEvent(new CustomEvent('monedaPayPalDetectada'));
-        });
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <!-- PayPal SDK (para usuarios internacionales) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=BAA_OdUNqQ1kMiEU8IuN0BxEhGvBkVlvCaWn9TqjIEFFzQuGUH1tSRYMCnzzEp4BMDMPZA12qKDjDwbL6Q&currency=USD"></script>
 
     <!-- Anuncio CPAnetwork invoke -->
     <style>
@@ -243,11 +209,6 @@
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
-        /* Ocultamiento de SPEI para usuarios no mexicanos */
-        .ocultar-spei-para-internacionales .spei-canje-item {
-            display: none !important;
-        }
 
         /* Sidebar desktop */
         #sidebar { width: 256px; min-width: 256px; transition: width 0.25s ease, min-width 0.25s ease; }
@@ -511,6 +472,340 @@
             border-color: rgba(71, 85, 105, 0.7) !important;
             outline: none !important;
         }
+
+        /* ════════════════════════════════════════════════════════════════
+           🎁 SISTEMA DE RECOMPENSAS DIARIAS - ESTILOS PROFESIONALES
+        ════════════════════════════════════════════════════════════════ */
+
+        #modal-recompensas-diarias {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #modal-recompensas-diarias.activo {
+            display: flex;
+        }
+
+        .recompensas-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(20, 30, 55, 0.9) 100%);
+            border: 2px solid rgba(124, 58, 237, 0.4);
+            border-radius: 2rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            animation: recompensasEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes recompensasEntrada {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .recompensas-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .recompensas-titulo {
+            font-size: 1.875rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .recompensas-subtitulo {
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .recompensas-progreso {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .progreso-label {
+            font-size: 0.75rem;
+            color: rgba(226, 232, 255, 0.6);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progreso-barra {
+            width: 100%;
+            height: 8px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .progreso-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .dia-card {
+            position: relative;
+            aspect-ratio: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(100, 116, 139, 0.3);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .dia-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(99, 102, 241, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dia-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(124, 58, 237, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .dia-card:hover::before {
+            opacity: 1;
+        }
+
+        .dia-card.disponible {
+            border-color: rgba(16, 185, 129, 0.6);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .dia-card.disponible:hover {
+            background: rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .dia-card.reclamado {
+            border-color: rgba(124, 58, 237, 0.6);
+            background: rgba(124, 58, 237, 0.2);
+            opacity: 1;
+        }
+
+        .dia-card.bloqueado {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .dia-numero {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: rgba(226, 232, 255, 0.8);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .dia-nc {
+            font-size: 0.75rem;
+            color: rgba(251, 191, 36, 0.9);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dia-card.reclamado .dia-numero,
+        .dia-card.reclamado .dia-nc {
+            color: rgba(168, 85, 247, 1);
+        }
+
+        .dia-checkmark {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .dia-card.reclamado .dia-checkmark {
+            display: flex;
+        }
+
+        .recompensas-info {
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .recompensas-info strong {
+            color: rgba(251, 191, 36, 1);
+        }
+
+        .btn-reclamar-diario {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .btn-reclamar-diario:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-reclamar-diario:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-reclamar-diario:disabled {
+            background: rgba(100, 116, 139, 0.5);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-cerrar-recompensas {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1.5px solid rgba(100, 116, 139, 0.3);
+            border-radius: 0.75rem;
+            color: rgba(226, 232, 255, 0.7);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-cerrar-recompensas:hover {
+            background: rgba(30, 41, 59, 1);
+            border-color: rgba(124, 58, 237, 0.5);
+            color: rgba(226, 232, 255, 1);
+            transform: rotate(90deg);
+        }
+
+        .recompensas-completadas {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .recompensas-completas-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .recompensas-completas-titulo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: rgba(251, 191, 36, 1);
+            margin-bottom: 0.5rem;
+        }
+
+        .recompensas-completas-desc {
+            font-size: 0.875rem;
+            color: rgba(226, 232, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .estado-reclamacion {
+            font-size: 0.75rem;
+            color: rgba(226, 232, 255, 0.6);
+            text-align: center;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .recompensas-card {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+
+            .recompensas-titulo {
+                font-size: 1.5rem;
+            }
+
+            .dias-grid {
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+                gap: 0.5rem;
+            }
+        }
+
+        /* ════════════════════════════════════════════════════════════════
+           FIN ESTILOS RECOMPENSAS DIARIAS
+        ════════════════════════════════════════════════════════════════ */
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
@@ -539,6 +834,42 @@
                 <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
             </button>
             <p class="text-xs text-slate-600 pt-2">Si crees que esto es un error, contacta a soporte a través de otro medio. NetGamer</p>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         🎁 MODAL DE RECOMPENSAS DIARIAS - PROFESIONAL Y SEGURO
+         ════════════════════════════════════════════════════════════════ -->
+    <div id="modal-recompensas-diarias">
+        <div class="recompensas-card">
+            <button onclick="cerrarModalRecompensas()" class="btn-cerrar-recompensas">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="recompensas-header">
+                <h2 class="recompensas-titulo">🎁 Recompensas Diarias</h2>
+                <p class="recompensas-subtitulo">Reclama tus NetCoins cada día</p>
+            </div>
+
+            <!-- Progreso -->
+            <div class="recompensas-progreso">
+                <div class="progreso-label">Progreso</div>
+                <div class="progreso-barra">
+                    <div class="progreso-fill" id="progreso-fill" style="width: 14.29%;"></div>
+                </div>
+                <div class="estado-reclamacion" id="estado-reclamacion">Día 1 de 7</div>
+            </div>
+
+            <!-- Contenido dinámico (se llena con JavaScript) -->
+            <div id="recompensas-contenido">
+                <!-- Aquí va el grid de días o el mensaje de completado -->
+            </div>
+
+            <!-- Info -->
+            <div class="recompensas-info">
+                ⏰ Las recompensas se resetean cada día a las <strong>12:00 AM</strong> (hora local). 
+                Completa los 7 días para obtener el máximo de NetCoins.
+            </div>
         </div>
     </div>
 
@@ -790,7 +1121,7 @@
                         </div>
 
                         <!-- SPEI -->
-                        <div class="carousel-item spei-canje-item">
+                        <div class="carousel-item">
                             <div class="group bg-white rounded-2xl p-8 text-center hover:bg-emerald-50 transition backdrop-blur-xl w-full border border-slate-200">
                                 <img src="https://seeklogo.com/images/S/spei-logo-3BFB0A560B-seeklogo.com.png" alt="SPEI" class="h-28 w-28 object-contain mx-auto mb-4 group-hover:scale-110 transition-transform">
                                 <h4 class="font-bold text-slate-800">SPEI</h4>
@@ -827,7 +1158,7 @@
                         </div>
 
                         <!-- SPEI -->
-                        <div class="carousel-item spei-canje-item">
+                        <div class="carousel-item">
                             <div class="group bg-white rounded-2xl p-8 text-center hover:bg-emerald-50 transition backdrop-blur-xl w-full border border-slate-200">
                                 <img src="https://seeklogo.com/images/S/spei-logo-3BFB0A560B-seeklogo.com.png" alt="SPEI" class="h-28 w-28 object-contain mx-auto mb-4 group-hover:scale-110 transition-transform">
                                 <h4 class="font-bold text-slate-800">SPEI</h4>
@@ -1434,7 +1765,7 @@
                                 </div>
                             </button>
 
-                            <button onclick="abrirCategoria('spei')" class="group relative bg-slate-800 border border-slate-700 hover:border-emerald-400 rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/30 hover:-translate-y-1 active:scale-95 text-left w-full spei-canje-item">
+                            <button onclick="abrirCategoria('spei')" class="group relative bg-slate-800 border border-slate-700 hover:border-emerald-400 rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/30 hover:-translate-y-1 active:scale-95 text-left w-full">
                                 <div class="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-2xl flex items-center justify-center group-hover:bg-emerald-50 transition-all duration-300">
                                     <img src="https://seeklogo.com/images/S/spei-logo-3BFB0A560B-seeklogo.com.png" alt="SPEI" class="w-12 h-12 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform">
                                 </div>
@@ -2084,7 +2415,7 @@
                         <!-- Botón renovar -->
                         <button onclick="iniciarPagoPremium()"
                             class="w-full bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 font-bold py-3 rounded-xl transition active:scale-95 text-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — <span data-precio-mxn="49">$49 MXN</span>
+                            <i class="fa-solid fa-rotate-right text-amber-400"></i> Renovar suscripción — $49 MXN
                         </button>
 
                     </div>
@@ -2103,8 +2434,8 @@
                                 <span class="bg-amber-500 text-black text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">Más Popular</span>
                             </div>
                             <div class="text-center mb-6 mt-2">
-                                <div class="text-5xl font-black text-white mb-1"><span data-precio-mxn="49">$49 MXN</span></div>
-                                <p class="text-slate-400 text-sm">por mes · Un unico pago</p>
+                                <div class="text-5xl font-black text-white mb-1">$49 <span class="text-2xl text-slate-400 font-semibold">MXN</span></div>
+                                <p class="text-slate-400 text-sm">por mes · cancela cuando quieras</p>
                             </div>
                             <ul class="space-y-3 mb-6">
                                 <li class="flex items-center gap-3 text-sm text-slate-200">
@@ -2124,7 +2455,7 @@
                             </ul>
                             <button onclick="iniciarPagoPremium()" id="btn-pagar-premium"
                                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-4 rounded-xl shadow-lg shadow-amber-700/30 transition-all active:scale-95 text-base flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-crown"></i><span>Premium — <span data-precio-mxn="49">$49 MXN</span>/mes</span>
+                                <i class="fa-solid fa-crown"></i><span>Premium — $49 MXN/mes</span>
                             </button>
                             <p class="text-center text-xs text-slate-500 mt-3">Pago seguro vía MercadoPago · Tarjeta, OXXO, transferencia</p>
                         </div>
@@ -2390,7 +2721,7 @@
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300" data-precio-mxn="49">$49 MXN</p>
+                        <p class="text-lg font-black text-amber-400 group-hover:text-amber-300">$49 MXN</p>
                         <p class="text-[10px] text-slate-500">por mes</p>
                     </div>
                 </button>
@@ -2408,7 +2739,7 @@
             </button>
             <div class="text-4xl mb-3">👑</div>
             <h3 class="text-xl font-black text-white mb-1">Sácale más provecho a NetGamer</h3>
-            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white"><span data-precio-mxn="49">$49 MXN</span>/mes</strong>.</p>
+            <p class="text-slate-400 text-sm mb-4">Con <span class="text-amber-400 font-bold">NetGamer Premium</span> obtienes vidas ilimitadas, badge exclusivo y soporte prioritario por solo <strong class="text-white">$49 MXN/mes</strong>.</p>
             <button onclick="cerrarModalPremiumAds(); switchTab('tab-premium', null)"
                 class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-extrabold py-3 rounded-xl transition active:scale-95 mb-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-crown"></i> Quiero Premium
@@ -6331,22 +6662,6 @@
                 mostrarNotificacion('Debes iniciar sesión primero.', 'error');
                 return;
             }
-
-            // Detectar país por moneda
-            const monedaDetectada = window.MONEDA_PAYPAL || 'MXN';
-
-            // Si es México → MercadoPago, Si es otro país → PayPal
-            if (monedaDetectada === 'MXN') {
-                // MÉXICO → MercadoPago
-                await iniciarPagoPremiumMercadoPago();
-            } else {
-                // INTERNACIONAL → PayPal
-                await iniciarPagoPremiumPayPal();
-            }
-        }
-
-        // ── Función para MercadoPago (México) ──
-        async function iniciarPagoPremiumMercadoPago() {
             const btn = document.getElementById('btn-pagar-premium');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando link de pago...';
@@ -6377,104 +6692,7 @@
                 mostrarNotificacion('Error: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
-                const precioMostrado = window.MONEDA_PAYPAL === 'USD' ? '$3 USD' : '$49 MXN';
-                btn.innerHTML = `<i class="fa-solid fa-crown"></i> Obtener Premium — ${precioMostrado}/mes`;
-            }
-        }
-
-        // ── Función para PayPal (Usuarios Internacionales) ──
-        async function iniciarPagoPremiumPayPal() {
-            if (!window.paypal) {
-                mostrarNotificacion('PayPal SDK no cargó correctamente', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('btn-pagar-premium');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Abriendo PayPal...';
-
-            try {
-                // Crear contenedor para PayPal buttons si no existe
-                let paypalContainer = document.getElementById('paypal-buttons-premium');
-                if (!paypalContainer) {
-                    paypalContainer = document.createElement('div');
-                    paypalContainer.id = 'paypal-buttons-premium';
-                    paypalContainer.className = 'w-full mt-4';
-                    btn.parentNode.insertBefore(paypalContainer, btn.nextSibling);
-                } else {
-                    paypalContainer.innerHTML = ''; // Limpiar si existe
-                }
-
-                // Renderizar botones de PayPal
-                paypal.Buttons({
-                    createOrder: (data, actions) => {
-                        return actions.order.create({
-                            intent: 'CAPTURE',
-                            purchase_units: [{
-                                reference_id: currentUser.id,
-                                amount: {
-                                    currency_code: 'USD',
-                                    value: '3.00',
-                                    breakdown: {
-                                        item_total: {
-                                            currency_code: 'USD',
-                                            value: '3.00'
-                                        }
-                                    }
-                                },
-                                description: 'NetGamer MX Premium — Sin Anuncios',
-                                items: [{
-                                    name: 'Premium Mensual',
-                                    description: 'Suscripción mensual sin anuncios',
-                                    unit_amount: {
-                                        currency_code: 'USD',
-                                        value: '3.00',
-                                    },
-                                    quantity: 1,
-                                }],
-                            }],
-                        });
-                    },
-
-                    onApprove: async (data, actions) => {
-                        try {
-                            // PayPal SDK captura automáticamente
-                            const details = await actions.order.capture();
-                            
-                            // Ahora enviamos a nuestra Edge Function para confirmar
-                            const { data: { session: pmSession } } = await _supabase.auth.getSession();
-                            const response = await _supabase.functions.invoke('paypal-capture-order', {
-                                body: { orderID: details.id },
-                                headers: { Authorization: `Bearer ${pmSession?.access_token}` }
-                            });
-
-                            if (response.data?.success) {
-                                mostrarNotificacion(`✅ Premium activado por $${response.data.amount} ${response.data.currency}`, 'success');
-                                setTimeout(() => location.reload(), 1500);
-                            } else {
-                                mostrarNotificacion(`Error: ${response.data?.error}`, 'error');
-                            }
-                        } catch (err) {
-                            console.error(err);
-                            mostrarNotificacion('Error confirmando pago: ' + err.message, 'error');
-                        }
-                    },
-
-                    onError: (err) => {
-                        console.error('PayPal Error:', err);
-                        mostrarNotificacion('Error en PayPal: ' + (err.message || err), 'error');
-                    }
-                }).render('#paypal-buttons-premium').catch(err => {
-                    console.error('Error renderizando PayPal:', err);
-                    mostrarNotificacion('Error cargando PayPal: ' + err.message, 'error');
-                });
-
-            } catch (err) {
-                mostrarNotificacion('Error: ' + err.message, 'error');
-            } finally {
-                btn.disabled = false;
-                const precioMostrado = window.MONEDA_PAYPAL === 'USD' ? '$3 USD' : '$49 MXN';
-                btn.innerHTML = `<i class="fa-solid fa-crown"></i> Obtener Premium — ${precioMostrado}/mes`;
+                btn.innerHTML = '<i class="fa-solid fa-crown"></i> Obtener Premium — $49 MXN/mes';
             }
         }
 
@@ -7256,54 +7474,242 @@ if (typeof verificarSesionActiva !== 'undefined') {
                 programarSiguienteAnuncio();
             }
         }
+        
+        // ════════════════════════════════════════════════════════════════
+        // SISTEMA DE RECOMPENSAS DIARIAS - INICIALIZACIÓN SEGURA
+        // ════════════════════════════════════════════════════════════════
+        if (currentUser) {
+            setTimeout(() => {
+                cargarRecompensasDiarias(currentUser);
+            }, 500);
+        }
     };
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-// CONVERSIÓN DE MONEDA: PayPal + Premium (data-precio-mxn)
-// ══════════════════════════════════════════════════════════════════════════
-function aplicarConversionesMonedas() {
-    if (window.MONEDA_PAYPAL !== 'USD') return;
-    
-    // 1. Modificar PayPal
-    if (typeof CANJES_CONFIG !== 'undefined' && CANJES_CONFIG.paypal && CANJES_CONFIG.paypal.montos) {
-        CANJES_CONFIG.paypal.montos = CANJES_CONFIG.paypal.montos.map(monto => {
-            const mxnStr = monto.mxn.toString();
-            if (window.PAYPAL_CONVERSIONES[mxnStr]) {
-                const conversion = window.PAYPAL_CONVERSIONES[mxnStr];
-                return {
-                    ...monto,
-                    usd: conversion.usd,
-                    label: conversion.label
-                };
-            }
-            return monto;
-        });
-    }
-    
-    // 2. Modificar Premium - SIMPLE Y DIRECTO
-    document.querySelectorAll('[data-precio-mxn="49"]').forEach(elem => {
-        // Reemplazar directamente "$49 MXN" por "$3 USD"
-        const textoOriginal = elem.textContent.trim();
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE RECOMPENSAS DIARIAS - FUNCIONES PRINCIPALES
+// ════════════════════════════════════════════════════════════════
+
+const RECOMPENSAS_POR_DIA = [500, 600, 700, 800, 900, 1000, 1500];
+
+async function cargarRecompensasDiarias(user) {
+    try {
+        const hoy = new Date().toISOString().split('T')[0];
         
-        if (textoOriginal.includes('$49') || textoOriginal.includes('49')) {
-            // Reemplazar manteniendo la estructura (si tiene "/mes", mantenerlo)
-            const nuevoTexto = textoOriginal.replace(/\$49\s*MXN/, '$3 USD');
-            elem.textContent = nuevoTexto;
+        const { data, error } = await _supabase
+            .from('recompensas_diarias')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('fecha_reset', hoy)
+            .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error cargando recompensas:', error);
+            return;
         }
-    });
-    
-    // 3. Ocultar SPEI para usuarios NO mexicanos
-    document.querySelectorAll('.spei-canje-item').forEach(elem => {
-        elem.style.display = 'none';
-    });
+
+        // Si existe registro de hoy, cargar su estado
+        if (data) {
+            mostrarModalRecompensas(data);
+        } else {
+            // Si no existe, crear uno nuevo o verificar si completó los 7 días
+            const { data: ultimoRegistro, error: errorUltimo } = await _supabase
+                .from('recompensas_diarias')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('fecha_reset', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (ultimoRegistro && ultimoRegistro.completado) {
+                // Ya completó los 7 días, no mostrar más
+                return;
+            }
+
+            // Crear nuevo registro para hoy (día 1)
+            const { data: nuevoRegistro } = await _supabase
+                .from('recompensas_diarias')
+                .insert({
+                    user_id: user.id,
+                    dia_actual: 1,
+                    fecha_reset: hoy,
+                    completado: false
+                })
+                .select()
+                .single();
+
+            if (nuevoRegistro) {
+                mostrarModalRecompensas(nuevoRegistro);
+            }
+        }
+    } catch (err) {
+        console.error('Error en cargarRecompensasDiarias:', err);
+    }
 }
 
-// Ejecutar cuando se detecta la moneda
-window.addEventListener('monedaPayPalDetectada', aplicarConversionesMonedas);
+function mostrarModalRecompensas(registro) {
+    const modal = document.getElementById('modal-recompensas-diarias');
+    const contenido = document.getElementById('recompensas-contenido');
+    const progreso = document.getElementById('progreso-fill');
+    const estado = document.getElementById('estado-reclamacion');
 
-// También ejecutar después de un pequeño delay para asegurar que el DOM está listo
-setTimeout(aplicarConversionesMonedas, 500);
+    // Calcular progreso
+    const porcentaje = (registro.dia_actual / 7) * 100;
+    progreso.style.width = porcentaje + '%';
+    estado.textContent = `Día ${registro.dia_actual} de 7`;
+
+    if (registro.completado) {
+        // Mostrar pantalla de completado
+        contenido.innerHTML = `
+            <div class="recompensas-completadas">
+                <div class="recompensas-completas-icon">🎉</div>
+                <h3 class="recompensas-completas-titulo">¡Completado!</h3>
+                <p class="recompensas-completas-desc">
+                    Has reclamado todas las recompensas de los 7 días.
+                    <br><br>
+                    <strong>Total obtenido: ${RECOMPENSAS_POR_DIA.reduce((a, b) => a + b, 0).toLocaleString()} NC</strong>
+                    <br><br>
+                    Vuelve mañana para un nuevo ciclo.
+                </p>
+            </div>
+        `;
+    } else {
+        // Mostrar grid de días
+        let diasHTML = '<div class="dias-grid">';
+        
+        for (let i = 1; i <= 7; i++) {
+            const yaPasó = i < registro.dia_actual;
+            const esHoy = i === registro.dia_actual;
+            const yaReclamado = i < registro.dia_actual;
+            
+            let claseCard = 'dia-card';
+            if (yaReclamado) claseCard += ' reclamado';
+            if (esHoy) claseCard += ' disponible';
+            if (yaPasó && !yaReclamado) claseCard += ' bloqueado';
+
+            diasHTML += `
+                <div class="${claseCard}">
+                    <div class="dia-numero">Día ${i}</div>
+                    <div class="dia-nc">${RECOMPENSAS_POR_DIA[i - 1]} NC</div>
+                    ${yaReclamado ? '<div class="dia-checkmark">✓</div>' : ''}
+                </div>
+            `;
+        }
+        
+        diasHTML += '</div>';
+        
+        const btnHTML = registro.dia_actual <= 7 ? `
+            <button class="btn-reclamar-diario" onclick="reclamarRecompensaDiaria()">
+                🎁 Reclamar ${RECOMPENSAS_POR_DIA[registro.dia_actual - 1]} NetCoins
+            </button>
+        ` : '';
+
+        contenido.innerHTML = diasHTML + btnHTML;
+    }
+
+    // Guardar estado en sessionStorage para acceso desde función de reclamación
+    sessionStorage.setItem('recompensas_actual', JSON.stringify(registro));
+
+    // Mostrar modal
+    modal.classList.add('activo');
+}
+
+function cerrarModalRecompensas() {
+    const modal = document.getElementById('modal-recompensas-diarias');
+    modal.classList.remove('activo');
+}
+
+async function reclamarRecompensaDiaria() {
+    try {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = '⏳ Procesando...';
+
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) {
+            mostrarToastError('Sesión expirada');
+            btn.disabled = false;
+            return;
+        }
+
+        // Llamar Edge Function segura
+        const { data, error } = await _supabase.functions.invoke('reclamar-recompensa-diaria', {
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+
+        if (error) {
+            mostrarToastError(error.message || 'Error reclamando recompensa');
+            btn.disabled = false;
+            btn.textContent = '🎁 Reclamar NetCoins';
+            return;
+        }
+
+        // Éxito
+        mostrarToastExito(`¡+${data.ncOtorgados} NC reclamados!`);
+        
+        // Actualizar balance en la interfaz
+        const nuevoBalance = data.nuevoTotal || 0;
+        actualizarTextosInterfaz(nuevoBalance);
+
+        // Recargar modal
+        setTimeout(() => {
+            cargarRecompensasDiarias(currentUser);
+        }, 1000);
+
+    } catch (err) {
+        console.error('Error reclamando recompensa:', err);
+        mostrarToastError('Error procesando tu reclamación');
+        event.target.disabled = false;
+    }
+}
+
+function mostrarToastExito(mensaje) {
+    const toast = document.getElementById('toast-sesion');
+    const toastInner = document.getElementById('toast-sesion-inner');
+    
+    toastInner.className = 'flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold bg-emerald-900/50 border-emerald-500/50 text-emerald-100';
+    document.getElementById('toast-sesion-icon').className = 'text-xl shrink-0';
+    document.getElementById('toast-sesion-icon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+    document.getElementById('toast-sesion-titulo').textContent = '¡Éxito!';
+    document.getElementById('toast-sesion-msg').textContent = mensaje;
+    
+    toast.classList.add('toast-enter');
+    toast.style.display = 'flex';
+    
+    setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toast.classList.remove('toast-exit');
+        }, 300);
+    }, 3000);
+}
+
+function mostrarToastError(mensaje) {
+    const toast = document.getElementById('toast-sesion');
+    const toastInner = document.getElementById('toast-sesion-inner');
+    
+    toastInner.className = 'flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border text-sm font-semibold bg-rose-900/50 border-rose-500/50 text-rose-100';
+    document.getElementById('toast-sesion-icon').className = 'text-xl shrink-0';
+    document.getElementById('toast-sesion-icon').innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
+    document.getElementById('toast-sesion-titulo').textContent = 'Error';
+    document.getElementById('toast-sesion-msg').textContent = mensaje;
+    
+    toast.classList.add('toast-enter');
+    toast.style.display = 'flex';
+    
+    setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toast.classList.remove('toast-exit');
+        }, 300);
+    }, 3000);
+}
 
 </script>
 
