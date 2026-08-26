@@ -41,6 +41,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- PayPal SDK (para usuarios internacionales) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ATwRG-nLLhp5jYB2rR8PVYlIFKGxj2pXsJhWJfxp4TBJPbzD6XkBKSWFJzTJKxjfzPh4x0bGr2tVrZ_c&currency=USD"></script>
+
     <!-- Anuncio CPAnetwork invoke -->
     <style>
         
@@ -6328,6 +6331,22 @@
                 mostrarNotificacion('Debes iniciar sesión primero.', 'error');
                 return;
             }
+
+            // Detectar país por moneda
+            const monedaDetectada = window.MONEDA_PAYPAL || 'MXN';
+
+            // Si es México → MercadoPago, Si es otro país → PayPal
+            if (monedaDetectada === 'MXN') {
+                // MÉXICO → MercadoPago
+                await iniciarPagoPremiumMercadoPago();
+            } else {
+                // INTERNACIONAL → PayPal
+                await iniciarPagoPremiumPayPal();
+            }
+        }
+
+        // ── Función para MercadoPago (México) ──
+        async function iniciarPagoPremiumMercadoPago() {
             const btn = document.getElementById('btn-pagar-premium');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando link de pago...';
@@ -6358,8 +6377,101 @@
                 mostrarNotificacion('Error: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-crown"></i> Obtener Premium — $49 MXN/mes';
+                const precioMostrado = window.MONEDA_PAYPAL === 'USD' ? '$3 USD' : '$49 MXN';
+                btn.innerHTML = `<i class="fa-solid fa-crown"></i> Obtener Premium — ${precioMostrado}/mes`;
             }
+        }
+
+        // ── Función para PayPal (Usuarios Internacionales) ──
+        async function iniciarPagoPremiumPayPal() {
+            if (!window.paypal) {
+                mostrarNotificacion('PayPal SDK no cargó correctamente', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-pagar-premium');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Abriendo PayPal...';
+
+            try {
+                // Crear orden en PayPal
+                const orderResponse = await fetch('https://api.paypal.com/v2/checkout/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (await obtenerAccessTokenPayPal())
+                    },
+                    body: JSON.stringify({
+                        intent: 'CAPTURE',
+                        purchase_units: [{
+                            amount: {
+                                currency_code: 'USD',
+                                value: '3.00'
+                            },
+                            description: 'NetGamer MX Premium — Sin Anuncios'
+                        }],
+                        return_url: window.location.href,
+                        cancel_url: window.location.href
+                    })
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error('Error creando orden en PayPal');
+                }
+
+                const orderData = await orderResponse.json();
+                const orderID = orderData.id;
+
+                // Renderizar botones de PayPal
+                if (document.getElementById('paypal-buttons-premium')) {
+                    document.getElementById('paypal-buttons-premium').innerHTML = '';
+                } else {
+                    const container = document.createElement('div');
+                    container.id = 'paypal-buttons-premium';
+                    btn.parentNode.insertBefore(container, btn.nextSibling);
+                }
+
+                paypal.Buttons({
+                    createOrder() {
+                        return orderID;
+                    },
+                    onApprove(data) {
+                        // Capturar orden
+                        return fetch(`${_supabase_url}/functions/v1/paypal-capture-order`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${currentUser.id}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ orderID: data.orderID })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                mostrarNotificacion(`✅ Premium activado por $${data.amount} ${data.currency}`, 'success');
+                                setTimeout(() => location.reload(), 1500);
+                            }
+                        });
+                    },
+                    onError(err) {
+                        mostrarNotificacion('Error en PayPal: ' + err, 'error');
+                    }
+                }).render('#paypal-buttons-premium');
+
+            } catch (err) {
+                mostrarNotificacion('Error: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                const precioMostrado = window.MONEDA_PAYPAL === 'USD' ? '$3 USD' : '$49 MXN';
+                btn.innerHTML = `<i class="fa-solid fa-crown"></i> Obtener Premium — ${precioMostrado}/mes`;
+            }
+        }
+
+        // Helper: obtener token de PayPal (simplificado)
+        async function obtenerAccessTokenPayPal() {
+            // En producción, esto debería venir de tu servidor
+            // Por ahora, retorna un placeholder
+            return 'placeholder_token';
         }
 
         // Hook: extender cargarDatosPerfil para cargar estado premium también
