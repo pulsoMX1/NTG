@@ -42,7 +42,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- PayPal SDK (para usuarios internacionales) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AaXSMq99ajqgo-osKXT7vm7qTEQ671fK57PaO8XAM_pNsrtK_LAmhlRm_CAK3_JYGBUFXBvFXyX-ony2&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ATwRG-nLLhp5jYB2rR8PVYlIFKGxj2pXsJhWJfxp4TBJPbzD6XkBKSWFJzTJKxjfzPh4x0bGr2tVrZ_c&currency=USD"></script>
 
     <!-- Anuncio CPAnetwork invoke -->
     <style>
@@ -6394,67 +6394,67 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Abriendo PayPal...';
 
             try {
-                // Crear orden en PayPal
-                const orderResponse = await fetch('https://api.paypal.com/v2/checkout/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (await obtenerAccessTokenPayPal())
-                    },
-                    body: JSON.stringify({
-                        intent: 'CAPTURE',
-                        purchase_units: [{
-                            amount: {
-                                currency_code: 'USD',
-                                value: '3.00'
-                            },
-                            description: 'NetGamer MX Premium — Sin Anuncios'
-                        }],
-                        return_url: window.location.href,
-                        cancel_url: window.location.href
-                    })
-                });
-
-                if (!orderResponse.ok) {
-                    throw new Error('Error creando orden en PayPal');
+                // Crear contenedor para PayPal buttons si no existe
+                let paypalContainer = document.getElementById('paypal-buttons-premium');
+                if (!paypalContainer) {
+                    paypalContainer = document.createElement('div');
+                    paypalContainer.id = 'paypal-buttons-premium';
+                    paypalContainer.className = 'w-full mt-4';
+                    btn.parentNode.insertBefore(paypalContainer, btn.nextSibling);
+                } else {
+                    paypalContainer.innerHTML = ''; // Limpiar si existe
                 }
-
-                const orderData = await orderResponse.json();
-                const orderID = orderData.id;
 
                 // Renderizar botones de PayPal
-                if (document.getElementById('paypal-buttons-premium')) {
-                    document.getElementById('paypal-buttons-premium').innerHTML = '';
-                } else {
-                    const container = document.createElement('div');
-                    container.id = 'paypal-buttons-premium';
-                    btn.parentNode.insertBefore(container, btn.nextSibling);
-                }
-
                 paypal.Buttons({
-                    createOrder() {
-                        return orderID;
-                    },
-                    onApprove(data) {
-                        // Capturar orden
-                        return fetch(`${_supabase_url}/functions/v1/paypal-capture-order`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${currentUser.id}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ orderID: data.orderID })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                mostrarNotificacion(`✅ Premium activado por $${data.amount} ${data.currency}`, 'success');
-                                setTimeout(() => location.reload(), 1500);
-                            }
+                    createOrder: (data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    currency_code: 'USD',
+                                    value: '3.00',
+                                },
+                                description: 'NetGamer MX Premium — Sin Anuncios',
+                                items: [{
+                                    name: 'Premium Mensual',
+                                    description: 'Suscripción mensual sin anuncios',
+                                    unit_amount: {
+                                        currency_code: 'USD',
+                                        value: '3.00',
+                                    },
+                                    quantity: '1',
+                                }],
+                            }],
                         });
                     },
-                    onError(err) {
-                        mostrarNotificacion('Error en PayPal: ' + err, 'error');
+
+                    onApprove: async (data, actions) => {
+                        try {
+                            // PayPal SDK captura automáticamente
+                            const details = await actions.order.capture();
+                            
+                            // Ahora enviamos a nuestra Edge Function para confirmar
+                            const { data: { session: pmSession } } = await _supabase.auth.getSession();
+                            const response = await _supabase.functions.invoke('paypal-capture-order', {
+                                body: { orderID: details.id },
+                                headers: { Authorization: `Bearer ${pmSession?.access_token}` }
+                            });
+
+                            if (response.data?.success) {
+                                mostrarNotificacion(`✅ Premium activado por $${response.data.amount} ${response.data.currency}`, 'success');
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                mostrarNotificacion(`Error: ${response.data?.error}`, 'error');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            mostrarNotificacion('Error confirmando pago: ' + err.message, 'error');
+                        }
+                    },
+
+                    onError: (err) => {
+                        console.error(err);
+                        mostrarNotificacion('Error en PayPal: ' + err.message, 'error');
                     }
                 }).render('#paypal-buttons-premium');
 
@@ -6465,13 +6465,6 @@
                 const precioMostrado = window.MONEDA_PAYPAL === 'USD' ? '$3 USD' : '$49 MXN';
                 btn.innerHTML = `<i class="fa-solid fa-crown"></i> Obtener Premium — ${precioMostrado}/mes`;
             }
-        }
-
-        // Helper: obtener token de PayPal (simplificado)
-        async function obtenerAccessTokenPayPal() {
-            // En producción, esto debería venir de tu servidor
-            // Por ahora, retorna un placeholder
-            return 'placeholder_token';
         }
 
         // Hook: extender cargarDatosPerfil para cargar estado premium también
