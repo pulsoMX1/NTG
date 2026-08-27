@@ -2367,7 +2367,7 @@ async function cargarGananciasUsuario(userId) {
 
     try {
         const { data, error } = await _supabase
-            .from('pagos_premium')
+            .from('historial_ganancias')
             .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: false });
@@ -2409,7 +2409,7 @@ async function cargarRetirosPendientes(userId) {
 
     try {
         const { data, error } = await _supabase
-            .from('solicitudes_retiro')
+            .from('retiros_pendientes')
             .select('*')
             .eq('user_id', userId)
             .neq('estatus', 'completado')
