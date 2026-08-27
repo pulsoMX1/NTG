@@ -2008,25 +2008,33 @@ let filtroCanjesActual = 'todos';
 
 async function cargarCanjes() {
     try {
-        const { data, error } = await _supabase
+        // Primero traemos los canjes
+        const { data: canjes, error: errorCanjes } = await _supabase
             .from('retiros_pendientes')
-            .select(`
-                *,
-                perfiles(email)
-            `)
+            .select('*')
             .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('Error cargando canjes:', error);
-            document.getElementById('lista-canjes').innerHTML = '<p class="text-center text-red-400 py-8">Error al cargar canjes</p>';
-            return;
-        }
+        if (errorCanjes) throw errorCanjes;
+
+        // Luego traemos los emails de perfiles
+        const { data: perfiles, error: errorPerfiles } = await _supabase
+            .from('perfiles')
+            .select('id, email');
+
+        if (errorPerfiles) throw errorPerfiles;
+
+        // Combinamos: para cada canje, buscamos el perfil con matching user_id
+        const data = canjes.map(canje => ({
+            ...canje,
+            perfiles: perfiles.find(p => p.id === canje.user_id)
+        }));
 
         todosLosCanjes = data || [];
         renderListaCanjes();
         actualizarStatsCanjes();
     } catch(err) {
-        console.error('Error:', err);
+        console.error('Error cargando canjes:', err);
+        document.getElementById('lista-canjes').innerHTML = '<p class="text-center text-red-400 py-8">Error al cargar canjes</p>';
     }
 }
 
