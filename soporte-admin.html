@@ -2382,33 +2382,43 @@ async function cargarGananciasUsuario(userId) {
             return;
         }
 
-        // Calcular total de ganancias
-        const totalGanancias = data.reduce((sum, g) => sum + parseFloat(g.monto || 0), 0);
+        // Iconos por tipo de ganancia (igual que NetGamer)
+        const iconos = {
+            'Victoria PPT': '🎰',
+            'Video visto': '🎬',
+            'Ruleta Diaria': '🎡',
+            'Slots': '🎰',
+            'Referral': '👥',
+            'Tarea': '📋',
+            'Bono': '🎁',
+            'Juego': '🎮',
+            'default': '💰'
+        };
 
-        // Renderizar total
-        let html = `
-            <div class="bg-blue-500/20 border border-blue-500/40 rounded-lg p-4 mb-4">
-                <p class="text-xs text-blue-300 mb-1">Total de ganancias</p>
-                <p class="text-2xl font-black text-blue-300">$${totalGanancias.toFixed(2)} ${data[0]?.moneda || 'MXN'}</p>
-            </div>
-        `;
-
-        // Renderizar cada ganancia
-        html += data.map(ganancia => `
-            <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-3">
-                <div class="flex items-center justify-between mb-2">
-                    <div>
-                        <span class="text-sm font-bold text-white">${ganancia.tipo || 'Ganancia'}</span>
-                        ${ganancia.descripcion ? `<p class="text-xs text-slate-400 mt-1">${ganancia.descripcion}</p>` : ''}
+        // Renderizar cada ganancia (IGUAL A NETGAMER)
+        let html = data.map(ganancia => {
+            const tipo = ganancia.tipo || ganancia.nombre || 'Ganancia';
+            const monto = ganancia.monto || ganancia.cantidad || 0;
+            const moneda = ganancia.moneda || 'NC';
+            const icono = iconos[tipo] || iconos.default;
+            const fecha = new Date(ganancia.created_at);
+            const fechaFormato = fecha.toLocaleDateString('es-MX');
+            const horaFormato = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            
+            return `
+                <div class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="text-2xl">${icono}</div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-white truncate">${tipo} (+${parseFloat(monto).toLocaleString('es-MX')} ${moneda})</p>
+                            <p class="text-xs text-slate-400">${fechaFormato} · ${horaFormato}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">NetCoins descontadas</p>
+                        </div>
                     </div>
-                    <span class="text-sm font-bold text-green-400">+$${parseFloat(ganancia.monto).toFixed(2)}</span>
+                    <span class="text-base font-black text-green-400 shrink-0">+${parseFloat(monto).toLocaleString('es-MX')} ${moneda}</span>
                 </div>
-                <div class="text-xs text-slate-400 flex items-center justify-between">
-                    <span>${new Date(ganancia.created_at).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span class="text-green-500">${ganancia.estatus || 'completado'}</span>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         container.innerHTML = html;
 
