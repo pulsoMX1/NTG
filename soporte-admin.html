@@ -22,7 +22,6 @@
         #app-screen { display: none; }
         textarea { resize: none; }
 
-        /* Móvil: sidebar angosto, chat ocupa el resto */
         @media (max-width: 767px) {
             #sidebar-panel { width: 120px !important; min-width: 120px !important; }
             #sidebar-panel .ticket-email { font-size: 10px; }
@@ -34,7 +33,6 @@
 </head>
 <body class="h-screen overflow-hidden">
 
-<!-- ═══════════════════ LOGIN ═══════════════════ -->
 <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-2xl">
         <div class="flex items-center gap-3 mb-8">
@@ -68,10 +66,8 @@
     </div>
 </div>
 
-<!-- ═══════════════════ APP ═══════════════════ -->
 <div id="app-screen" class="h-screen flex flex-col">
 
-    <!-- Topbar -->
     <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/80 flex-shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
@@ -118,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Selector móvil de módulo -->
     <div class="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-slate-900 border-b border-slate-700/50">
         <button id="modulo-btn-soporte-mobile" onclick="cambiarModulo('soporte')" class="modulo-btn flex-1 text-xs font-bold py-2 rounded-lg bg-purple-600 text-white transition">
             <i class="fa-solid fa-headset mr-1.5"></i>Soporte
@@ -140,13 +135,10 @@
         </button>
     </div>
 
-    <!-- Cuerpo principal — MÓDULO SOPORTE -->
     <div id="main-body" class="flex flex-1 overflow-hidden">
 
-        <!-- ── SIDEBAR – Lista de tickets ── -->
         <div id="sidebar-panel" class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 border-r border-slate-700/80 flex flex-col">
 
-            <!-- Búsqueda + filtros -->
             <div class="p-3 border-b border-slate-700/50 space-y-2">
                 <div class="flex gap-1.5">
                     <button onclick="setFiltro('all')" data-filter="all"
@@ -164,7 +156,6 @@
                 </div>
             </div>
 
-            <!-- Contadores -->
             <div class="flex items-center justify-between px-3 py-2 border-b border-slate-700/50">
                 <span class="text-xs text-slate-500"><span id="tickets-count">0</span> conversaciones</span>
                 <span id="unread-badge" class="hidden text-xs bg-red-500/20 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5 font-semibold">
@@ -172,7 +163,6 @@
                 </span>
             </div>
 
-            <!-- Lista tickets -->
             <div id="tickets-list" class="flex-1 overflow-y-auto">
                 <div id="tickets-loading" class="flex items-center justify-center py-12">
                     <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -180,10 +170,8 @@
             </div>
         </div>
 
-        <!-- ── CHAT PRINCIPAL ── -->
         <div id="chat-panel" class="flex-1 flex flex-col overflow-hidden bg-slate-950">
 
-            <!-- Estado vacío -->
             <div id="chat-empty" class="flex-1 flex flex-col items-center justify-center text-center p-8">
                 <div class="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
                     <i class="fa-solid fa-comments text-slate-600 text-2xl"></i>
@@ -192,10 +180,8 @@
                 <p class="text-sm text-slate-600 mt-1">Elige un ticket del panel izquierdo para ver los mensajes</p>
             </div>
 
-            <!-- Chat activo -->
             <div id="chat-active" class="hidden flex-1 flex flex-col overflow-hidden">
 
-                <!-- Header del chat -->
                 <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900 border-b border-slate-700/50 flex-shrink-0">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="w-9 h-9 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
@@ -219,15 +205,12 @@
                     </div>
                 </div>
 
-                <!-- Mensajes -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto px-5 py-5 space-y-3"></div>
 
-                <!-- Preview imágenes admin -->
                 <div id="admin-preview-container" class="hidden px-4 pt-3 pb-1 bg-slate-900 border-t border-slate-700/50">
                     <div id="admin-preview-grid" class="flex gap-2 flex-wrap"></div>
                 </div>
 
-                <!-- Input respuesta -->
                 <div class="px-4 py-3 bg-slate-900 border-t border-slate-700 flex-shrink-0">
                     <div class="flex items-end gap-2 bg-slate-800 rounded-2xl px-3 py-2 border border-slate-700 focus-within:border-purple-500/70 transition">
                         <label for="admin-file-input" class="cursor-pointer flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 transition mb-0.5" title="Adjuntar imagen">
@@ -251,13 +234,10 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════ -->
-    <!--        MÓDULO CANJES Y RETIROS         -->
-    <!-- ══════════════════════════════════════ -->
+
     <div id="modulo-canjes" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
         <div class="max-w-5xl mx-auto space-y-6">
 
-            <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-lg font-black text-white">Solicitudes de Canjes</h2>
@@ -279,7 +259,6 @@
                 </div>
             </div>
 
-            <!-- Stats -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 text-center">
                     <p class="text-xs text-slate-400 font-semibold">Pendientes</p>
@@ -299,20 +278,16 @@
                 </div>
             </div>
 
-            <!-- Lista de canjes -->
             <div id="lista-canjes" class="space-y-3">
                 <p class="text-center text-slate-500 py-8">Cargando canjes...</p>
             </div>
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════ -->
-    <!--      MÓDULO ANUNCIOS PERSONALIZADOS    -->
-    <!-- ══════════════════════════════════════ -->
+
     <div id="modulo-anuncios" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
         <div class="max-w-4xl mx-auto space-y-5">
 
-            <!-- Header + botón nuevo -->
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-lg font-black text-white">Anuncios Personalizados</h2>
@@ -323,7 +298,6 @@
                 </button>
             </div>
 
-            <!-- Stats globales -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
                     <p id="stat-anuncios-total" class="text-xl font-black text-white">0</p>
@@ -339,7 +313,6 @@
                 </div>
             </div>
 
-            <!-- Formulario nuevo/editar anuncio -->
             <div id="form-anuncio-container" class="hidden bg-slate-800 border border-purple-500/30 rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
                     <h3 id="form-anuncio-titulo" class="font-bold text-white text-sm">Nuevo Anuncio</h3>
@@ -392,7 +365,6 @@
                 </div>
             </div>
 
-            <!-- Lista de anuncios -->
             <div id="lista-anuncios" class="space-y-3">
                 <div class="flex items-center justify-center py-12">
                     <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -402,28 +374,24 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════ -->
-    <!--        MÓDULO PELÍCULAS (Pulso Play)   -->
-    <!-- ══════════════════════════════════════ -->
+
     <div id="modulo-peliculas" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
         <div class="max-w-4xl mx-auto space-y-5">
 
-            <!-- Header + botón nuevo -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-black text-white">Películas IA — Pulso Play</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Feed vertical de PulsoMX. Los usuarios ganan NetCoins al ver cada película completa</p>
+                    <h2 class="text-lg font-black text-white">Videos IA — Pulso Play</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Feed vertical de PulsoMX. Los usuarios ganan NetCoins al ver cada video completo</p>
                 </div>
                 <button onclick="abrirFormNuevaPelicula()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition active:scale-95 flex items-center gap-2 flex-shrink-0">
-                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nueva Película</span>
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nuevo Video</span>
                 </button>
             </div>
 
-            <!-- Stats globales -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
                     <p id="stat-peliculas-total" class="text-xl font-black text-white">0</p>
-                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">Películas activas</p>
+                    <p class="text-[11px] text-slate-500 font-semibold mt-0.5">Videos activos</p>
                 </div>
                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-center">
                     <p id="stat-peliculas-duracion" class="text-xl font-black text-amber-400">0m</p>
@@ -435,10 +403,9 @@
                 </div>
             </div>
 
-            <!-- Formulario nueva/editar película -->
             <div id="form-pelicula-container" class="hidden bg-slate-800 border border-purple-500/30 rounded-2xl p-5">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 id="form-pelicula-titulo" class="font-bold text-white text-sm">Nueva Película</h3>
+                    <h3 id="form-pelicula-titulo" class="font-bold text-white text-sm">Nuevo Video</h3>
                     <button onclick="cerrarFormPelicula()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <input type="hidden" id="pelicula-edit-id">
@@ -455,7 +422,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Video de la película</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase mb-1.5">Video</label>
                         <input type="file" id="input-pelicula-video" accept="video/*" class="hidden" onchange="previewVideoPelicula(this)">
                         <label for="input-pelicula-video" class="cursor-pointer w-full border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl flex flex-col items-center justify-center gap-2 py-6 transition">
                             <i class="fa-solid fa-clapperboard text-slate-500 text-2xl"></i>
@@ -499,12 +466,11 @@
 
                     <button onclick="guardarPelicula()" id="btn-guardar-pelicula"
                         class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Película
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Video
                     </button>
                 </div>
             </div>
 
-            <!-- Lista de películas -->
             <div id="lista-peliculas" class="space-y-3">
                 <div class="flex items-center justify-center py-12">
                     <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -514,9 +480,7 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════ -->
-    <!--      MÓDULO ESTADO DEL SITIO           -->
-    <!-- ══════════════════════════════════════ -->
+
     <div id="modulo-sitio" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
         <div class="max-w-lg mx-auto">
             <h2 class="text-lg font-black text-white mb-1">Estado del sitio</h2>
@@ -543,7 +507,6 @@
         </div>
     </div>
 
-    <!-- ── MÓDULO USUARIOS ── -->
     <div id="modulo-usuarios" class="hidden flex-1 overflow-y-auto p-4 sm:p-6">
         <div class="max-w-3xl mx-auto">
             <div class="flex items-center justify-between mb-1">
@@ -564,7 +527,6 @@
     </div>
 </div>
 
-<!-- ══ MODAL CONFIRMAR SUSPENSIÓN DE USUARIO ══ -->
 <div id="modal-suspender-usuario" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
     <div class="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md shadow-2xl">
         <div class="px-5 pt-5 pb-3 border-b border-slate-700/70">
@@ -588,7 +550,6 @@
     </div>
 </div>
 
-<!-- ══ MODAL HISTORIAL DE USUARIO ══ -->
 <div id="modal-historial-usuario" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 overflow-y-auto">
     <div class="bg-slate-900 border border-blue-500/40 rounded-2xl w-full max-w-2xl shadow-2xl my-8">
         <div class="px-5 pt-5 pb-3 border-b border-slate-700/70 flex items-center justify-between">
@@ -599,7 +560,6 @@
             <button onclick="cerrarModalHistorialUsuario()" class="text-slate-400 hover:text-white text-xl">✕</button>
         </div>
 
-        <!-- Tabs para Ganancias y Retiros -->
         <div class="flex border-b border-slate-700">
             <button onclick="cambiarTabHistorial('ganancias')" id="tab-ganancias" class="flex-1 px-4 py-3 text-sm font-bold text-blue-400 border-b-2 border-blue-500 bg-blue-500/10">
                 <i class="fa-solid fa-wallet mr-1"></i>Ganancias
@@ -610,7 +570,6 @@
         </div>
 
         <div class="px-5 py-4 max-h-96 overflow-y-auto">
-            <!-- Tab Ganancias -->
             <div id="tab-content-ganancias" class="space-y-3">
                 <div id="ganancias-loading" class="text-center text-slate-500 py-8">
                     <i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando ganancias...
@@ -618,7 +577,6 @@
                 <div id="ganancias-list" class="space-y-2"></div>
             </div>
 
-            <!-- Tab Retiros -->
             <div id="tab-content-retiros" class="hidden space-y-3">
                 <div id="retiros-loading" class="text-center text-slate-500 py-8">
                     <i class="fa-solid fa-spinner fa-spin mr-2"></i>Cargando retiros...
@@ -633,7 +591,6 @@
     </div>
 </div>
 
-<!-- ══ MODAL CONFIRMAR SUSPENSIÓN ══ -->
 <div id="modal-suspender" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
     <div class="bg-slate-900 border border-rose-500/40 rounded-2xl w-full max-w-md shadow-2xl">
         <div class="px-5 pt-5 pb-3 border-b border-slate-700/70">
@@ -669,9 +626,7 @@ let chatRealtimeChannel = null;
 let adminFilesSelected = [];
 let ticketsRealtimeChannel = null;
 
-// ══════════════════════════════════
-//             AUTH
-// ══════════════════════════════════
+
 
 async function iniciarSesionAdmin() {
     const email = document.getElementById('login-email').value.trim();
@@ -735,9 +690,7 @@ async function cerrarSesionAdmin() {
     location.reload();
 }
 
-// ══════════════════════════════════
-//           TICKETS
-// ══════════════════════════════════
+
 
 async function cargarTickets() {
     const { data: tickets, error } = await _supabase
@@ -835,7 +788,6 @@ function suscribirTicketsRealtime() {
         })
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, async (payload) => {
             if (payload.new.sender === 'user') {
-                // Actualizar unread_admin del ticket
                 const ticket = todosLosTickets.find(t => t.id === payload.new.ticket_id);
                 if (ticket && payload.new.ticket_id !== ticketActivoId) {
                     ticket.unread_admin = (ticket.unread_admin || 0) + 1;
@@ -847,9 +799,7 @@ function suscribirTicketsRealtime() {
         .subscribe();
 }
 
-// ══════════════════════════════════
-//           CHAT
-// ══════════════════════════════════
+
 
 async function abrirTicket(ticketId) {
     ticketActivoId = ticketId;
@@ -858,7 +808,6 @@ async function abrirTicket(ticketId) {
     document.getElementById('chat-active').classList.remove('hidden');
     document.getElementById('chat-active').classList.add('flex');
 
-    // Marcar como activo en sidebar
     document.querySelectorAll('.ticket-item').forEach(el => {
         el.classList.toggle('active', el.dataset.ticketId === ticketId);
     });
@@ -869,11 +818,10 @@ async function abrirTicket(ticketId) {
         document.getElementById('chat-user-id').textContent = `ID: ${ticket.user_id}`;
         actualizarBadgeStatus(ticket.status);
 
-        // Premium solo cuenta como activo si is_premium=true Y todavía no venció
+
         const esPremiumActivo = !!(ticket.perfiles?.is_premium && ticket.perfiles?.premium_hasta && new Date(ticket.perfiles.premium_hasta) >= new Date());
         document.getElementById('chat-user-premium-badge').classList.toggle('hidden', !esPremiumActivo);
 
-        // Resetear unread
         if (ticket.unread_admin > 0) {
             ticket.unread_admin = 0;
             await _supabase.from('support_tickets').update({ unread_admin: 0 }).eq('id', ticketId);
@@ -881,10 +829,8 @@ async function abrirTicket(ticketId) {
         }
     }
 
-    // Cargar mensajes
     await cargarMensajesChat(ticketId);
 
-    // Realtime
     if (chatRealtimeChannel) _supabase.removeChannel(chatRealtimeChannel);
     chatRealtimeChannel = _supabase
         .channel(`admin-chat-${ticketId}`)
@@ -981,7 +927,6 @@ async function enviarRespuestaAdmin() {
     const btn = document.getElementById('admin-send-btn');
     btn.disabled = true;
 
-    // Subir imágenes si hay
     let imageUrls = [];
     if (adminFilesSelected.length > 0) {
         for (const file of adminFilesSelected) {
@@ -997,7 +942,6 @@ async function enviarRespuestaAdmin() {
         }
     }
 
-    // Un solo insert con imagen + texto juntos
     await _supabase.from('support_messages').insert({
         ticket_id: ticketActivoId,
         sender: 'admin',
@@ -1008,7 +952,6 @@ async function enviarRespuestaAdmin() {
 
     await _supabase.from('support_tickets').update({ updated_at: new Date().toISOString() }).eq('id', ticketActivoId);
 
-    // Incrementar mensajes no leídos para el usuario
     const { data: t } = await _supabase.from('support_tickets').select('unread_user').eq('id', ticketActivoId).single();
     await _supabase.from('support_tickets').update({ unread_user: (t?.unread_user || 0) + 1 }).eq('id', ticketActivoId);
 
@@ -1024,7 +967,6 @@ async function toggleEstadoTicket() {
     const ticket = todosLosTickets.find(t => t.id === ticketActivoId);
     if (!ticket) return;
 
-    // Si ya está resuelto, solo reabrirlo normal
     if (ticket.status === 'resolved') {
         await _supabase.from('support_tickets').update({ status: 'open' }).eq('id', ticketActivoId);
         ticket.status = 'open';
@@ -1033,7 +975,6 @@ async function toggleEstadoTicket() {
         return;
     }
 
-    // Si está abierto → confirmar y borrar todo
     const confirmar = confirm('¿Marcar como resuelto? Esto eliminará todos los mensajes e imágenes de esta conversación permanentemente.');
     if (!confirmar) return;
 
@@ -1041,19 +982,16 @@ async function toggleEstadoTicket() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-1"></i>Eliminando...';
 
-    // 1. Obtener todos los mensajes con imágenes
     const { data: msgs } = await _supabase
         .from('support_messages')
         .select('id, images')
         .eq('ticket_id', ticketActivoId);
 
-    // 2. Eliminar imágenes del storage usando los URLs reales guardados en BD
     if (msgs && msgs.length > 0) {
         const paths = [];
         msgs.forEach(m => {
             if (m.images && m.images.length > 0) {
                 m.images.forEach(url => {
-                    // El path después del bucket name en el URL público
                     const match = url.match(/\/object\/public\/support-images\/(.+)$/);
                     if (match) paths.push(decodeURIComponent(match[1]));
                 });
@@ -1063,23 +1001,18 @@ async function toggleEstadoTicket() {
             await _supabase.storage.from('support-images').remove(paths);
         }
     }
-    // Borrar placeholder de la carpeta
     await _supabase.storage.from('support-images').remove([`support/${ticketActivoId}/.emptyFolderPlaceholder`]);
 
-    // 3. Eliminar mensajes
     await _supabase.from('support_messages').delete().eq('ticket_id', ticketActivoId);
 
-    // 4. Eliminar ticket
     await _supabase.from('support_tickets').delete().eq('id', ticketActivoId);
 
-    // 5. Limpiar UI
     todosLosTickets = todosLosTickets.filter(t => t.id !== ticketActivoId);
     ticketActivoId = null;
     if (chatRealtimeChannel) { _supabase.removeChannel(chatRealtimeChannel); chatRealtimeChannel = null; }
     document.getElementById('chat-active').classList.add('hidden');
     document.getElementById('chat-active').classList.remove('flex');
     document.getElementById('chat-empty').classList.remove('hidden');
-    // Resetear botón
     const btnReset = document.getElementById('toggle-status-btn');
     btnReset.disabled = false;
     btnReset.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Marcar resuelto';
@@ -1101,15 +1034,12 @@ function actualizarBadgeStatus(status) {
     }
 }
 
-// ══════════════════════════════════
-//         ARCHIVOS ADMIN
-// ══════════════════════════════════
+
 
 function handleAdminFiles(input) {
     const files = Array.from(input.files);
     for (const file of files) {
         if (adminFilesSelected.length >= 4) { mostrarToast('Máximo 4 imágenes', 'error'); break; }
-        // Validar duración si es video
         if (file.type.startsWith('video/')) {
             validarDuracionVideo(file);
         } else {
@@ -1137,11 +1067,9 @@ function renderAdminPreview() {
 function quitarAdminFile(idx) { adminFilesSelected.splice(idx, 1); renderAdminPreview(); }
 function limpiarAdminFiles() { adminFilesSelected = []; renderAdminPreview(); }
 
-// Cambiar entre imagen y video para anuncios personalizados
 function seleccionarTipoMedia(tipo) {
     document.getElementById('anuncio-tipo-media').value = tipo;
     
-    // Actualizar estilos de botones
     const btnImagen = document.getElementById('btn-tipo-imagen');
     const btnVideo = document.getElementById('btn-tipo-video');
     const inputFile = document.getElementById('input-anuncio-imagen');
@@ -1163,14 +1091,12 @@ function seleccionarTipoMedia(tipo) {
         labelArchivo.textContent = 'Video del anuncio';
     }
     
-    // Limpiar preview
     anuncioImagenFile = null;
     document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
     document.getElementById('preview-anuncio-video-container').classList.add('hidden');
     inputFile.value = '';
 }
 
-// Validar duración de video (máximo 30 segundos)
 function validarDuracionVideo(file) {
     const video = document.createElement('video');
     const url = URL.createObjectURL(file);
@@ -1193,7 +1119,6 @@ function validarDuracionVideo(file) {
     video.src = url;
 }
 
-// Validar duración de video para anuncios (máximo 30 segundos)
 function validarDuracionVideoAnuncio(file) {
     const video = document.createElement('video');
     const url = URL.createObjectURL(file);
@@ -1208,9 +1133,8 @@ function validarDuracionVideoAnuncio(file) {
         const videoUrl = URL.createObjectURL(file);
         const preview = document.getElementById('preview-anuncio-imagen');
         preview.src = videoUrl;
-        preview.style.display = 'none'; // Ocultar para mostrar video
+        preview.style.display = 'none'; 
         
-        // Crear elemento video para preview
         const videoPreview = document.createElement('video');
         videoPreview.src = videoUrl;
         videoPreview.controls = false;
@@ -1236,9 +1160,7 @@ function validarDuracionVideoAnuncio(file) {
     video.src = url;
 }
 
-// ══════════════════════════════════
-//           UTILS
-// ══════════════════════════════════
++
 
 function volverSidebar() {
     document.getElementById('chat-panel').classList.remove('mobile-visible');
@@ -1279,9 +1201,7 @@ function mostrarToast(msg, tipo) {
     setTimeout(() => el.remove(), 3500);
 }
 
-// ══════════════════════════════════
-//           INIT – verificar sesión
-// ══════════════════════════════════
+
 (async () => {
     const { data: { session } } = await _supabase.auth.getSession();
     if (session?.user && session.user.email === 'ed8108868@gmail.com') {
@@ -1297,9 +1217,7 @@ function mostrarToast(msg, tipo) {
     }
 })();
 
-// ══════════════════════════════════════════════
-//      MÓDULO ANUNCIOS PERSONALIZADOS
-// ══════════════════════════════════════════════
+
 let moduloActivo = 'soporte';
 let anuncioImagenFile = null;
 let todosLosAnuncios = [];
@@ -1342,9 +1260,7 @@ function cambiarModulo(modulo) {
     if (modulo === 'usuarios') cargarUsuarios();
 }
 
-// ══════════════════════════════════════════════════════════
-// ESTADO DEL SITIO — suspender / reactivar NetGamer para todos
-// ══════════════════════════════════════════════════════════
+
 
 function actualizarTarjetaEstadoSitio(suspendido, motivo) {
     const icono = document.getElementById('icono-estado-sitio');
@@ -1374,19 +1290,10 @@ function actualizarTarjetaEstadoSitio(suspendido, motivo) {
     }
 }
 
-// ══════════════════════════════════════════════════════════════════
-// Helper de seguridad: garantiza un access_token FRESCO antes de llamar
-// cualquier Edge Function sensible. El error "UNAUTHORIZED_INVALID_JWT_FORMAT"
-// pasa cuando la sesión ya expiró y access_token queda undefined —el header
-// termina siendo literalmente "Bearer undefined", que no es un JWT válido.
-// Aquí forzamos un refresh de la sesión primero; si de plano no hay sesión
-// (el admin ya no está logueado), avisamos claro en vez de mandar la
-// petición rota.
-// ══════════════════════════════════════════════════════════════════
+
 async function obtenerTokenSesionValido() {
     let { data: { session } } = await _supabase.auth.getSession();
 
-    // Si no hay token (sesión vencida o nunca se refrescó sola), forzar refresh
     if (!session?.access_token) {
         const { data: refreshData } = await _supabase.auth.refreshSession();
         session = refreshData?.session || null;
@@ -1591,7 +1498,6 @@ function previewImagenAnuncio(input) {
     
     const tipo = document.getElementById('anuncio-tipo-media').value;
     
-    // Si es video, validar duración
     if (file.type.startsWith('video/') || tipo === 'video') {
         const video = document.createElement('video');
         const url = URL.createObjectURL(file);
@@ -1606,7 +1512,6 @@ function previewImagenAnuncio(input) {
             
             anuncioImagenFile = file;
             
-            // Mostrar preview de video
             document.getElementById('preview-anuncio-imagen-container').classList.add('hidden');
             const videoPreview = document.getElementById('preview-anuncio-video');
             videoPreview.src = url;
@@ -1621,7 +1526,6 @@ function previewImagenAnuncio(input) {
         
         video.src = url;
     } else {
-        // Es imagen
         anuncioImagenFile = file;
         const url = URL.createObjectURL(file);
         document.getElementById('preview-anuncio-imagen').src = url;
@@ -1704,7 +1608,6 @@ async function eliminarAnuncio(id) {
 
     const anuncio = todosLosAnuncios.find(a => a.id === id);
 
-    // Intentar borrar la imagen del storage también
     if (anuncio?.imagen_url) {
         const match = anuncio.imagen_url.match(/\/object\/public\/anuncios-imagenes\/(.+)$/);
         if (match) {
@@ -1717,9 +1620,7 @@ async function eliminarAnuncio(id) {
     cargarAnuncios();
 }
 
-// ══════════════════════════════════════════════
-//      MÓDULO PELÍCULAS (Pulso Play)
-// ══════════════════════════════════════════════
+
 let todasLasPeliculas = [];
 let peliculaVideoFile = null;
 let peliculaMiniaturaFile = null;
@@ -1856,8 +1757,7 @@ function editarPelicula(id) {
     document.getElementById('form-pelicula-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Al elegir el archivo de video: se lee su duración real con el propio
-// navegador (metadata del video) para no tener que medirla a mano.
+
 function previewVideoPelicula(input) {
     const file = input.files[0];
     if (!file) return;
@@ -2000,15 +1900,12 @@ async function eliminarPelicula(id) {
     cargarPeliculas();
 }
 
-// ══════════════════════════════════════════════
-//         MÓDULO CANJES Y RETIROS
-// ══════════════════════════════════════════════
+
 let todosLosCanjes = [];
 let filtroCanjesActual = 'todos';
 
 async function cargarCanjes() {
     try {
-        // Primero traemos los canjes
         const { data: canjes, error: errorCanjes } = await _supabase
             .from('retiros_pendientes')
             .select('*')
@@ -2016,14 +1913,12 @@ async function cargarCanjes() {
 
         if (errorCanjes) throw errorCanjes;
 
-        // Luego traemos los emails de perfiles
         const { data: perfiles, error: errorPerfiles } = await _supabase
             .from('perfiles')
             .select('id, email');
 
         if (errorPerfiles) throw errorPerfiles;
 
-        // Combinamos: para cada canje, buscamos el perfil con matching user_id
         const data = canjes.map(canje => ({
             ...canje,
             perfiles: perfiles.find(p => p.id === canje.user_id)
@@ -2041,7 +1936,6 @@ async function cargarCanjes() {
 function filtrarCanjesPor(filtro) {
     filtroCanjesActual = filtro;
     
-    // Actualizar botones
     document.querySelectorAll('.canjes-filter-btn').forEach(btn => {
         const esteBtn = btn.getAttribute('onclick').includes(`'${filtro}'`);
         btn.classList.toggle('bg-purple-600', esteBtn);
@@ -2143,11 +2037,9 @@ async function procesarCanje(canjeId, nuevoStatus) {
     if (!confirm(`¿Estás seguro de que deseas marcar este canje como ${nuevoStatus}?`)) return;
 
     try {
-        // Obtener un token de sesión garantizado fresco (evita "Bearer undefined"
-        // si la sesión del admin ya había expirado)
+ 
         const token = await obtenerTokenSesionValido();
 
-        // Llamar a la Edge Function segura
         const response = await fetch('https://meiwuluwrdjszxeyoqtt.supabase.co/functions/v1/procesar-canje', {
             method: 'POST',
             headers: {
@@ -2179,14 +2071,10 @@ async function procesarCanje(canjeId, nuevoStatus) {
     }
 }
 
-// ══════════════════════════════════════════════════════════
-// MÓDULO USUARIOS — lista de correos registrados, estado en línea
-// en tiempo real, y suspensión permanente de cuentas.
-// ══════════════════════════════════════════════════════════
 
 let todosLosUsuarios = [];
 let usuariosEnLineaIds = new Set();
-let _usuarioParaSuspender = null; // { id, email }
+let _usuarioParaSuspender = null; 
 let _suscritoPresenciaUsuarios = false;
 
 async function cargarUsuarios() {
@@ -2285,15 +2173,7 @@ function _escaparHtmlAdmin(texto) {
     return div.innerHTML;
 }
 
-// Reutilizamos el MISMO canal de presence que ya usa el sitio principal
-// para saber, en tiempo real, quién está conectado ahora mismo — sin
-// necesitar ninguna Edge Function ni polling adicional para esta parte.
-//
-// IMPORTANTE: el nombre de este canal ('landing-realtime') debe ser
-// IDÉNTICO al que usa el archivo principal de NetGamer (netgamer.html).
-// Si en algún momento cambias el nombre del canal en un lado, tienes que
-// cambiarlo también aquí, o este contador y el estado "En línea" por
-// usuario dejan de funcionar en silencio (sin error visible).
+
 function suscribirsePresenciaUsuarios() {
     if (_suscritoPresenciaUsuarios) return;
     _suscritoPresenciaUsuarios = true;
@@ -2325,9 +2205,7 @@ function cerrarModalSuspenderUsuario() {
     _usuarioParaSuspender = null;
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-// FUNCIONES PARA HISTORIAL DE USUARIO
-// ══════════════════════════════════════════════════════════════════════════
+
 
 let _usuarioHistorialActual = null;
 
@@ -2336,7 +2214,6 @@ function abrirModalHistorialUsuario(userId, email) {
     document.getElementById('historial-usuario-email').textContent = email || '(sin correo)';
     document.getElementById('modal-historial-usuario').classList.remove('hidden');
     
-    // Cargar ganancias por defecto
     cambiarTabHistorial('ganancias');
     cargarGananciasUsuario(userId);
 }
@@ -2347,7 +2224,6 @@ function cerrarModalHistorialUsuario() {
 }
 
 function cambiarTabHistorial(tab) {
-    // Actualizar tabs
     if (tab === 'ganancias') {
         document.getElementById('tab-ganancias').classList.add('text-blue-400', 'border-b-2', 'border-blue-500', 'bg-blue-500/10');
         document.getElementById('tab-ganancias').classList.remove('text-slate-400', 'hover:text-slate-300');
@@ -2378,10 +2254,9 @@ async function cargarGananciasUsuario(userId) {
     container.innerHTML = '';
 
     try {
-        // ✅ ARREGLADO: Seleccionar las columnas CORRECTAS
         const { data, error } = await _supabase
             .from('historial_ganancias')
-            .select('concepto, netcoins, created_at')  // ✅ Columnas correctas
+            .select('concepto, netcoins, created_at')  
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
             .limit(50);
@@ -2395,7 +2270,6 @@ async function cargarGananciasUsuario(userId) {
             return;
         }
 
-        // Renderizar EXACTO como NetGamer
         container.innerHTML = data.map(g => {
             const fecha = new Date(g.created_at);
             const fechaStr = fecha.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
@@ -2426,7 +2300,6 @@ async function cargarRetirosPendientes(userId) {
     container.innerHTML = '';
 
     try {
-        // ✅ ARREGLADO: Seleccionar columnas CORRECTAS igual a NetGamer
         const { data, error } = await _supabase
             .from('retiros_pendientes')
             .select('tipo_premio, monto_mxn, netcoins_deducidos, estatus, created_at')
@@ -2446,14 +2319,13 @@ async function cargarRetirosPendientes(userId) {
             return;
         }
 
-        // Configuración de estados - EXACTO COMO NETGAMER
+
         const estatusConfig = {
             'Pendiente':  { color: 'text-amber-400',  bg: 'bg-amber-500/10',  border: 'border-amber-500/30',  icono: '⏳' },
             'Procesado':  { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', icono: '✅' },
             'Rechazado':  { color: 'text-rose-400',    bg: 'bg-rose-500/10',    border: 'border-rose-500/30',    icono: '❌' },
         };
 
-        // Renderizar EXACTO como NetGamer
         container.innerHTML = data.map(c => {
             const fecha   = new Date(c.created_at);
             const fechaStr = fecha.toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
@@ -2512,7 +2384,6 @@ async function confirmarSuspenderUsuarioPermanente() {
             return;
         }
 
-        // Reflejar el cambio localmente sin tener que recargar toda la lista
         const u = todosLosUsuarios.find(x => x.id === _usuarioParaSuspender.id);
         if (u) { u.suspendido_permanente = true; u.motivo_suspension = motivo; }
         renderizarListaUsuarios();
