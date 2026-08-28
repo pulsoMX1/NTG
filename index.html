@@ -7365,9 +7365,9 @@ async function mostrarBannersAlIngresar() {
             modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm z-[10000] flex items-center justify-center p-4';
             
             modal.innerHTML = `
-                <div class="relative max-w-6xl w-full">
-                    <!-- Imagen del banner -->
-                    <img src="${banner.url_imagen}" alt="${banner.titulo}" class="w-full h-auto rounded-2xl shadow-2xl border border-blue-500/40">
+                <div class="relative flex items-center justify-center max-h-[90vh]">
+                    <!-- Imagen del banner - SIN ESTIRARSE -->
+                    <img src="${banner.url_imagen}" alt="${banner.titulo}" class="max-w-4xl max-h-[90vh] w-auto h-auto object-contain rounded-2xl shadow-2xl border border-blue-500/40">
                     
                     <!-- Botón cerrar X -->
                     <button onclick="document.getElementById('modal-banner-fullscreen').remove()" 
