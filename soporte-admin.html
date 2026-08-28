@@ -1297,12 +1297,15 @@ function cambiarModulo(modulo) {
     const esPeliculas = modulo === 'peliculas';
     const esSitio = modulo === 'sitio';
     const esUsuarios = modulo === 'usuarios';
+    const esBanners = modulo === 'banners';
 
     document.getElementById('main-body').classList.toggle('hidden', !esSoporte);
     document.getElementById('modulo-canjes').classList.toggle('hidden', !esCanjes);
     document.getElementById('modulo-canjes').classList.toggle('flex', esCanjes);
     document.getElementById('modulo-anuncios').classList.toggle('hidden', esAnuncios ? false : true);
     document.getElementById('modulo-anuncios').classList.toggle('flex', esAnuncios);
+    document.getElementById('modulo-banners').classList.toggle('hidden', !esBanners);
+    document.getElementById('modulo-banners').classList.toggle('flex', esBanners);
     document.getElementById('modulo-peliculas').classList.toggle('hidden', !esPeliculas);
     document.getElementById('modulo-peliculas').classList.toggle('flex', esPeliculas);
     document.getElementById('modulo-sitio').classList.toggle('hidden', !esSitio);
@@ -1310,17 +1313,18 @@ function cambiarModulo(modulo) {
     document.getElementById('modulo-usuarios').classList.toggle('hidden', !esUsuarios);
     document.getElementById('modulo-usuarios').classList.toggle('flex', esUsuarios);
 
-    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-peliculas', 'modulo-btn-sitio', 'modulo-btn-usuarios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-peliculas-mobile', 'modulo-btn-sitio-mobile', 'modulo-btn-usuarios-mobile'].forEach(id => {
+    ['modulo-btn-soporte', 'modulo-btn-canjes', 'modulo-btn-anuncios', 'modulo-btn-banners', 'modulo-btn-peliculas', 'modulo-btn-sitio', 'modulo-btn-usuarios', 'modulo-btn-soporte-mobile', 'modulo-btn-canjes-mobile', 'modulo-btn-anuncios-mobile', 'modulo-btn-banners-mobile', 'modulo-btn-peliculas-mobile', 'modulo-btn-sitio-mobile', 'modulo-btn-usuarios-mobile'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
         const esEsteBtn = id.includes(modulo);
         el.classList.toggle('bg-purple-600', esEsteBtn);
         el.classList.toggle('text-white', esEsteBtn);
-        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('peliculas') || id.includes('sitio') || id.includes('usuarios')));
+        el.classList.toggle('bg-slate-800', !esEsteBtn && (id.includes('mobile') || id.includes('canjes') || id.includes('anuncios') || id.includes('banners') || id.includes('peliculas') || id.includes('sitio') || id.includes('usuarios')));
         el.classList.toggle('text-slate-400', !esEsteBtn);
     });
 
     if (modulo === 'anuncios') cargarAnuncios();
+    if (modulo === 'banners') cargarBanners();
     if (modulo === 'peliculas') cargarPeliculas();
     if (modulo === 'canjes') cargarCanjes();
     if (modulo === 'sitio') cargarEstadoSitio();
