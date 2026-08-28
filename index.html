@@ -1240,7 +1240,7 @@
                             </div>
                             
                             <div class="shrink-0 w-full sm:w-auto flex flex-col items-center">
-                                <div class="text-amber-400 font-black text-xl mb-2">+500 NC <span class="text-slate-500 text-xs font-semibold uppercase">x noticia</span></div>
+                                <div class="text-amber-400 font-black text-xl mb-2">+40 NC <span class="text-slate-500 text-xs font-semibold uppercase">x noticia</span></div>
                                 <button onclick="irANoticias()" class="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-3 px-6 rounded-xl transition-all active:scale-95 text-sm shadow-lg shadow-sky-900/30 flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-book-open"></i> Leer Noticias
                                 </button>
@@ -7333,6 +7333,62 @@ window.addEventListener('monedaPayPalDetectada', aplicarConversionesMonedas);
 // También ejecutar después de un pequeño delay para asegurar que el DOM está listo
 setTimeout(aplicarConversionesMonedas, 500);
 
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SISTEMA DE BANNERS PANTALLA COMPLETA -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<script>
+// Mostrar banners cuando ingresa con sesión activa
+async function mostrarBannersAlIngresar() {
+    try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        
+        if (!session) return; // Sin sesión, no mostrar
+
+        // Obtener banners activos
+        const { data, error } = await _supabase
+            .from('banners_pantalla_completa')
+            .select('*')
+            .eq('activo', true)
+            .order('orden', { ascending: true });
+
+        if (error) throw error;
+        
+        // Si hay banners, mostrar el primero
+        if (data && data.length > 0) {
+            const banner = data[0];
+            
+            // Crear modal
+            const modal = document.createElement('div');
+            modal.id = 'modal-banner-fullscreen';
+            modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm z-[10000] flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="relative max-w-6xl w-full">
+                    <!-- Imagen del banner -->
+                    <img src="${banner.url_imagen}" alt="${banner.titulo}" class="w-full h-auto rounded-2xl shadow-2xl border border-blue-500/40">
+                    
+                    <!-- Botón cerrar X -->
+                    <button onclick="document.getElementById('modal-banner-fullscreen').remove()" 
+                            class="absolute top-6 right-6 bg-black/60 hover:bg-black/80 text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            // Agregar al DOM
+            document.body.appendChild(modal);
+        }
+    } catch (err) {
+        console.error('Error cargando banners:', err);
+    }
+}
+
+// Llamar cuando carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(mostrarBannersAlIngresar, 500);
+});
 </script>
 
 </body>
