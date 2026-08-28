@@ -2548,12 +2548,12 @@ async function guardarBanner() {
     const imagenFile = document.getElementById('input-banner-imagen').files[0];
 
     if (!titulo) {
-        mostrarNotificacion('El título es requerido', 'error');
+        alert('El título es requerido');
         return;
     }
 
     if (!imagenFile) {
-        mostrarNotificacion('La imagen es requerida', 'error');
+        alert('La imagen es requerida');
         return;
     }
 
@@ -2582,12 +2582,12 @@ async function guardarBanner() {
             });
 
         if (error) throw error;
-        mostrarNotificacion('Banner creado', 'success');
+        alert('Banner creado exitosamente');
         cerrarFormBanner();
         cargarBanners();
     } catch (err) {
         console.error('Error:', err);
-        mostrarNotificacion('Error al guardar banner', 'error');
+        alert('Error al guardar banner: ' + err.message);
     }
 }
 
@@ -2601,11 +2601,11 @@ async function eliminarBanner(id) {
             .eq('id', id);
 
         if (error) throw error;
-        mostrarNotificacion('Banner eliminado', 'success');
+        alert('Banner eliminado exitosamente');
         cargarBanners();
     } catch (err) {
         console.error('Error:', err);
-        mostrarNotificacion('Error al eliminar banner', 'error');
+        alert('Error al eliminar banner: ' + err.message);
     }
 }
 
