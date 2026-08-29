@@ -1240,7 +1240,7 @@
                             </div>
                             
                             <div class="shrink-0 w-full sm:w-auto flex flex-col items-center">
-                                <div class="text-amber-400 font-black text-xl mb-2">+250 NC <span class="text-slate-500 text-xs font-semibold uppercase">x noticia</span></div>
+                                <div class="text-amber-400 font-black text-xl mb-2">+40 NC <span class="text-slate-500 text-xs font-semibold uppercase">x noticia</span></div>
                                 <button onclick="irANoticias()" class="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-3 px-6 rounded-xl transition-all active:scale-95 text-sm shadow-lg shadow-sky-900/30 flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-book-open"></i> Leer Noticias
                                 </button>
@@ -7339,14 +7339,17 @@ setTimeout(aplicarConversionesMonedas, 500);
 <!-- SISTEMA DE BANNERS PANTALLA COMPLETA -->
 <!-- ════════════════════════════════════════════════════════════════════════ -->
 <script>
-// Mostrar banners cuando ingresa con sesión activa
+// Mostrar banners cuando ingresa con sesión activa - CON CAROUSEL
+let bannerIndiceActual = 0;
+let todosLosBanners = [];
+
 async function mostrarBannersAlIngresar() {
     try {
         const { data: { session } } = await _supabase.auth.getSession();
         
         if (!session) return; // Sin sesión, no mostrar
 
-        // Obtener banners activos
+        // Obtener TODOS los banners activos, ordenados por "orden"
         const { data, error } = await _supabase
             .from('banners_pantalla_completa')
             .select('*')
@@ -7357,33 +7360,76 @@ async function mostrarBannersAlIngresar() {
         
         // Si hay banners, mostrar el primero
         if (data && data.length > 0) {
-            const banner = data[0];
-            
-            // Crear modal (idéntico a modal de anuncios)
-            const modal = document.createElement('div');
-            modal.id = 'modal-banner-fullscreen';
-            modal.className = 'hidden fixed inset-0 z-[9500] bg-black/95 flex items-center justify-center p-0';
-            
-            modal.innerHTML = `
-                <button id="btn-cerrar-banner" onclick="cerrarModalBanner()" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[9510] w-10 h-10 rounded-full bg-slate-800/90 border border-slate-600 flex items-center justify-center text-white hover:bg-slate-700 transition active:scale-90 shadow-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-                <a id="banner-link" href="#" onclick="cerrarModalBanner()" class="w-full h-full flex items-center justify-center cursor-pointer">
-                    <img id="banner-imagen-modal" src="${banner.url_imagen}" alt="${banner.titulo}" class="max-w-full max-h-full object-contain" />
-                </a>
-                <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest z-[9999]">Novedades</p>
-            `;
-            
-            // Agregar al DOM y mostrar
-            document.body.appendChild(modal);
-            modal.classList.remove('hidden');
+            todosLosBanners = data;
+            bannerIndiceActual = 0;
+            crearModalBanner();
+            mostrarBannerActual();
         }
     } catch (err) {
         console.error('Error cargando banners:', err);
     }
 }
 
+function crearModalBanner() {
+    // Verificar si ya existe el modal
+    if (document.getElementById('modal-banner-fullscreen')) {
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'modal-banner-fullscreen';
+    modal.className = 'hidden fixed inset-0 z-[9500] bg-black/95 flex items-center justify-center p-0';
+    modal.innerHTML = `
+        <!-- Botón cerrar (top-right) -->
+        <button id="btn-cerrar-banner" onclick="cerrarModalBanner()" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[9510] w-10 h-10 rounded-full bg-slate-800/90 border border-slate-600 flex items-center justify-center text-white hover:bg-slate-700 transition active:scale-90 shadow-lg">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        
+        <!-- Imagen clickeable (cubre toda el área) -->
+        <a id="banner-link" href="#" onclick="cerrarModalBanner()" class="w-full h-full flex items-center justify-center cursor-pointer">
+            <img id="banner-imagen-modal" src="" alt="Banner" class="max-w-full max-h-full object-contain" />
+        </a>
+
+        <!-- Texto "Promoción" -->
+        <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 font-semibold uppercase tracking-widest z-[9999]">Promoción</p>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function mostrarBannerActual() {
+    if (!todosLosBanners.length || bannerIndiceActual >= todosLosBanners.length) {
+        // Si no hay más banners, cerrar todo
+        cerrarTodosBanners();
+        return;
+    }
+    
+    const banner = todosLosBanners[bannerIndiceActual];
+    const modal = document.getElementById('modal-banner-fullscreen');
+    
+    // Mostrar imagen del banner actual
+    document.getElementById('banner-imagen-modal').src = banner.url_imagen;
+    
+    // Mostrar modal
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
 function cerrarModalBanner() {
+    // Pasar al siguiente banner
+    bannerIndiceActual++;
+    
+    if (bannerIndiceActual < todosLosBanners.length) {
+        // Hay más banners, mostrar el siguiente
+        mostrarBannerActual();
+    } else {
+        // No hay más banners, cerrar todo
+        cerrarTodosBanners();
+    }
+}
+
+function cerrarTodosBanners() {
     const modal = document.getElementById('modal-banner-fullscreen');
     if (modal) {
         modal.classList.add('hidden');
