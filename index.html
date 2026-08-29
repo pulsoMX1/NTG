@@ -5409,12 +5409,14 @@
             _puntosRival   = 0;
 
             const { data: { session } } = await _supabase.auth.getSession();
-            const { data, error } = await _supabase.functions.invoke('buscar-partida', {
+            
+            // ✅ CAMBIO: Directamente juega contra IA, SIN buscar otros jugadores en tiempo real
+            const { data, error } = await _supabase.functions.invoke('jugar-vs-bot', {
                 body: { juego, apuesta },
                 headers: { Authorization: `Bearer ${session?.access_token}` }
             });
 
-            // Extraer el código de error ya sea que venga en data.error o en el body del error HTTP
+            // Extraer el código de error
             let codigoError = data?.error;
             if (!codigoError && error) {
                 try {
@@ -5431,26 +5433,25 @@
                     sin_netcoins:     `💰 Balance insuficiente. Necesitas ${apuesta} NC para jugar.`,
                     apuesta_invalida: '⚠️ Apuesta no válida.'
                 };
-                mostrarNotificacion(msgs[codigoError] || '⚠️ Ocurrió un error al buscar partida. Intenta de nuevo.', 'error');
+                mostrarNotificacion(msgs[codigoError] || '⚠️ Ocurrió un error al iniciar partida. Intenta de nuevo.', 'error');
                 if (codigoError === 'sin_vidas') setTimeout(() => abrirRecargarVidas(), 600);
                 _buscandoPartida = false;
                 document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
                 return;
             }
 
+            // Mostrar modal del juego
             mostrarModalJuego();
 
-            if (data.status === 'emparejado') {
-                _partidaActual = data.partida_id;
-                _jugadorNum    = data.eres_jugador;
-                // Obtener nombre del otro jugador
-                await _cargarNombreRival(data.partida_id);
-                mostrarFaseRivalEncontrado();
-                suscribirsePartida(data.partida_id);
-            } else {
-                iniciarCountdownBusqueda();
-                suscribirseColaPorEmparejamiento(juego, apuesta);
-            }
+            // ✅ Conectar directamente contra IA - sin búsqueda, sin espera
+            _esPartidaVsBot = true;
+            _partidaActual = data.partida_id;
+            _jugadorNum = data.eres_jugador;
+            _nombreRival = '🤖 IA NetGamer';
+            mostrarFaseRivalEncontrado();
+            suscribirsePartida(data.partida_id);
+            
+            _buscandoPartida = false;
         }
 
         async function _cargarNombreRival(partida_id) {
