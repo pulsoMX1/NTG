@@ -1617,7 +1617,7 @@
                                     <span class="text-[10px] bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-full px-2 py-0.5 font-bold animate-pulse">EN VIVO</span>
                                 </div>
                                 <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">Juegos 1v1 con apuesta</h2>
-                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">Compítete contra la ia de NetGamer y gana o pierde NetCoins según los resultados de el juego.</p>
+                                <p class="text-xs text-slate-400 mt-1 leading-relaxed">Compítete contra jugadores reales y gana o pierde NetCoins según el resultado.</p>
                             </div>
                             <div class="text-right shrink-0">
                                 <div id="vidas-display" class="text-xl leading-none mb-1">❤️❤️❤️</div>
@@ -1652,7 +1652,7 @@
                                     <div class="w-7 h-7 shrink-0 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-xs font-black text-blue-400">2</div>
                                     <div>
                                         <p class="text-xs font-bold text-white">Te emparejamos</p>
-                                        <p class="text-[11px] text-slate-400 mt-0.5">Te conectamos automaticamnte con la ia de NetGamer.</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">Jugarás automáticamente contra la IA de NetGamer. Apuesta real: si ganas, ganas NC; si pierdes, pierdes NC.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3 bg-slate-900/50 rounded-xl p-3">
@@ -1685,7 +1685,7 @@
                             <div class="flex items-start gap-2.5 bg-amber-500/8 border border-amber-500/20 rounded-xl px-3 py-2.5">
                                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs mt-0.5 shrink-0"></i>
                                 <p class="text-[11px] text-amber-200/80 leading-relaxed">
-                                    <strong class="text-amber-300">Recuerda:</strong> Juegas contra la ia de NetGamer. La ia de netgamer no tiene ninguna ventaja sobre el jugador, esta ia elige acciones inteligentes al azar. Cada apuesta es real — si ganas, los NC se acreditan de inmediato; si pierdes, se descuentan. Juega responsablemente.
+                                    <strong class="text-amber-300">Recuerda:</strong> Juegas contra la IA de NetGamer automáticamente. Cada apuesta es real — si ganas, los NC se acreditan de inmediato; si pierdes, se descuentan. La IA es inteligente y desafiante. Juega responsablemente.
                                 </p>
                             </div>
 
@@ -1778,7 +1778,7 @@
                         <div class="px-4 pt-3 pb-2 space-y-2">
                             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">⚡ Selecciona tu apuesta para jugar</p>
 
-                            <button onclick="buscarPartida('ppt', 500)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-emerald-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                            <button onclick="jugarContraIA('ppt', 500)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-emerald-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-base">🌱</div>
                                     <div class="text-left">
@@ -1791,7 +1791,7 @@
                                 </div>
                             </button>
 
-                            <button onclick="buscarPartida('ppt', 1000)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-blue-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                            <button onclick="jugarContraIA('ppt', 1000)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-blue-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-base">⚡</div>
                                     <div class="text-left">
@@ -1804,7 +1804,7 @@
                                 </div>
                             </button>
 
-                            <button onclick="buscarPartida('ppt', 3000)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-amber-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
+                            <button onclick="jugarContraIA('ppt', 3000)" class="btn-jugar w-full flex items-center justify-between gap-3 bg-slate-800/70 hover:bg-slate-700 border border-slate-600/60 hover:border-amber-500/40 rounded-xl px-4 py-3 transition group active:scale-[.98]">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-base">🔥</div>
                                     <div class="text-left">
@@ -1848,7 +1848,7 @@
                                     <span class="absolute inset-0 rounded-2xl border border-purple-400/30 animate-ping"></span>
                                 </div>
                                 <h3 class="text-lg font-black text-white mb-1">Buscando rival...</h3>
-                                <p class="text-sm text-slate-400 mb-5">Emparejando con otro jugador en tiempo real</p>
+                                <p class="text-sm text-slate-400 mb-5">Conectando con la IA de NetGamer...</p>
                                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 mb-4">
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-[11px] text-slate-400 font-semibold">Tiempo restante</span>
@@ -5393,16 +5393,22 @@
 
 
         let _buscandoPartida = false;
-        async function buscarPartida(juego, apuesta) {
-            if (!currentUser) { mostrarNotificacion('Inicia sesión primero', 'error'); return; }
+        async function jugarContraIA(juego, apuesta) {
+            if (!currentUser) { 
+                mostrarNotificacion('Inicia sesión primero', 'error'); 
+                return; 
+            }
             if (_buscandoPartida) return;
+            
             Sonidos.click();
             cerrarModalSeleccionJuego();
             _buscandoPartida = true;
             document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = true);
+            
+            // Establecer variables
             _apuestaActual = apuesta;
             _juegoActual   = juego;
-            _esPartidaVsBot = false;
+            _esPartidaVsBot = true;  // ← IMPORTANTE: Indicar que es vs bot
             _jugadaHecha   = false;
             _rondaActual   = 1;
             _puntosYo      = 0;
@@ -5410,48 +5416,41 @@
 
             const { data: { session } } = await _supabase.auth.getSession();
             
-            // ✅ CAMBIO: Directamente juega contra IA, SIN buscar otros jugadores en tiempo real
+            // Invocar Edge Function para validar vidas/netcoins y crear partida con IA
             const { data, error } = await _supabase.functions.invoke('jugar-vs-bot', {
                 body: { juego, apuesta },
                 headers: { Authorization: `Bearer ${session?.access_token}` }
             });
 
-            // Extraer el código de error
-            let codigoError = data?.error;
-            if (!codigoError && error) {
-                try {
-                    const errBody = typeof error.context === 'string'
-                        ? JSON.parse(error.context)
-                        : (await error.context?.json?.());
-                    codigoError = errBody?.error;
-                } catch(e) {}
-            }
-
-            if (codigoError || error) {
+            // Manejo de errores
+            if (error || data?.error) {
                 const msgs = {
                     sin_vidas:        '💔 No tienes vidas para seguir jugando. Vuelve mañana o recarga más vidas.',
                     sin_netcoins:     `💰 Balance insuficiente. Necesitas ${apuesta} NC para jugar.`,
                     apuesta_invalida: '⚠️ Apuesta no válida.'
                 };
-                mostrarNotificacion(msgs[codigoError] || '⚠️ Ocurrió un error al iniciar partida. Intenta de nuevo.', 'error');
+                const codigoError = data?.error;
+                mostrarNotificacion(msgs[codigoError] || '⚠️ No se pudo iniciar la partida. Intenta de nuevo.', 'error');
                 if (codigoError === 'sin_vidas') setTimeout(() => abrirRecargarVidas(), 600);
+                
                 _buscandoPartida = false;
                 document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
                 return;
             }
 
-            // Mostrar modal del juego
+            // Éxito: Mostrar modal de juego
             mostrarModalJuego();
 
-            // ✅ Conectar directamente contra IA - sin búsqueda, sin espera
-            _esPartidaVsBot = true;
+            // Establecer datos de partida
             _partidaActual = data.partida_id;
-            _jugadorNum = data.eres_jugador;
-            _nombreRival = '🤖 IA NetGamer';
-            mostrarFaseRivalEncontrado();
-            suscribirsePartida(data.partida_id);
+            _jugadorNum    = data.eres_jugador;
+            _nombreRival   = 'IA NetGamer';  // ← Nombre de la IA
             
-            _buscandoPartida = false;
+            // Mostrar rival encontrado inmediatamente (sin búsqueda)
+            mostrarFaseRivalEncontrado();
+            
+            // Suscribirse a cambios en tiempo real
+            suscribirsePartida(data.partida_id);
         }
 
         async function _cargarNombreRival(partida_id) {
