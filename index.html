@@ -5408,7 +5408,7 @@
             // Establecer variables
             _apuestaActual = apuesta;
             _juegoActual   = juego;
-            _esPartidaVsBot = true;  // ← IMPORTANTE: Indicar que es vs bot
+            _esPartidaVsBot = true;
             _jugadaHecha   = false;
             _rondaActual   = 1;
             _puntosYo      = 0;
@@ -5416,20 +5416,20 @@
 
             const { data: { session } } = await _supabase.auth.getSession();
             
-            // Invocar Edge Function para validar vidas/netcoins y crear partida con IA
-            const { data, error } = await _supabase.functions.invoke('jugar-vs-bot', {
+            // PASO 1: Invocar buscar-partida para validar y restar balance
+            const { data: searchData, error: searchError } = await _supabase.functions.invoke('buscar-partida', {
                 body: { juego, apuesta },
                 headers: { Authorization: `Bearer ${session?.access_token}` }
             });
 
-            // Manejo de errores
-            if (error || data?.error) {
+            // Manejo de errores de validación
+            if (searchError || searchData?.error) {
                 const msgs = {
                     sin_vidas:        '💔 No tienes vidas para seguir jugando. Vuelve mañana o recarga más vidas.',
                     sin_netcoins:     `💰 Balance insuficiente. Necesitas ${apuesta} NC para jugar.`,
                     apuesta_invalida: '⚠️ Apuesta no válida.'
                 };
-                const codigoError = data?.error;
+                const codigoError = searchData?.error;
                 mostrarNotificacion(msgs[codigoError] || '⚠️ No se pudo iniciar la partida. Intenta de nuevo.', 'error');
                 if (codigoError === 'sin_vidas') setTimeout(() => abrirRecargarVidas(), 600);
                 
@@ -5438,15 +5438,30 @@
                 return;
             }
 
-            // Éxito: Mostrar modal de juego
+            // PASO 2: Mostrar modal de juego
             mostrarModalJuego();
+
+            // PASO 3: Invocar jugar-vs-bot para crear partida con IA
+            const { data, error } = await _supabase.functions.invoke('jugar-vs-bot', {
+                body: { juego, apuesta },
+                headers: { Authorization: `Bearer ${session?.access_token}` }
+            });
+
+            // Manejo de errores
+            if (error || data?.error) {
+                mostrarNotificacion('⚠️ No se pudo iniciar la partida. Intenta de nuevo.', 'error');
+                _buscandoPartida = false;
+                document.querySelectorAll('.btn-jugar').forEach(b => b.disabled = false);
+                await cancelarBusqueda();
+                return;
+            }
 
             // Establecer datos de partida
             _partidaActual = data.partida_id;
             _jugadorNum    = data.eres_jugador;
-            _nombreRival   = 'IA NetGamer';  // ← Nombre de la IA
+            _nombreRival   = 'IA NetGamer';
             
-            // Mostrar rival encontrado inmediatamente (sin búsqueda)
+            // Mostrar rival encontrado inmediatamente
             mostrarFaseRivalEncontrado();
             
             // Suscribirse a cambios en tiempo real
@@ -6052,10 +6067,12 @@
                 document.getElementById('resultado-rival-jugada').textContent = rivalEmoji;
             }
 
-            // Refrescar vidas y balance de NetCoins (las NetCoins ya se acreditaron
-            // en el servidor — aquí solo actualizamos lo que se ve en pantalla)
+            // IMPORTANTE: Refrescar vidas y balance de NetCoins
+            // Esperar 500ms para asegurar que el servidor completó la actualización
             cargarVidas();
-            cargarDatosPerfil(currentUser);
+            setTimeout(() => {
+                cargarDatosPerfil(currentUser);
+            }, 500);
         }
 
         // alias legacy por si Realtime llega con estatus terminada directamente en 1 ronda
@@ -6099,6 +6116,12 @@
                 b.disabled = false;
                 b.classList.remove('opacity-40', 'ring-2', 'ring-purple-500', 'bg-purple-500/20');
             });
+            
+            // AGREGAR: Recargar datos después de cerrar
+            setTimeout(() => {
+                cargarVidas();
+                cargarDatosPerfil(currentUser);
+            }, 300);
         }
 
         // Cargar vidas cuando se abre el tab de juegos
