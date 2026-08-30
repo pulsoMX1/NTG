@@ -4696,12 +4696,12 @@
                     
                     mostrarNotificacion(`¡Ganaste ${ncGanadas} NetCoins en la ruleta!`, "success");
 
-                    // Si la Edge Function nos dice cuántos giros quedan (premium puede
-                    // tener más de 1 al día), reflejamos eso en el botón en vez de
-                    // asumir que ya se acabaron los giros de hoy.
-                    const limiteGirosHoy = isPremium ? 5 : 1;
-                    const girosRestantesHoy = (typeof data.girosRestantes === 'number') ? data.girosRestantes : 0;
-                    actualizarBotonRuleta(girosRestantesHoy, limiteGirosHoy);
+                    // ARREGLO: En lugar de confiar en data.girosRestantes (que puede no venir),
+                    // recargar el estado desde la BD después de un pequeño delay
+                    // para asegurar que la Edge Function ya actualizó los datos
+                    setTimeout(() => {
+                        verificarEstadoRuleta();
+                    }, 500);
                 }
             }
             
