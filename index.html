@@ -218,8 +218,8 @@
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
-            overflow-y: auto;
             animation: fadeInMantenimiento 0.6s ease-out;
+            overflow: hidden;
         }
 
         @keyframes fadeInMantenimiento {
@@ -251,8 +251,9 @@
             max-width: 700px;
             width: 100%;
             padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 2vw, 2rem);
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             background: rgba(30, 27, 75, 0.8);
             border: 1px solid rgba(168, 139, 250, 0.3);
             border-radius: 1rem;
@@ -262,6 +263,10 @@
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
             text-align: center;
             animation: slideUpMantenimiento 0.8s ease-out;
+            /* Asegurar que funcione en móviles */
+            -webkit-user-select: text;
+            user-select: text;
+            touch-action: auto;
         }
 
         /* Scrollbar styling para el contenido del modal */
@@ -7660,9 +7665,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </p>
         
         <div class="modal-mantenimiento-footer">
-            Volveremos pronto cuando nuestros sistemas ahigan mejorado <span class="modal-mantenimiento-pulse"></span>
+            Volveremos pronto cuando nuestros sistemas ahigan mejorardo <span class="modal-mantenimiento-pulse"></span>
             <br>
-            <span style="font-size: 0.9em; margin-top: 0.5rem; display: block;">⏱️ Estaremos pendientes en comunicarles nuevas modificaciones que se presenten en esta plataforma</span>
+            <span style="font-size: 0.9em; margin-top: 0.5rem; display: block;">⏱️ Estaremos avisando sobre nuevos cambios que se realicen a la plataforma</span>
         </div>
     </div>
 </div>
@@ -7675,6 +7680,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Hacer que el modal sea completamente no-interactuable
     const modalMantenimiento = document.getElementById('modal-mantenimiento');
+    const modalContenido = document.querySelector('.modal-contenido-mantenimiento');
+    
     if (modalMantenimiento) {
         // Prevenir cualquier clic fuera
         modalMantenimiento.addEventListener('click', (e) => {
@@ -7694,10 +7701,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, true);
         
-        // Prevenir touch gestures
+        // Prevenir touch gestures PERO permitir scroll en el contenido
         modalMantenimiento.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, false);
+            // Solo prevenir si el touch NO está en el contenido del modal (permite scroll interno)
+            if (!modalContenido.contains(e.target) && e.target !== modalContenido) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
 });
 </script>
